@@ -5,7 +5,7 @@
  *
  * @package contentreview
  */
-class SiteTreeCMSWorkflow extends DataObjectDecorator implements PermissionProvider {
+class SiteTreeContentReview extends DataObjectDecorator implements PermissionProvider {
 	
 	function extraStatics() {
 		return array(
