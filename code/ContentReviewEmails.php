@@ -39,7 +39,7 @@ class ContentReviewEmails extends DailyTask {
 						"LiveSiteLink"	=> $page->Link()."?stage=live",
 					));
 
-					return $email->send();
+					$email->send();
 				}
 			}
 		}
