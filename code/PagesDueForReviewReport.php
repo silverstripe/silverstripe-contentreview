@@ -88,7 +88,7 @@ class PagesDueForReviewReport extends SS_Report {
 		
 		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
 			// If there's no review dates set, default to all pages due for review now
-			$wheres[] = 'NextReviewDate < \'' . SSDatetime::now()->URLDate() . '\' + INTERVAL 1 DAY';
+			$wheres[] = 'NextReviewDate < \'' . (class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate()) . '\' + INTERVAL 1 DAY';
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
