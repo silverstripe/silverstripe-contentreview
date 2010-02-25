@@ -21,7 +21,7 @@ class SiteTreeContentReview extends DataObjectDecorator implements PermissionPro
 	}
 	
 	function getOwnerName() {
-		if($this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
+		if($this->owner->OwnerID && $this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
 	}
 	
 	public function updateCMSFields(&$fields) {

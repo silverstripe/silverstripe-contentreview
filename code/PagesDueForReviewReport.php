@@ -92,14 +92,14 @@ class PagesDueForReviewReport extends SS_Report {
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
-				list($day, $month, $year) = explode('/', $_REQUEST['ReviewDateBefore']);
+				list($day, $month, $year) = explode('/', $params['ReviewDateBefore']);
 				$reviewDate = "$year-$month-$day";
 				$wheres[] = 'NextReviewDate < \'' . Convert::raw2sql($reviewDate) . '\' + INTERVAL 1 DAY';
 			}
 			
 			// Review date after
 			if(!empty($params['ReviewDateAfter'])) {
-				list($day, $month, $year) = explode('/', $_REQUEST['ReviewDateAfter']);
+				list($day, $month, $year) = explode('/', $params['ReviewDateAfter']);
 				$reviewDate = "$year-$month-$day";
 				$wheres[] = 'NextReviewDate >= \'' . Convert::raw2sql($reviewDate) . '\'';
 			}
@@ -148,7 +148,7 @@ class PagesDueForReviewReport extends SS_Report {
 		// var_dump($records);
 		if($records) {
 			foreach($records as $record) {
-				$record->LastEditedByName = $record->LastEditedBy()->Title;
+				$record->LastEditedByName = $record->LastEditedBy() ? $record->LastEditedBy()->Title : null;
 			}
 		
 			if($sort && $field != "LastEditedByName") $records->sort($sort);

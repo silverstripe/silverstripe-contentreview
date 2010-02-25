@@ -1,0 +1,48 @@
+Permission:
+    cmsmain1:
+        Code: CMS_ACCESS_CMSMain
+    cmsmain2:
+        Code: CMS_ACCESS_CMSMain
+    setreviewdates:
+        Code: EDIT_CONTENT_REVIEW_FIELDS
+    workflowadmin1:
+        Code: IS_WORKFLOW_ADMIN
+    workflowadmin2:
+        Code: IS_WORKFLOW_ADMIN
+
+Group:
+    editorgroup:
+        Title: Edit existing pages
+        Code: editorgroup
+        Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
+    authorgroup:
+        Title: Author existing pages
+        Code: authorgroup
+        Permissions: =>Permission.cmsmain2,=>Permission.workflowadmin2
+
+    
+Member:
+    author:
+        FirstName: Test
+        Surname: Author
+        Email: author@example.com
+        Groups: =>Group.authorgroup
+    editor:
+        FirstName: Test
+        Surname: Editor
+        Groups: =>Group.editorgroup
+    
+Page:
+    home:
+        Title: Home
+        NextReviewDate: 2010-02-01
+    about:
+        Title: About Us
+        NextReviewDate: 2010-02-07
+    staff:
+        Title: Staff
+        NextReviewDate: 2010-02-14
+        Owner: =>Member.author
+    contact:
+        Title: Contact Us
+        NextReviewDate: 2010-02-21
