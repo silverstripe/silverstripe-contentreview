@@ -14,7 +14,7 @@
 						<h2>Actions</h2>
 						<ul>
 							<li><a href="$PageCMSLink"><% _t('ContentReviewEmails.REVIEWPAGELINK','Review the page in the CMS') %></a></li>
-							<li><a href="$LiveSiteLink"><% _t('ContentReviewEmails.VIEWPUBLISHEDLINK','View this page on your website') %></a></li>
+							<li><a href="$LiveSiteLink"><% _t('ContentReviewEmails.VIEWPUBLISHEDLINK','View this page on the website') %></a></li>
 						</ul>
 					</td>
 				</tr>
