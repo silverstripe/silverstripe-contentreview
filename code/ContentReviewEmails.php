@@ -35,8 +35,8 @@ class ContentReviewEmails extends DailyTask {
 						"Recipient" => $recipient,
 						"Sender" => $sender,
 						"Page" => $page,
-						"StageSiteLink"	=> $page->Link()."?stage=stage",
-						"LiveSiteLink"	=> $page->Link()."?stage=live",
+						"StageSiteLink"	=> Controller::join_links($page->Link(), "?stage=Stage"),
+						"LiveSiteLink"	=> Controller::join_links($page->Link(), "?stage=Live"),
 					));
 
 					$email->send();
