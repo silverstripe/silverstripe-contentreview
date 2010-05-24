@@ -1,4 +1,5 @@
 <?php
+require_once 'Zend/Date.php';
 
 /**
  * Show all pages that need to be reviewed
@@ -88,20 +89,23 @@ class PagesDueForReviewReport extends SS_Report {
 		
 		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
 			// If there's no review dates set, default to all pages due for review now
-			$wheres[] = 'NextReviewDate < \'' . (class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate()) . '\' + INTERVAL 1 DAY';
+			$reviewDate = new Zend_Date(SS_Datetime::now()->getValue());
+			$reviewDate->add(1, Zend_Date::DAY);
+			$wheres[] = sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd'));
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
 				list($day, $month, $year) = explode('/', $params['ReviewDateBefore']);
-				$reviewDate = "$year-$month-$day";
-				$wheres[] = 'NextReviewDate < \'' . Convert::raw2sql($reviewDate) . '\' + INTERVAL 1 DAY';
+				$reviewDate = new Zend_Date("$year-$month-$day");
+				$reviewDate->add(1, Zend_Date::DAY);
+				$wheres[] = sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd'));
 			}
 			
 			// Review date after
 			if(!empty($params['ReviewDateAfter'])) {
 				list($day, $month, $year) = explode('/', $params['ReviewDateAfter']);
-				$reviewDate = "$year-$month-$day";
-				$wheres[] = 'NextReviewDate >= \'' . Convert::raw2sql($reviewDate) . '\'';
+				$reviewDate = new Zend_Date("$year-$month-$day");
+				$wheres[] = sprintf('"NextReviewDate" >= \'%s\'', $reviewDate->toString('YYYY-MM-dd'));
 			}
 		}
 		
@@ -119,7 +123,7 @@ class PagesDueForReviewReport extends SS_Report {
 			$ownerID = (int)$params[$ownerIdParam];
 			// We use -1 here to distinguish between No Owner and Any
 			if($ownerID == -1) $ownerID = 0;
-			$wheres[] = 'OwnerID = ' . $ownerID;
+			$wheres[] = '"OwnerID" = ' . $ownerID;
 		}
 		
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
@@ -134,7 +138,7 @@ class PagesDueForReviewReport extends SS_Report {
 			$direction = $parts[1];
 			
 			if($field == 'AbsoluteLink') {
-				$sort = 'URLSegment ' . $direction;
+				$sort = '"URLSegment" ' . $direction;
 			} elseif($field == 'Subsite.Title') {
 				$query->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
 			}

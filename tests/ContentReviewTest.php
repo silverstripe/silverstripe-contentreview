@@ -67,11 +67,9 @@ class ContentReviewTest extends FunctionalTest {
 			'Contact Us'
 		));
 		
-		SS_Datetime::set_mock_now('2010-02-13 12:00:00');
-		
+		SS_Datetime::set_mock_now('2010-02-13 00:00:00');
 		$results = $report->sourceRecords(array(
 		), 'NextReviewDate ASC', false);
-		
 		$this->assertEquals($results->column('Title'), array(
 			'Home',
 			'About Us'
