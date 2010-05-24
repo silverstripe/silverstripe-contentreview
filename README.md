@@ -6,7 +6,8 @@
 
 ## Requirements
  * SilverStripe 2.4 or newer
-
+ * Database: MySQL, Postgres, SQLite or MSSQL 
+ * PHP 5.2 or newer (because of Zend_Date usage)
 
 ## Installation
 
