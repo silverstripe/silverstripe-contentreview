@@ -6,36 +6,45 @@
  * @package contentreview
  */
 class SiteTreeContentReview extends DataObjectDecorator implements PermissionProvider {
-	
+
 	function extraStatics() {
 		return array(
 			'db' => array(
 				"ReviewPeriodDays" => "Int",
 				"NextReviewDate" => "Date",
-				'ReviewNotes' => 'Text'
+				'ReviewNotes' => 'Text',
+				'LastEditedByName' => 'Varchar(255)',
+				'OwnerNames' => 'Varchar(255)'
 			),
 			'has_one' => array(
-				'Owner' => 'Member'
+				'Owner' => 'Member',
 			),
 		);
 	}
-	
+
 	function getOwnerName() {
 		if($this->owner->OwnerID && $this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
 	}
-	
+
+	function getEditorName() {
+		if( $member = Member::currentUser() ) {
+			 return $member->FirstName .' '. $member->Surname;
+		}
+		return NULL;
+	}
+
 	public function updateCMSFields(&$fields) {
 		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
-			
+
 			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-			
+
 			$fields->addFieldsToTab("Root.Review", array(
 				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
-				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER", 
+				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER",
 					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
 				new CalendarDateField("NextReviewDate", _t("SiteTreeCMSWorkflow.NEXTREVIEWDATE",
 					"Next review date (leave blank for no review)")),
-				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY", 
+				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY",
 					"Review frequency (the review date will be set to this far in the future whenever the page is published.)"), array(
 					0 => "No automatic review date",
 					1 => "1 day",
@@ -52,13 +61,15 @@ class SiteTreeContentReview extends DataObjectDecorator implements PermissionPro
 			));
 		}
 	}
-	
+
 	function onBeforeWrite() {
 		if($this->owner->ReviewPeriodDays && !$this->owner->NextReviewDate) {
 			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
 		}
+		$this->owner->LastEditedByName=$this->owner->getEditorName();
+		$this->owner->OwnerNames = $this->owner->getOwnerName();
 	}
-	
+
 	function providePermissions() {
 		return array(
 			"EDIT_CONTENT_REVIEW_FIELDS" => array(
