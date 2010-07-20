@@ -6,8 +6,9 @@
 
 ## Requirements
  * SilverStripe 2.4 or newer
- * Database: MySQL, Postgres, SQLite or MSSQL 
+ * Database: MySQL, Postgres, SQLite or MSSQL
  * PHP 5.2 or newer (because of Zend_Date usage)
+ * module legacydatetimefields (http://svn.silverstripe.com/open/modules/legacydatetimefields/trunk)
 
 ## Installation
 
@@ -20,5 +21,3 @@ new to have the DailyTask cron job set up. See ScheduledTask.php
 ## Usage
 
 When you open a page in the CMS, there will now be a Review tab.
-
-
