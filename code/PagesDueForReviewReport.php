@@ -110,12 +110,15 @@ class PagesDueForReviewReport extends SS_Report {
 
 		// Show virtual pages?
 		if(empty($params['ShowVirtualPages'])) {
-			$wheres[] = '"SiteTree"."ClassName" != \'VirtualPage\' AND "SiteTree"."ClassName" != \'SubsitesVirtualPage\'';
+			$virtualPageClasses = ClassInfo::subclassesFor('VirtualPage');
+			$wheres[] = sprintf(
+				'"SiteTree"."ClassName" NOT IN (\'%s\')',
+				implode("','", array_values($virtualPageClasses))
+			);
 		}
 
 		// We use different dropdown depending on the subsite
 		$ownerIdParam = 'OwnerID';
-
 
 		// Owner dropdown
 		if(!empty($params[$ownerIdParam])) {
