@@ -86,7 +86,6 @@ class PagesDueForReviewReport extends SS_Report {
 	function sourceRecords($params, $sort, $limit) {
 		$wheres = array();
 
-
 		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
 			// If there's no review dates set, default to all pages due for review now
 			$reviewDate = new Zend_Date(SS_Datetime::now()->getValue());
@@ -128,11 +127,6 @@ class PagesDueForReviewReport extends SS_Report {
 
 		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 
-		//$query->select[] = Member::get_title_sql('Owner').' AS OwnerNames';
-////		$query->select[] = '"Owner"."Surname" AS OwnerLastNames';
-////		$query->select[] = '"Owner"."FirstName" AS OwnerNames';
-////		$query->from[] = 'LEFT JOIN "Member" AS "Owner" ON "SiteTree"."OwnerID" = "Owner"."ID"';
-
 		// Turn a query into records
 		if($sort) {
 			$parts = explode(' ', $sort);
@@ -151,11 +145,8 @@ class PagesDueForReviewReport extends SS_Report {
 		}
 
 		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
-		// var_dump($records);
+
 		if($records) {
-			////////foreach($records as $record) {
-			////////	$record->OwnerNames = $record->OwnerNames .' '. $record->OwnerLastNames;
-			////////}
 
 			if($sort && $field != "LastEditedByName") $records->sort($sort);
 
@@ -165,5 +156,3 @@ class PagesDueForReviewReport extends SS_Report {
 		}
 	}
 }
-
-?>
