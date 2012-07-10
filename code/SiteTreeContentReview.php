@@ -5,22 +5,19 @@
  *
  * @package contentreview
  */
-class SiteTreeContentReview extends DataObjectDecorator implements PermissionProvider {
+class SiteTreeContentReview extends DataExtension implements PermissionProvider {
 
-	function extraStatics() {
-		return array(
-			'db' => array(
-				"ReviewPeriodDays" => "Int",
-				"NextReviewDate" => "Date",
-				'ReviewNotes' => 'Text',
-				'LastEditedByName' => 'Varchar(255)',
-				'OwnerNames' => 'Varchar(255)'
-			),
-			'has_one' => array(
-				'Owner' => 'Member',
-			),
-		);
-	}
+	static $db = array(
+		"ReviewPeriodDays" => "Int",
+		"NextReviewDate" => "Date",
+		'ReviewNotes' => 'Text',
+		'LastEditedByName' => 'Varchar(255)',
+		'OwnerNames' => 'Varchar(255)'
+	);
+
+	static $has_one = array(
+		'Owner' => 'Member',
+	);
 
 	function getOwnerName() {
 		if($this->owner->OwnerID && $this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
@@ -33,7 +30,7 @@ class SiteTreeContentReview extends DataObjectDecorator implements PermissionPro
 		return NULL;
 	}
 
-	public function updateCMSFields(&$fields) {
+	public function updateCMSFields(FieldList $fields) {
 		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
 
 			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
@@ -42,8 +39,10 @@ class SiteTreeContentReview extends DataObjectDecorator implements PermissionPro
 				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
 				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER",
 					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
-				new CalendarDateField("NextReviewDate", _t("SiteTreeCMSWorkflow.NEXTREVIEWDATE",
-					"Next review date (leave blank for no review)")),
+				DateField::create(
+					"NextReviewDate", 
+					_t("SiteTreeCMSWorkflow.NEXTREVIEWDATE", "Next review date (leave blank for no review)")
+				)->setConfig('showcalendar', true),
 				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY",
 					"Review frequency (the review date will be set to this far in the future whenever the page is published.)"), array(
 					0 => "No automatic review date",
