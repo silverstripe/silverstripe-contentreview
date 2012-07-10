@@ -5,22 +5,19 @@
  *
  * @package contentreview
  */
-class SiteTreeContentReview extends DataObjectDecorator implements PermissionProvider {
+class SiteTreeContentReview extends DataExtension implements PermissionProvider {
 
-	function extraStatics() {
-		return array(
-			'db' => array(
-				"ReviewPeriodDays" => "Int",
-				"NextReviewDate" => "Date",
-				'ReviewNotes' => 'Text',
-				'LastEditedByName' => 'Varchar(255)',
-				'OwnerNames' => 'Varchar(255)'
-			),
-			'has_one' => array(
-				'Owner' => 'Member',
-			),
-		);
-	}
+	static $db = array(
+		"ReviewPeriodDays" => "Int",
+		"NextReviewDate" => "Date",
+		'ReviewNotes' => 'Text',
+		'LastEditedByName' => 'Varchar(255)',
+		'OwnerNames' => 'Varchar(255)'
+	);
+
+	static $has_one = array(
+		'Owner' => 'Member',
+	);
 
 	function getOwnerName() {
 		if($this->owner->OwnerID && $this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
@@ -33,7 +30,7 @@ class SiteTreeContentReview extends DataObjectDecorator implements PermissionPro
 		return NULL;
 	}
 
-	public function updateCMSFields(&$fields) {
+	public function updateCMSFields(FieldList $fields) {
 		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
 
 			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
