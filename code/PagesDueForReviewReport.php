@@ -50,8 +50,8 @@ class PagesDueForReviewReport extends SS_Report {
 			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
 		}
 
-		$params->push($startDate = new CalendarDateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYYY)'));
-		$params->push($endDate = new CalendarDateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)', date('d/m/Y', strtotime('midnight'))));
+		$params->push($startDate = new DateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYYY)'));
+		$params->push($endDate = new DateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)', date('d/m/Y', strtotime('midnight'))));
 		$endDate->mustBeAfter($startDate->Name());
 		$startDate->mustBeBefore($endDate->Name());
 
