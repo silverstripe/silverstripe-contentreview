@@ -12,12 +12,14 @@ class PagesDueForReviewReport extends SS_Report {
 	}
 
 	function parameterFields() {
-		$params = new FieldSet();
+		$params = new FieldList();
 
 		// We need to be a bit fancier when subsites is enabled
 		if(class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
+
 			// javascript for subsite specific owner dropdown
-			Requirements::javascript('contentreview/javascript/PagesDueForReviewReport.js');
+			Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
+			Requirements::javascript('contentreview/javascript/PagesDueForReview.js');
 
 			// Remember current subsite
 			$existingSubsite = Subsite::currentSubsiteID();
@@ -31,7 +33,7 @@ class PagesDueForReviewReport extends SS_Report {
 
 				$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 				// Key-preserving merge
-				foreach($cmsUsers->toDropdownMap('ID', 'Title') as $k => $v) {
+				foreach($cmsUsers->map('ID', 'Title') as $k => $v) {
 					$map[$k] = $v;
 				}
 			}
@@ -44,16 +46,20 @@ class PagesDueForReviewReport extends SS_Report {
 			Subsite::changeSubsite($existingSubsite);
 		} else {
 			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-			$map = $cmsUsers->map('ID', 'Title', '(no owner)');
+			$map = $cmsUsers->map('ID', 'Title', '(no owner)')->toArray();
 			unset($map['']);
 			$map = array('' => 'Any', '-1' => '(no owner)') + $map;
 			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
 		}
 
-		$params->push($startDate = new DateField('ReviewDateAfter', 'Review date after or on (DD/MM/YYYY)'));
-		$params->push($endDate = new DateField('ReviewDateBefore', 'Review date before or on (DD/MM/YYYY)', date('d/m/Y', strtotime('midnight'))));
-		$endDate->mustBeAfter($startDate->Name());
-		$startDate->mustBeBefore($endDate->Name());
+		$params->push(
+			DateField::create('ReviewDateAfter', 'Review date after or on')
+				->setConfig('showcalendar', true)
+		);
+		$params->push(
+			DateField::create('ReviewDateBefore', 'Review date before or on', date('d/m/Y', strtotime('midnight')))
+				->setConfig('showcalendar', true)	
+		);
 
 		$params->push(new CheckboxField('ShowVirtualPages', 'Show Virtual Pages'));
 
@@ -61,10 +67,11 @@ class PagesDueForReviewReport extends SS_Report {
 	}
 
 	function columns() {
+		$linkBase = singleton('CMSPageEditController')->Link('show') . '/';
 		$fields = array(
 			'Title' => array(
 				'title' => 'Page name',
-				'formatting' => '<a href=\"admin/show/$ID\" title=\"Edit page\">$value</a>'
+				'formatting' => '<a href=\"' . $linkBase . '/$ID\" title=\"Edit page\">$value</a>'
 			),
 			'NextReviewDate' => array(
 				'title' => 'Review Date',
@@ -76,7 +83,15 @@ class PagesDueForReviewReport extends SS_Report {
 			'LastEditedByName' => 'Last edited by',
 			'AbsoluteLink' => array(
 				'title' => 'URL',
-				'formatting' => '$value " . ($AbsoluteLiveLink ? "<a target=\"_blank\" href=\"$AbsoluteLiveLink\">(live)</a>" : "") . " <a target=\"_blank\" href=\"$value?stage=Stage\">(draft)</a>'
+				'formatting' => function($value, $item) {
+					$liveLink = $item->AbsoluteLiveLink;
+					$stageLink = $item->AbsoluteLink();
+					return sprintf('%s <a href="%s">%s</a>',
+						$stageLink,
+						$liveLink ? $liveLink : $stageLink . '?stage=Stage',
+						$liveLink ? '(live)' : '(draft)'
+					);
+				}
 			)
 		);
 
@@ -84,51 +99,48 @@ class PagesDueForReviewReport extends SS_Report {
 	}
 
 	function sourceRecords($params, $sort, $limit) {
+		$records = SiteTree::get();
+
 		$wheres = array();
 
 		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
 			// If there's no review dates set, default to all pages due for review now
-			$reviewDate = new Zend_Date(SS_Datetime::now()->getValue());
+			$reviewDate = new Zend_Date(SS_Datetime::now()->Format('U'));
 			$reviewDate->add(1, Zend_Date::DAY);
-			$wheres[] = sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd'));
+			$records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
-				list($day, $month, $year) = explode('/', $params['ReviewDateBefore']);
-				$reviewDate = new Zend_Date("$year-$month-$day");
+				// TODO Get value from DateField->dataValue() once we have access to form elements here
+				$reviewDate = new Zend_Date($params['ReviewDateBefore'], i18n::get_date_format());
 				$reviewDate->add(1, Zend_Date::DAY);
-				$wheres[] = sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd'));
+				$records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 			}
 
 			// Review date after
 			if(!empty($params['ReviewDateAfter'])) {
-				list($day, $month, $year) = explode('/', $params['ReviewDateAfter']);
-				$reviewDate = new Zend_Date("$year-$month-$day");
-				$wheres[] = sprintf('"NextReviewDate" >= \'%s\'', $reviewDate->toString('YYYY-MM-dd'));
+				// TODO Get value from DateField->dataValue() once we have access to form elements here
+				$reviewDate = new Zend_Date($params['ReviewDateAfter'], i18n::get_date_format());
+				$records->where(sprintf('"NextReviewDate" >= \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 			}
 		}
 
 		// Show virtual pages?
 		if(empty($params['ShowVirtualPages'])) {
 			$virtualPageClasses = ClassInfo::subclassesFor('VirtualPage');
-			$wheres[] = sprintf(
+			$records->where(sprintf(
 				'"SiteTree"."ClassName" NOT IN (\'%s\')',
 				implode("','", array_values($virtualPageClasses))
-			);
+			));
 		}
-
-		// We use different dropdown depending on the subsite
-		$ownerIdParam = 'OwnerID';
 
 		// Owner dropdown
-		if(!empty($params[$ownerIdParam])) {
-			$ownerID = (int)$params[$ownerIdParam];
+		if(!empty($params['OwnerID'])) {
+			$ownerID = (int)$params['OwnerID'];
 			// We use -1 here to distinguish between No Owner and Any
 			if($ownerID == -1) $ownerID = 0;
-			$wheres[] = '"OwnerID" = ' . $ownerID;
+			$records->addFilter(array('OwnerID' => $ownerID));
 		}
-
-		$query = singleton("SiteTree")->extendedSQL(join(' AND ', $wheres));
 
 		// Turn a query into records
 		if($sort) {
@@ -139,23 +151,16 @@ class PagesDueForReviewReport extends SS_Report {
 			if($field == 'AbsoluteLink') {
 				$sort = '"URLSegment" ' . $direction;
 			} elseif($field == 'Subsite.Title') {
-				$query->from[] = 'LEFT JOIN "Subsite" ON "Subsite"."ID" = "SiteTree"."SubsiteID"';
+				$records->leftJoin("Subsite", '"Subsite"."ID" = "SiteTree"."SubsiteID"');
 			}
 
 			if($field != "LastEditedByName") {
-				$query->orderby = $sort;
+				$records->sort($sort);
 			}
+
+			if($limit) $records->limit($limit['start'], $limit['limit']);
 		}
 
-		$records = singleton('SiteTree')->buildDataObjectSet($query->execute(), 'DataObjectSet', $query);
-
-		if($records) {
-
-			if($sort && $field != "LastEditedByName") $records->sort($sort);
-
-			// Apply limit after that filtering.
-			if($limit) return $records->getRange($limit['start'], $limit['limit']);
-			else return $records;
-		}
+		return $records;
 	}
 }
