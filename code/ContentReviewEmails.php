@@ -31,7 +31,7 @@ class ContentReviewEmails extends DailyTask {
 					$email->setTemplate('ContentReviewEmails');
 					$email->setSubject($subject);
 					$email->populateTemplate(array(
-						"PageCMSLink" => "admin/show/".$page->ID,
+						"PageCMSLink" => "admin/pages/edit/show/".$page->ID,
 						"Recipient" => $recipient,
 						"Sender" => $sender,
 						"Page" => $page,
