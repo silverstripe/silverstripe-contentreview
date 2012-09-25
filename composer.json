@@ -1,0 +1,21 @@
+{
+	"name": "silverstripe-labs/contentreview",
+	"description": "This module lets you provide a date, and an owner to review
+		content at a future date. When you install this module, a 'Review' tab will
+		show up in the CMS where you can set the content owner and review date.",
+	"type": "silverstripe-module",
+	"keywords": ["silverstripe-labs", "contentreview"],
+	"authors": [
+	{
+		"name": "Tom Rix",
+		"email": "tom@silverstripe.com"
+	}
+	],
+	"minimum-stability": "dev",
+	"require":
+	{
+		"php": ">=5.2",
+		"silverstripe/framework": "2.4.*",
+		"silverstripe-labs/legacydatetimefields": "dev-master"
+	}
+}
