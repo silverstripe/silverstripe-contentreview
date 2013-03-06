@@ -158,7 +158,7 @@ class PagesDueForReviewReport extends SS_Report {
 				$records->sort($sort);
 			}
 
-			if($limit) $records->limit($limit['start'], $limit['limit']);
+			if($limit) $records->limit($limit['limit'], $limit['start']);
 		}
 
 		return $records;
