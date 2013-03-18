@@ -42,7 +42,7 @@ Page:
     staff:
         Title: Staff
         NextReviewDate: 2010-02-14
-        Owner: =>Member.author
+        ContentReviewOwner: =>Member.author
     contact:
         Title: Contact Us
         NextReviewDate: 2010-02-21

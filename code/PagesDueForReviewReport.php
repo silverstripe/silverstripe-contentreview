@@ -40,7 +40,7 @@ class PagesDueForReviewReport extends SS_Report {
 
 			$map = $map + array('' => 'Any', '-1' => '(no owner)');
 
-			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
+			$params->push(new DropdownField("ContentReviewOwnerID", 'Page owner', $map));
 
 			// Restore current subsite
 			Subsite::changeSubsite($existingSubsite);
@@ -49,7 +49,7 @@ class PagesDueForReviewReport extends SS_Report {
 			$map = $cmsUsers->map('ID', 'Title', '(no owner)')->toArray();
 			unset($map['']);
 			$map = array('' => 'Any', '-1' => '(no owner)') + $map;
-			$params->push(new DropdownField("OwnerID", 'Page owner', $map));
+			$params->push(new DropdownField("ContentReviewOwnerID", 'Page owner', $map));
 		}
 
 		$params->push(
@@ -135,11 +135,11 @@ class PagesDueForReviewReport extends SS_Report {
 		}
 
 		// Owner dropdown
-		if(!empty($params['OwnerID'])) {
-			$ownerID = (int)$params['OwnerID'];
+		if(!empty($params['ContentReviewOwnerID'])) {
+			$ownerID = (int)$params['ContentReviewOwnerID'];
 			// We use -1 here to distinguish between No Owner and Any
 			if($ownerID == -1) $ownerID = 0;
-			$records->addFilter(array('OwnerID' => $ownerID));
+			$records->addFilter(array('ContentReviewOwnerID' => $ownerID));
 		}
 
 		// Turn a query into records

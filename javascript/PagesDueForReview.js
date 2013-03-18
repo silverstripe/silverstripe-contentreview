@@ -2,7 +2,7 @@
 
 	// Hide all owner dropdowns except the one for the current subsite
 	function showCorrectSubsiteIDDropdown(value) {
-		var domid = 'OwnerID' + value;
+		var domid = 'ContentReviewOwnerID' + value;
 		
 		var ownerIDDropdowns = $('div.subsiteSpecificOwnerID');
 		for(var i = 0; i < ownerIDDropdowns.length; i++) {

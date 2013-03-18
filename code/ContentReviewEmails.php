@@ -15,10 +15,10 @@ class ContentReviewEmails extends DailyTask {
 			Subsite::$disable_subsite_filter = true;
 		}
 		
-		$pages = DataObject::get('Page', "\"SiteTree\".\"NextReviewDate\" = '".(class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate())."' AND \"SiteTree\".\"OwnerID\" != 0");
+		$pages = DataObject::get('Page', "\"SiteTree\".\"NextReviewDate\" = '".(class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate())."' AND \"SiteTree\".\"ContentReviewOwnerID\" != 0");
 		if ($pages && $pages->Count()) {
 			foreach($pages as $page) {
-				$owner = $page->Owner();
+				$owner = $page->ContentReviewOwner();
 				if ($owner) {
 					$sender = Security::findAnAdministrator();
 					$recipient = $owner;

@@ -84,14 +84,14 @@ class ContentReviewTest extends FunctionalTest {
 		
 		$page = new Page();		
 		$page->ReviewPeriodDays = 10;
-		$page->OwnerID = $editor->ID;
+		$page->ContentReviewOwnerID = $editor->ID;
 		$page->write();
 
 		$this->assertTrue($page->doPublish());
 		$this->assertEquals($page->OwnerName, "Test Editor");
 		
 		$page = $this->objFromFixture('Page', 'about');
-		$page->OwnerID = 0;
+		$page->ContentReviewOwnerID = 0;
 		$page->write();
 		
 		$this->assertTrue($page->doPublish());

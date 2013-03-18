@@ -21,3 +21,8 @@ new to have the DailyTask cron job set up. See ScheduledTask.php
 ## Usage
 
 When you open a page in the CMS, there will now be a Review tab.
+
+## Migration
+When migrating from an older version of this module to the current version, 
+you might need to run: /dev/tasks/ContentReviewOwnerMigrationTask
+

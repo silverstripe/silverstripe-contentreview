@@ -16,11 +16,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	);
 
 	static $has_one = array(
-		'Owner' => 'Member',
+		'ContentReviewOwner' => 'Member',
 	);
 
 	function getOwnerName() {
-		if($this->owner->OwnerID && $this->owner->Owner()) return $this->owner->Owner()->FirstName . ' ' . $this->owner->Owner()->Surname;
+		if($this->owner->ContentReviewOwnerID && $this->owner->ContentReviewOwner()) return $this->owner->ContentReviewOwner()->FirstName . ' ' . $this->owner->ContentReviewOwner()->Surname;
 	}
 
 	function getEditorName() {
@@ -37,7 +37,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 
 			$fields->addFieldsToTab("Root.Review", array(
 				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
-				new DropdownField("OwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER",
+				new DropdownField("ContentReviewOwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER",
 					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
 				DateField::create(
 					"NextReviewDate", 
