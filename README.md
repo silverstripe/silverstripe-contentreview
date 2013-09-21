@@ -5,10 +5,9 @@
   <tom (at) silverstripe (dot) com>
 
 ## Requirements
- * SilverStripe 2.4 or newer
+ * SilverStripe 3.0
  * Database: MySQL, Postgres, SQLite or MSSQL
  * PHP 5.2 or newer (because of Zend_Date usage)
- * module legacydatetimefields (http://svn.silverstripe.com/open/modules/legacydatetimefields/trunk)
 
 ## Installation
 
