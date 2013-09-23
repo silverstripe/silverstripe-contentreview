@@ -1,5 +1,5 @@
 {
-  "name": "silverstripe/contentreview",
+	"name": "silverstripe/contentreview",
 	"type": "silverstripe-module",
 	"description": "Flags pages for periodical author review (incl. reporting)",
 	"homepage": "http://silverstripe.org",
@@ -16,9 +16,8 @@
 		}
 	],
 	"require": {
-		"php": ">=5.3.2",
 		"composer/installers": "*",
-		"silverstripe/framework": "3.0.*",
-    "silverstripe/cms": "3.0.*"
+		"silverstripe/framework": "~3.1",
+		"silverstripe/cms": "~3.1"
 	}
 }
