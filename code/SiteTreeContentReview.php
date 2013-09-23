@@ -7,7 +7,7 @@
  */
 class SiteTreeContentReview extends DataExtension implements PermissionProvider {
 
-	static $db = array(
+	private static $db = array(
 		"ReviewPeriodDays" => "Int",
 		"NextReviewDate" => "Date",
 		'ReviewNotes' => 'Text',
@@ -15,7 +15,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		'OwnerNames' => 'Varchar(255)'
 	);
 
-	static $has_one = array(
+	private static $has_one = array(
 		'ContentReviewOwner' => 'Member',
 	);
 
