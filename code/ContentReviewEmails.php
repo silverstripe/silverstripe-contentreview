@@ -6,9 +6,9 @@
  *
  * @package contentreview
  */
-class ContentReviewEmails extends DailyTask {
-	function run($req) { $this->process(); }
-	function process() {
+class ContentReviewEmails extends BuildTask {
+
+	public function run($request) {
 		// Disable subsite filter (if installed)
 		if (ClassInfo::exists('Subsite')) {
 			$oldSubsiteState = Subsite::$disable_subsite_filter;
