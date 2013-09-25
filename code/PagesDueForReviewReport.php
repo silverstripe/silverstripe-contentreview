@@ -107,28 +107,28 @@ class PagesDueForReviewReport extends SS_Report {
 			// If there's no review dates set, default to all pages due for review now
 			$reviewDate = new Zend_Date(SS_Datetime::now()->Format('U'));
 			$reviewDate->add(1, Zend_Date::DAY);
-			$records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
+			$records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
 				// TODO Get value from DateField->dataValue() once we have access to form elements here
 				$reviewDate = new Zend_Date($params['ReviewDateBefore'], i18n::get_date_format());
 				$reviewDate->add(1, Zend_Date::DAY);
-				$records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
+				$records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 			}
 
 			// Review date after
 			if(!empty($params['ReviewDateAfter'])) {
 				// TODO Get value from DateField->dataValue() once we have access to form elements here
 				$reviewDate = new Zend_Date($params['ReviewDateAfter'], i18n::get_date_format());
-				$records->where(sprintf('"NextReviewDate" >= \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
+				$records = $records->where(sprintf('"NextReviewDate" >= \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 			}
 		}
 
 		// Show virtual pages?
 		if(empty($params['ShowVirtualPages'])) {
 			$virtualPageClasses = ClassInfo::subclassesFor('VirtualPage');
-			$records->where(sprintf(
+			$records = $records->where(sprintf(
 				'"SiteTree"."ClassName" NOT IN (\'%s\')',
 				implode("','", array_values($virtualPageClasses))
 			));
@@ -139,7 +139,7 @@ class PagesDueForReviewReport extends SS_Report {
 			$ownerID = (int)$params['ContentReviewOwnerID'];
 			// We use -1 here to distinguish between No Owner and Any
 			if($ownerID == -1) $ownerID = 0;
-			$records->addFilter(array('ContentReviewOwnerID' => $ownerID));
+			$records = $records->filter('ContentReviewOwnerID', $ownerID);
 		}
 
 		// Turn a query into records
@@ -151,14 +151,14 @@ class PagesDueForReviewReport extends SS_Report {
 			if($field == 'AbsoluteLink') {
 				$sort = '"URLSegment" ' . $direction;
 			} elseif($field == 'Subsite.Title') {
-				$records->leftJoin("Subsite", '"Subsite"."ID" = "SiteTree"."SubsiteID"');
+				$records = $records->leftJoin("Subsite", '"Subsite"."ID" = "SiteTree"."SubsiteID"');
 			}
 
 			if($field != "LastEditedByName") {
-				$records->sort($sort);
+				$records = $records->sort($sort);
 			}
 
-			if($limit) $records->limit($limit['limit'], $limit['start']);
+			if($limit) $records = $records->limit($limit['limit'], $limit['start']);
 		}
 
 		return $records;
