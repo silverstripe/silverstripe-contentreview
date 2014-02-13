@@ -8,21 +8,21 @@ class ContentReviewTest extends FunctionalTest {
 	 */
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
-	public function testPermissions() {
-		$editor = $this->objFromFixture('Member', 'editor');
-		$author = $this->objFromFixture('Member', 'author');
-		
-		// Assert the permission code exists
+	public function testPermissionsExists() {
 		$perms = singleton('SiteTreeContentReview')->providePermissions();
 		$this->assertTrue(isset($perms['EDIT_CONTENT_REVIEW_FIELDS']));
-		
-		// Check a user with permission can edit fields
+	}
+	
+	public function testUserWithPermissionCanEdit() {
+		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		$page = new Page();
 		$fields = $page->getCMSFields();
 		$this->assertNotNull($fields->fieldByName('Root.Review'));
-		
-		// Check a user without permission can see tab
+	}
+	
+	public function testUserWithoutPermissionCannotEdit() {
+		$author = $this->objFromFixture('Member', 'author');
 		$this->logInAs($author);
 		$page = new Page();
 		$fields = $page->getCMSFields();
@@ -83,23 +83,23 @@ class ContentReviewTest extends FunctionalTest {
 		SS_Datetime::clear_mock_now();
 	}
 	
-	public function testOwnerName() {
+	public function testOwnerNames() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		
 		$page = new Page();		
 		$page->ReviewPeriodDays = 10;
-		$page->ContentReviewOwnerID = $editor->ID;
+		$page->ContentReviewUsers()->push($editor);
 		$page->write();
 
 		$this->assertTrue($page->doPublish());
-		$this->assertEquals($page->OwnerName, "Test Editor");
+		$this->assertEquals($page->OwnerNames, "Test Editor", 'Test Editor should be the owner');
 		
 		$page = $this->objFromFixture('Page', 'about');
 		$page->ContentReviewOwnerID = 0;
 		$page->write();
 		
 		$this->assertTrue($page->doPublish());
-		$this->assertNull($page->OwnerName);
+		$this->assertEquals('', $page->OwnerNames);
 	}
 }

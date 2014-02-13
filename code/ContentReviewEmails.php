@@ -19,14 +19,23 @@ class ContentReviewEmails extends BuildTask {
 			Subsite::$disable_subsite_filter = true;
 		}
 		
-		$pages = DataObject::get('Page', "\"SiteTree\".\"NextReviewDate\" = '".(class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate())."' AND \"SiteTree\".\"ContentReviewOwnerID\" != 0");
+		$now = class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate();
+		
+		$pages = Page::get('Page')
+			->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
+			->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
+			->where('"SiteTree"."NextReviewDate" <= \''.$now.'\' AND' .' ("OwnerGroups"."ID" IS NOT NULL OR "OwnerUsers"."ID" IS NOT NULL)')
+		;
+		
 		if ($pages && $pages->Count()) {
 			foreach($pages as $page) {
-				$owner = $page->ContentReviewOwner();
-				if ($owner) {
-					$sender = Security::findAnAdministrator();
-					$recipient = $owner;
-
+				$owners = $page->ContentReviewOwners();
+				if(!$owners->count()) {
+					continue;
+				}
+				$sender = Security::findAnAdministrator();
+				
+				foreach($owners as $recipient) { 
 					$subject = sprintf(_t('ContentReviewEmails.SUBJECT', 'Page %s due for content review'), $page->Title);
 
 					$email = new Email();

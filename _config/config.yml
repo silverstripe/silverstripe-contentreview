@@ -1,3 +1,9 @@
 SiteTree:
   extensions:
     - SiteTreeContentReview
+Group:
+  extensions:
+    - ContentReviewOwner
+Member:
+  extensions:
+    - ContentReviewOwner
