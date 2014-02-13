@@ -7,6 +7,10 @@
  */
 class SiteTreeContentReview extends DataExtension implements PermissionProvider {
 
+	/**
+	 *
+	 * @var array
+	 */
 	private static $db = array(
 		"ReviewPeriodDays" => "Int",
 		"NextReviewDate" => "Date",
@@ -15,53 +19,75 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		'OwnerNames' => 'Varchar(255)'
 	);
 
+	/**
+	 *
+	 * @var array
+	 */
 	private static $has_one = array(
 		'ContentReviewOwner' => 'Member',
 	);
 
-	function getOwnerName() {
-		if($this->owner->ContentReviewOwnerID && $this->owner->ContentReviewOwner()) return $this->owner->ContentReviewOwner()->FirstName . ' ' . $this->owner->ContentReviewOwner()->Surname;
+	/**
+	 * 
+	 * @return string
+	 */
+	public function getOwnerName() {
+		if($this->owner->ContentReviewOwnerID && $this->owner->ContentReviewOwner()) {
+			return $this->owner->ContentReviewOwner()->FirstName . ' ' . $this->owner->ContentReviewOwner()->Surname;
+		}
 	}
 
-	function getEditorName() {
+	/**
+	 * 
+	 * @return string
+	 */
+	public function getEditorName() {
 		if( $member = Member::currentUser() ) {
 			 return $member->FirstName .' '. $member->Surname;
 		}
 		return NULL;
 	}
 
+	/**
+	 * 
+	 * @param FieldList $fields
+	 * @return void
+	 */
 	public function updateCMSFields(FieldList $fields) {
 		if(Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
-
-			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-
-			$fields->addFieldsToTab("Root.Review", array(
-				new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
-				new DropdownField("ContentReviewOwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER",
-					"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
-				DateField::create(
-					"NextReviewDate", 
-					_t("SiteTreeCMSWorkflow.NEXTREVIEWDATE", "Next review date (leave blank for no review)")
-				)->setConfig('showcalendar', true)->setConfig('dateformat', 'yyyy-MM-dd')->setConfig('datavalueformat', 'yyyy-MM-dd'),
-				new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY",
-					"Review frequency (the review date will be set to this far in the future whenever the page is published.)"), array(
-					0 => "No automatic review date",
-					1 => "1 day",
-					7 => "1 week",
-					30 => "1 month",
-					60 => "2 months",
-					91 => "3 months",
-					121 => "4 months",
-					152 => "5 months",
-					183 => "6 months",
-					365 => "12 months",
-				)),
-				new TextareaField('ReviewNotes', 'Review Notes')
-			));
+			return;
 		}
+		$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
+
+		$fields->addFieldsToTab("Root.Review", array(
+			new HeaderField(_t('SiteTreeCMSWorkflow.REVIEWHEADER', "Content review"), 2),
+			new DropdownField("ContentReviewOwnerID", _t("SiteTreeCMSWorkflow.PAGEOWNER",
+				"Page owner (will be responsible for reviews)"), $cmsUsers->map('ID', 'Title', '(no owner)')),
+			DateField::create(
+				"NextReviewDate", 
+				_t("SiteTreeCMSWorkflow.NEXTREVIEWDATE", "Next review date (leave blank for no review)")
+			)->setConfig('showcalendar', true)->setConfig('dateformat', 'yyyy-MM-dd')->setConfig('datavalueformat', 'yyyy-MM-dd'),
+			new DropdownField("ReviewPeriodDays", _t("SiteTreeCMSWorkflow.REVIEWFREQUENCY",
+				"Review frequency (the review date will be set to this far in the future whenever the page is published.)"), array(
+				0 => "No automatic review date",
+				1 => "1 day",
+				7 => "1 week",
+				30 => "1 month",
+				60 => "2 months",
+				91 => "3 months",
+				121 => "4 months",
+				152 => "5 months",
+				183 => "6 months",
+				365 => "12 months",
+			)),
+			new TextareaField('ReviewNotes', 'Review Notes')
+		));
 	}
 
-	function onBeforeWrite() {
+	/**
+	 * Set the review data from the review period, if set.
+	 */
+	public function onBeforeWrite() {
 		if($this->owner->ReviewPeriodDays && !$this->owner->NextReviewDate) {
 			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
 		}
@@ -69,7 +95,12 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		$this->owner->OwnerNames = $this->owner->getOwnerName();
 	}
 
-	function providePermissions() {
+	/**
+	 * Provide permissions to the CMS
+	 * 
+	 * @return array
+	 */
+	public function providePermissions() {
 		return array(
 			"EDIT_CONTENT_REVIEW_FIELDS" => array(
 				'name' => "Set content owners and review dates",

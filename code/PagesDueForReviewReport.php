@@ -7,11 +7,20 @@ require_once 'Zend/Date.php';
  * @package contentreview
  */
 class PagesDueForReviewReport extends SS_Report {
-	function title() {
+
+	/**
+	 * 
+	 * @return string
+	 */
+	public function title() {
 		return _t('PagesDueForReviewReport.TITLE', 'Pages due for review');
 	}
 
-	function parameterFields() {
+	/**
+	 * 
+	 * @return \FieldList
+	 */
+	public function parameterFields() {
 		$params = new FieldList();
 
 		// We need to be a bit fancier when subsites is enabled
@@ -66,7 +75,11 @@ class PagesDueForReviewReport extends SS_Report {
 		return $params;
 	}
 
-	function columns() {
+	/**
+	 * 
+	 * @return array
+	 */
+	public function columns() {
 		$linkBase = singleton('CMSPageEditController')->Link('show') . '/';
 		$fields = array(
 			'Title' => array(
@@ -98,10 +111,15 @@ class PagesDueForReviewReport extends SS_Report {
 		return $fields;
 	}
 
-	function sourceRecords($params, $sort, $limit) {
+	/**
+	 * 
+	 * @param array $params
+	 * @param string $sort
+	 * @param array $limit
+	 * @return DataList
+	 */
+	public function sourceRecords($params, $sort, $limit) {
 		$records = SiteTree::get();
-
-		$wheres = array();
 
 		if(empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
 			// If there's no review dates set, default to all pages due for review now

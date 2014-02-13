@@ -8,6 +8,10 @@
  */
 class ContentReviewEmails extends BuildTask {
 
+	/**
+	 * 
+	 * @param SS_HTTPRequest $request
+	 */
 	public function run($request) {
 		// Disable subsite filter (if installed)
 		if (ClassInfo::exists('Subsite')) {
@@ -38,7 +42,6 @@ class ContentReviewEmails extends BuildTask {
 						"StageSiteLink"	=> Controller::join_links($page->Link(), "?stage=Stage"),
 						"LiveSiteLink"	=> Controller::join_links($page->Link(), "?stage=Live"),
 					));
-
 					$email->send();
 				}
 			}

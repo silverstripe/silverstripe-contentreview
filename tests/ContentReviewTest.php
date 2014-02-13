@@ -1,9 +1,14 @@
 <?php
 
 class ContentReviewTest extends FunctionalTest {
-	static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
-	function testPermissions() {
+	/**
+	 *
+	 * @var string
+	 */
+	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
+	
+	public function testPermissions() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$author = $this->objFromFixture('Member', 'author');
 		
@@ -24,7 +29,7 @@ class ContentReviewTest extends FunctionalTest {
 		$this->assertNull($fields->fieldByName('Root.Review'));
 	}
 	
-	function testContentReviewEmails() {
+	public function testContentReviewEmails() {
 		SS_Datetime::set_mock_now('2010-02-14 12:00:00');
 		
 		$task = new ContentReviewEmails();
@@ -35,7 +40,7 @@ class ContentReviewTest extends FunctionalTest {
 		SS_Datetime::clear_mock_now();
 	}
 	
-	function testAutomaticallySettingReviewDate() {
+	public function testAutomaticallySettingReviewDate() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		
@@ -46,7 +51,7 @@ class ContentReviewTest extends FunctionalTest {
 		$this->assertEquals(date('Y-m-d', strtotime('now + 10 days')), $page->NextReviewDate);
 	}
 	
-	function testReportContent() {
+	public function testReportContent() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		$report = new PagesDueForReviewReport();
@@ -78,7 +83,7 @@ class ContentReviewTest extends FunctionalTest {
 		SS_Datetime::clear_mock_now();
 	}
 	
-	function testOwnerName() {
+	public function testOwnerName() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		

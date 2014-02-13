@@ -3,6 +3,11 @@
  * Task which migrates the ContentReview Module's SiteTree->OwnerID column to a new column name
  */
 class ContentReviewOwnerMigrationTask extends BuildTask {
+	
+	/**
+	 * 
+	 * @param SS_HTTPRequest $request
+	 */
 	public function run($request) {
 		$results = DB::query('SHOW columns from "SiteTree" WHERE "field" = \'OwnerID\'');
 		if ($results->numRecords() == 0) {
