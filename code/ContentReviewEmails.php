@@ -52,6 +52,14 @@ class ContentReviewEmails extends BuildTask {
 						"LiveSiteLink"	=> Controller::join_links($page->Link(), "?stage=Live"),
 					));
 					$email->send();
+					
+					$message = '<strong>'._t('ContentReviewEmails.EMAIL_HEADING','Page due for review').'</strong><br/>'.
+						'The page "'.$page->Title.'" is due for review today by you.<br/>
+						<a href="admin/pages/edit/show/'.$page->ID.'">'. _t('ContentReviewEmails.REVIEWPAGELINK','Review the page in the CMS') .'</a> &mdash;
+						<a href="#">'. _t('ContentReviewEmails.VIEWPUBLISHEDLINK','View this page on the website') .'</a>';
+					if(class_exists('Notification')) {
+						Notification::notify($recipient, $message);
+					}
 				}
 			}
 		}

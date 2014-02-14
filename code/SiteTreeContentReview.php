@@ -49,7 +49,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @return string
 	 */
 	public function getEditorName() {
-		if( $member = Member::currentUser() ) {
+		if($member = Member::currentUser()) {
 			 return $member->FirstName .' '. $member->Surname;
 		}
 		return NULL;
@@ -163,14 +163,54 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			)
 		)->setDescription(_t('ContentReview.REVIEWFREQUENCYDESCRIPTION', 'The review date will be set to this far in the future whenever the page is published'));
 		
+		$notesField = TextareaField::create('ReviewNotes', 'Review Notes');
+		
 		$fields->addFieldsToTab("Root.Review", array(
 			new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2),
 			$userField,
 			$groupField,
 			$reviewDate,
 			$reviewFrequency,
-			new TextareaField('ReviewNotes', 'Review Notes')
+			$notesField
 		));
+	}
+	
+	/**
+	 * 
+	 * @param \FieldList $actions
+	 */
+	public function updateCMSActions(\FieldList $actions) {
+		if($this->canBeReviewedBy(Member::currentUser())) {
+			$reviewAction = FormAction::create('reviewed', _t('ContentReview.BUTTONREVIEWED', 'Content reviewed'))
+				->setAttribute('data-icon', 'pencil')
+				->setAttribute('data-text-alternate', _t('ContentReview.BUTTONREVIEWED', 'Content reviewed'));
+			$actions->push($reviewAction);
+		}
+	}
+	
+	/**
+	 * Check if a review is due by a member for this owner
+	 * 
+	 * @param Member $member
+	 * @return boolean
+	 */
+	public function canBeReviewedBy(Member $member) {
+		if(!$this->owner->obj('NextReviewDate')->exists()) {
+			return false;
+		}
+		if($this->owner->obj('NextReviewDate')->InFuture()) {
+			return false;
+		}
+		if($this->DirectGroups()->count() == 0 && $this->DirectUsers()->count() == 0) {
+			return false;
+		}
+		if($member->inGroups($this->DirectGroups())) {
+			return true;
+		}
+		if($this->DirectUsers()->find('ID', $member->ID)) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

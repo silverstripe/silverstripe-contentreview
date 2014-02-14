@@ -46,3 +46,7 @@ Page:
     contact:
         Title: Contact Us
         NextReviewDate: 2010-02-21
+        ContentReviewGroups: =>Group.authorgroup
+    no-review:
+        Title: Page without review date
+        ContentReviewUsers: =>Member.author

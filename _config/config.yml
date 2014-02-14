@@ -7,3 +7,6 @@ Group:
 Member:
   extensions:
     - ContentReviewOwner
+CMSPageEditController:
+  extensions:
+    - ContentReviewCMSPageEditController
