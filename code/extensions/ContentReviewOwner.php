@@ -3,6 +3,7 @@
 /**
  * Description of GroupContentReview
  *
+ * @codeCoverageIgnore
  */
 class ContentReviewOwner extends DataExtension {
 	

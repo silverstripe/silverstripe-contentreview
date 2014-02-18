@@ -29,11 +29,13 @@ class ContentReviewCMSPageEditController extends LeftAndMainExtension {
 		}
 		$SQL_id = Convert::raw2sql($data['ID']);
 		$record = SiteTree::get()->byID($SQL_id);
-		if($record && !$record->canEdit()) {
-			return Security::permissionFailure($this);
-		}
+		
 		if(!$record || !$record->ID) {
 			throw new SS_HTTPResponse_Exception("Bad record ID #$SQL_id", 404);
+		}
+		
+		if(!$record->canEdit()) {
+			return Security::permissionFailure($this->owner);
 		}
 			
 		$fields = new FieldList();

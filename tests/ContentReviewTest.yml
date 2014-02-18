@@ -31,6 +31,10 @@ Member:
         FirstName: Test
         Surname: Editor
         Groups: =>Group.editorgroup
+    visitor:
+        FirstName: Kari
+        Surname: Visitor
+        Email: visitor@example.com
     
 Page:
     home:
