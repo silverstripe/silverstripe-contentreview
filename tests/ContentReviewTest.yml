@@ -50,3 +50,6 @@ Page:
     no-review:
         Title: Page without review date
         ContentReviewUsers: =>Member.author
+    group-owned:
+        Title: Page owned by group
+        ContentReviewGroups: =>Group.authorgroup

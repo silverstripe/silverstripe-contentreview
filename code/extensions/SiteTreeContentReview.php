@@ -14,9 +14,16 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	private static $db = array(
 		"ReviewPeriodDays" => "Int",
 		"NextReviewDate" => "Date",
-		'ReviewNotes' => 'Text',
 		'LastEditedByName' => 'Varchar(255)',
 		'OwnerNames' => 'Varchar(255)'
+	);
+	
+	/**
+	 *
+	 * @var array
+	 */
+	private static $has_many = array(
+		'ReviewLogs' => 'ContentReviewLog' 
 	);
 
 	/**
@@ -34,11 +41,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 */
 	public function getOwnerNames() {
 		$names = array();
-		foreach($this->DirectGroups() as $group) {
+		foreach($this->OwnerGroups() as $group) {
 			$names[] = $group->Title;
 		}
 		
-		foreach($this->DirectUsers() as $group) {
+		foreach($this->OwnerUsers() as $group) {
 			$names[] = $group->getName();
 		}
 		return implode(', ', $names);
@@ -63,11 +70,9 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @return \ArrayList
 	 */
 	public function ContentReviewOwners() {
-		
 		$contentReviewOwners = new ArrayList();
-		
-		$toplevelGroups = $this->DirectGroups();
-		if($toplevelGroups) {
+		$toplevelGroups = $this->OwnerGroups();
+		if($toplevelGroups->count()) {
 			$groupIDs = array();
 			foreach($toplevelGroups as $group) {
 				$familyIDs = $group->collateFamilyIDs();
@@ -75,15 +80,15 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 					$groupIDs = array_merge($groupIDs, array_values($familyIDs));
 				}
 			}
+			array_unique($groupIDs);
 			if(count($groupIDs)) {
 				$groupMembers = DataObject::get('Member')->where("\"Group\".\"ID\" IN (" . implode(",",$groupIDs) . ")")
 				->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
 				->leftJoin("Group", "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
 				$contentReviewOwners->merge($groupMembers);
 			}
-			
 		}
-		$contentReviewOwners->merge($this->DirectUsers());
+		$contentReviewOwners->merge($this->OwnerUsers());
 		$contentReviewOwners->removeDuplicates();
 		return $contentReviewOwners;
 	}
@@ -91,14 +96,14 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	/**
 	 * @return ManyManyList
 	 */
-	public function DirectGroups() {
+	public function OwnerGroups() {
 		return $this->owner->getManyManyComponents('ContentReviewGroups');
 	}
 	
 	/**
 	 * @return ManyManyList
 	 */
-	public function DirectUsers() {
+	public function OwnerUsers() {
 		return $this->owner->getManyManyComponents('ContentReviewUsers');
 	}
 
@@ -120,7 +125,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		}
 		asort($usersMap);
 		
-		$userField = ListboxField::create('DirectUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"))
+		$userField = ListboxField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"))
 			->setMultiple(true)
 			->setSource($usersMap)
 			->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
@@ -132,7 +137,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			$groupsMap[$group->ID] = $group->getBreadcrumbs(' > ');
 		}
 		asort($groupsMap);
-		$groupField = ListboxField::create('DirectGroups', _t("ContentReview.PAGEOWNERGROUPS", "Groups"))
+		$groupField = ListboxField::create('OwnerGroups', _t("ContentReview.PAGEOWNERGROUPS", "Groups"))
 			->setMultiple(true)
 			->setSource($groupsMap)
 			->setAttribute('data-placeholder', _t('ContentReview.ADDGROUP', 'Add groups'))
@@ -163,7 +168,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			)
 		)->setDescription(_t('ContentReview.REVIEWFREQUENCYDESCRIPTION', 'The review date will be set to this far in the future whenever the page is published'));
 		
-		$notesField = TextareaField::create('ReviewNotes', 'Review Notes');
+		$notesField = GridField::create('ReviewNotes', 'Review Notes', $this->owner->ReviewLogs());
 		
 		$fields->addFieldsToTab("Root.Review", array(
 			new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2),
@@ -173,6 +178,37 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			$reviewFrequency,
 			$notesField
 		));
+	}
+	
+	/**
+	 * Creates a ContentReviewLog and connects it to this Page
+	 * 
+	 * @param Member $reviewer
+	 * @param string $message
+	 */
+	public function addReviewNote(Member $reviewer, $message) {
+		$reviewLog = ContentReviewLog::create();
+		$reviewLog->Note = $message;
+		$reviewLog->MemberID = $reviewer->ID;
+		$this->owner->ReviewLogs()->add($reviewLog);
+	}
+	
+	/**
+	 * Advance review date to the next date based on review period or set it to null
+	 * if there is no schedule
+	 * 
+	 * @return bool - returns true if date was set and false is content review is 'off'
+	 */
+	public function advanceReviewDate() {
+		$hasNextReview = true;
+		if($this->owner->ReviewPeriodDays) {
+			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
+		} else {
+			$hasNextReview = false;
+			$this->owner->NextReviewDate = null;
+		}
+		$this->owner->write();
+		return $hasNextReview;
 	}
 	
 	/**
@@ -201,13 +237,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		if($this->owner->obj('NextReviewDate')->InFuture()) {
 			return false;
 		}
-		if($this->DirectGroups()->count() == 0 && $this->DirectUsers()->count() == 0) {
+		if($this->OwnerGroups()->count() == 0 && $this->OwnerUsers()->count() == 0) {
 			return false;
 		}
-		if($member->inGroups($this->DirectGroups())) {
+		if($member->inGroups($this->OwnerGroups())) {
 			return true;
 		}
-		if($this->DirectUsers()->find('ID', $member->ID)) {
+		if($this->OwnerUsers()->find('ID', $member->ID)) {
 			return true;
 		}
 		return false;
@@ -217,9 +253,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * Set the review data from the review period, if set.
 	 */
 	public function onBeforeWrite() {
-		if($this->owner->ReviewPeriodDays && !$this->owner->NextReviewDate) {
-			$this->owner->NextReviewDate = date('Y-m-d', strtotime('+' . $this->owner->ReviewPeriodDays . ' days'));
-		}
 		$this->owner->LastEditedByName=$this->owner->getEditorName();
 		$this->owner->OwnerNames = $this->owner->getOwnerNames();
 	}

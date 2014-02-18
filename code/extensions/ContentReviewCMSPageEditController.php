@@ -66,16 +66,17 @@ class ContentReviewCMSPageEditController extends LeftAndMainExtension {
 			throw new SS_HTTPResponse_Exception("No record ID", 404);
 		}
 		$SQL_id = Convert::raw2sql($data['ID']);
-		$record = SiteTree::get()->byID($SQL_id);
-		if($record && !$record->canEdit()) {
+		$page = SiteTree::get()->byID($SQL_id);
+		if($page && !$page->canEdit()) {
 			return Security::permissionFailure($this);
 		}
-		if(!$record || !$record->ID) {
+		if(!$page || !$page->ID) {
 			throw new SS_HTTPResponse_Exception("Bad record ID #$SQL_id", 404);
 		}
 		
-		$record->ReviewNotes = $data['ReviewNotes'];
-		$record->write();
-		return $this->owner->redirect($this->owner->Link('show/'.$SQL_id));
+		$page->addReviewNote(Member::currentUser(), $data['ReviewNotes']);
+		$page->advanceReviewDate();
+		
+		return $this->owner->redirect($this->owner->Link('show/'.$page->ID));
 	}
 }
