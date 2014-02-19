@@ -15,11 +15,9 @@ There are two types of roles with this module.
 
 ## Features
 
- * Content owner will receive a notification when a pages review date is due with links to the page and the 
-   CMS edit form 
+ * Content owner will receive a notification when a pages review date is due with links to the page and the CMS edit form 
  * Content owners can mark a page as 'reviewed' via the CMS Page edit view.
- * Website Responsible can assign a content owner (members or groups) to a page (and optionally all sub-pages) 
-   and a schedule of how often the content should be reviewed.
+ * Website Responsible can assign a content owner (members or groups) to a page (and optionally all sub-pages) and a schedule of how often the content should be reviewed.
  * Website Responsible can see a “pages due for review” report
  * Website Responsible can see a “pages without content owner” report
  * Website Responsible can set a default Content Owner and schedule for all pages without a review schedule.
@@ -55,8 +53,8 @@ new to have the DailyTask cron job set up. See ScheduledTask.php
 
 ## Usage
 
-To set up a content review schedule you need the permission to set it up. It can be set up by and administrator
-in the Security Admin under the 'Content Permission' for a group.
+To set up a content review schedule the Website responsible needs the permission first. It can be 
+set up by and administrator in the Security Admin under the 'Content Permission' for a group.
 
 ![](docs/en/images/content-review-permission.png)
 
