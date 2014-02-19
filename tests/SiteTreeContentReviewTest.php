@@ -13,16 +13,16 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		$page = new Page();
-		$fields = $page->getCMSFields();
-		$this->assertNotNull($fields->fieldByName('Root.Review'));
+		$fields = $page->getSettingsFields();
+		$this->assertNotNull($fields->dataFieldByName('NextReviewDate'));
 	}
 	
 	public function testUserWithoutPermissionCannotEdit() {
 		$author = $this->objFromFixture('Member', 'author');
 		$this->logInAs($author);
 		$page = new Page();
-		$fields = $page->getCMSFields();
-		$this->assertNull($fields->fieldByName('Root.Review'));
+		$fields = $page->getSettingsFields();
+		$this->assertNull($fields->dataFieldByName('NextReviewDate'));
 	}
 	
 	public function testAutomaticallyToNotSetReviewDate() {
