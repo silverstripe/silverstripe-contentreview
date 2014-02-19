@@ -5,7 +5,7 @@
  * SiteTreeContentReview::updateCMSActions()
  * 
  */
-class ContentReviewCMSPageEditController extends LeftAndMainExtension {
+class ContentReviewCMSExtension extends LeftAndMainExtension {
 	
 	/**
 	 *

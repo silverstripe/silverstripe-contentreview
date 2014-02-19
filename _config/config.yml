@@ -9,4 +9,4 @@ Member:
     - ContentReviewOwner
 CMSPageEditController:
   extensions:
-    - ContentReviewCMSPageEditController
+    - ContentReviewCMSExtension

@@ -36,13 +36,30 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	);
 	
 	/**
+	 *
+	 * @var array
+	 */
+	private $daysToString = array(
+		0 => "No automatic review date",
+		1 => "1 day",
+		7 => "1 week",
+		30 => "1 month",
+		60 => "2 months",
+		91 => "3 months",
+		121 => "4 months",
+		152 => "5 months",
+		183 => "6 months",
+		365 => "12 months",
+	);
+	
+	/**
 	 * 
 	 * @return string
 	 */
 	public function getOwnerNames() {
 		$names = array();
 		foreach($this->OwnerGroups() as $group) {
-			$names[] = $group->Title;
+			$names[] = $group->getBreadcrumbs(' > ');
 		}
 		
 		foreach($this->OwnerUsers() as $group) {
@@ -112,22 +129,46 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @param FieldList $fields
 	 * @return void
 	 */
-	public function updateCMSFields(FieldList $fields) {
+	public function updateSettingsFields(FieldList $fields) {
+		$crFields = new FieldList();
+		
+		// Display read-only version only
 		if(!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
+			
+			$contentOwners = ReadonlyField::create('ROContentOwners', _t('ContentReview.CONTENTOWNERS', 'Content Owners'), $this->getOwnerNames());
+			$nextReviewAt = DateField::create('RONextReviewDate', _t("ContentReview.NEXTREVIEWDATE", "Next review date"), $this->owner->NextReviewDate);
+			if(!isset($this->daysToString[$this->owner->ReviewPeriodDays])) {
+				$reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $this->daysToString[0]);
+			} else {
+				$reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $this->daysToString[$this->owner->ReviewPeriodDays]);
+			}
+			
+			$logConfig = GridFieldConfig::create()
+				->addComponent(new GridFieldSortableHeader())
+				->addComponent($logColumns = new GridFieldDataColumns());
+			// Cast the value to the users prefered date format
+			$logColumns->setFieldCasting(array(
+				'Created' => 'DateTimeField->value'
+			));
+			$logs = GridField::create('ROReviewNotes', 'Review Notes', $this->owner->ReviewLogs(), $logConfig);
+			
+			$fields->addFieldsToTab("Root.ContentReview", array(
+				$contentOwners,
+				$nextReviewAt->performReadonlyTransformation(),
+				$reviewFreq,
+				$logs
+			));
+			// Done!
 			return;
 		}
+		
 		$users = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 		
-		$usersMap = array();
-		foreach($users as $user) {
-			// Listboxfield values are escaped, use ASCII char instead of &raquo;
-			$usersMap[$user->ID] = $user->getTitle();
-		}
+		$usersMap = $users->map('ID', 'Title')->toArray();
 		asort($usersMap);
 		
-		$userField = ListboxField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"))
+		$userField = ListboxField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"), $usersMap)
 			->setMultiple(true)
-			->setSource($usersMap)
 			->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
 			->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
@@ -137,47 +178,31 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			$groupsMap[$group->ID] = $group->getBreadcrumbs(' > ');
 		}
 		asort($groupsMap);
-		$groupField = ListboxField::create('OwnerGroups', _t("ContentReview.PAGEOWNERGROUPS", "Groups"))
+		
+		$groupField = ListboxField::create('OwnerGroups', _t("ContentReview.PAGEOWNERGROUPS", "Groups"), $groupsMap)
 			->setMultiple(true)
-			->setSource($groupsMap)
 			->setAttribute('data-placeholder', _t('ContentReview.ADDGROUP', 'Add groups'))
 			->setDescription(_t('ContentReview.OWNERGROUPSDESCRIPTION', 'Page owners that are responsible for reviews'));
 		
-		$reviewDate = DateField::create(
-			"NextReviewDate",
-			_t("ContentReview.NEXTREVIEWDATE", "Next review date")
-		)->setConfig('showcalendar', true)
+		$reviewDate = DateField::create("NextReviewDate", _t("ContentReview.NEXTREVIEWDATE", "Next review date"))
+			->setConfig('showcalendar', true)
 			->setConfig('dateformat', 'yyyy-MM-dd')
 			->setConfig('datavalueformat', 'yyyy-MM-dd')
 			->setDescription(_t('ContentReview.NEXTREVIEWDATADESCRIPTION', 'Leave blank for no review'));
 		
-		$reviewFrequency = DropdownField::create(
-			"ReviewPeriodDays",
-			_t("ContentReview.REVIEWFREQUENCY", "Review frequency"),
-			array(
-				0 => "No automatic review date",
-				1 => "1 day",
-				7 => "1 week",
-				30 => "1 month",
-				60 => "2 months",
-				91 => "3 months",
-				121 => "4 months",
-				152 => "5 months",
-				183 => "6 months",
-				365 => "12 months",
-			)
-		)->setDescription(_t('ContentReview.REVIEWFREQUENCYDESCRIPTION', 'The review date will be set to this far in the future whenever the page is published'));
+		$reviewFrequency = DropdownField::create("ReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $this->daysToString)
+			->setDescription(_t('ContentReview.REVIEWFREQUENCYDESCRIPTION', 'The review date will be set to this far in the future whenever the page is published'));
 		
-		$notesField = GridField::create('ReviewNotes', 'Review Notes', $this->owner->ReviewLogs());
+		$notesField = GridField::create('ReviewNotes', 'Review Notes', $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
 		
-		$fields->addFieldsToTab("Root.Review", array(
-			new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2),
-			$userField,
-			$groupField,
-			$reviewDate,
-			$reviewFrequency,
-			$notesField
-		));
+		$crFields->add(new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2));
+		$crFields->add($userField);
+		$crFields->add($groupField);
+		$crFields->add($reviewDate);
+		$crFields->add($reviewFrequency);
+		$crFields->add($notesField);
+		
+		$fields->addFieldsToTab("Root.ContentReview", $crFields);
 	}
 	
 	/**
@@ -189,7 +214,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	public function addReviewNote(Member $reviewer, $message) {
 		$reviewLog = ContentReviewLog::create();
 		$reviewLog->Note = $message;
-		$reviewLog->MemberID = $reviewer->ID;
+		$reviewLog->ReviewerID = $reviewer->ID;
 		$this->owner->ReviewLogs()->add($reviewLog);
 	}
 	
