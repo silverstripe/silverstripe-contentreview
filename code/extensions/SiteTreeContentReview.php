@@ -12,6 +12,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @var array
 	 */
 	private static $db = array(
+		"ContentReviewType" => "Enum('Inherit, Disabled, Custom', 'Inherit')",
 		"ReviewPeriodDays" => "Int",
 		"NextReviewDate" => "Date",
 		'LastEditedByName' => 'Varchar(255)',
@@ -39,7 +40,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 *
 	 * @var array
 	 */
-	private $daysToString = array(
+	private static $schedule = array(
 		0 => "No automatic review date",
 		1 => "1 day",
 		7 => "1 week",
@@ -111,6 +112,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	}
 	
 	/**
+	 * @return array
+	 */
+	public static function get_schedule() {
+		return self::$schedule;
+	}
+	
+	/**
 	 * @return ManyManyList
 	 */
 	public function OwnerGroups() {
@@ -130,17 +138,19 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @return void
 	 */
 	public function updateSettingsFields(FieldList $fields) {
+		
+		Requirements::javascript('contentreview/javascript/contentreview.js');
 		$crFields = new FieldList();
 		
 		// Display read-only version only
 		if(!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
-			
+			$schedule = self::get_schedule();
 			$contentOwners = ReadonlyField::create('ROContentOwners', _t('ContentReview.CONTENTOWNERS', 'Content Owners'), $this->getOwnerNames());
 			$nextReviewAt = DateField::create('RONextReviewDate', _t("ContentReview.NEXTREVIEWDATE", "Next review date"), $this->owner->NextReviewDate);
-			if(!isset($this->daysToString[$this->owner->ReviewPeriodDays])) {
-				$reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $this->daysToString[0]);
+			if(!isset($schedule[$this->owner->ReviewPeriodDays])) {
+				$reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $schedule[0]);
 			} else {
-				$reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $this->daysToString[$this->owner->ReviewPeriodDays]);
+				$reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $schedule[$this->owner->ReviewPeriodDays]);
 			}
 			
 			$logConfig = GridFieldConfig::create()
@@ -161,6 +171,17 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			// Done!
 			return;
 		}
+		
+		$options = array();
+		$options["Disabled"] = _t('ContentReview.DISABLE', "Disable content review");
+		$options["Inherit"] = _t('ContentReview.INHERIT', "Inherit from parent page");
+		$options["Custom"] = _t('ContentReview.CUSTOM', "Custom settings");
+		$viewersOptionsField = OptionsetField::create("ContentReviewType", _t('ContentReview.OPTIONS', "Options"), $options);
+		
+		//$viewersOptionsField->setValue($this->owner->ContentReviewType);
+		
+		#var_dump($this->owner->ContentReviewType);
+		#die();
 		
 		$users = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 		
@@ -190,19 +211,22 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			->setConfig('datavalueformat', 'yyyy-MM-dd')
 			->setDescription(_t('ContentReview.NEXTREVIEWDATADESCRIPTION', 'Leave blank for no review'));
 		
-		$reviewFrequency = DropdownField::create("ReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $this->daysToString)
+		$reviewFrequency = DropdownField::create("ReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), self::get_schedule())
 			->setDescription(_t('ContentReview.REVIEWFREQUENCYDESCRIPTION', 'The review date will be set to this far in the future whenever the page is published'));
 		
 		$notesField = GridField::create('ReviewNotes', 'Review Notes', $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
 		
-		$crFields->add(new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2));
-		$crFields->add($userField);
-		$crFields->add($groupField);
-		$crFields->add($reviewDate);
-		$crFields->add($reviewFrequency);
-		$crFields->add($notesField);
-		
-		$fields->addFieldsToTab("Root.ContentReview", $crFields);
+		$fields->addFieldsToTab("Root.ContentReview", array(
+			new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2),
+			$viewersOptionsField,
+			CompositeField::create(
+				$userField,
+				$groupField,
+				$reviewDate,
+				$reviewFrequency
+			)->addExtraClass('contentReviewSettings'),
+			$notesField
+		));
 	}
 	
 	/**
