@@ -28,31 +28,32 @@ class ContentReviewEmails extends BuildTask {
 			Subsite::$disable_subsite_filter = true;
 		}
 		
+		$overduePages = array();
+		
 		$now = class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate();
 		
 		// First grab all the pages with a custom setting
-		$pages = Page::get('Page')
+		$customSettingsPages = Page::get('Page')
 			->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
 			->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
-			->where('"SiteTree"."ContentReviewType" != \'Custom\' AND "SiteTree"."NextReviewDate" <= \''.$now.'\' AND' .
+			->where('"SiteTree"."ContentReviewType" = \'Custom\' AND "SiteTree"."NextReviewDate" <= \''.$now.'\' AND' .
 					' ("OwnerGroups"."ID" IS NOT NULL OR "OwnerUsers"."ID" IS NOT NULL)')
 		;
 		
-		$this->notify($pages);
+		$this->getOverduePagesForOwners($customSettingsPages, $overduePages);
 		
 		// Then grab all the pages with that inherits their settings
-		
-		$pages = Page::get('Page')
+		$inheritedSettingsPages = Page::get('Page')
 			->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
 			->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
 			->where('"SiteTree"."ContentReviewType" = \'Inherit\'')
 		;
 		
-		$overduePages = $this->findInheritedSettings($pages);
+		$this->getOverduePagesForOwners($inheritedSettingsPages, $overduePages);
 		
 		// Lets send one email to one owner with all the pages in there instead of no of pages of emails
 		foreach($overduePages as $memberID => $pages) {
-			$this->notify_user($memberID, $pages);
+			$this->notifyOwner($memberID, $pages);
 		}
 		
 		// Revert subsite filter (if installed)
@@ -64,33 +65,17 @@ class ContentReviewEmails extends BuildTask {
 	/**
 	 * 
 	 * @param SS_list $pages
+	 * @param array &$pages
 	 * @return type
 	 */
-	protected function findInheritedSettings(SS_list $pages) {
-		$overduePages = array();
-		
+	protected function getOverduePagesForOwners(SS_list $pages, array &$overduePages) {
 		foreach($pages as $page) {
-			
-			$settings = $this->findContentSettingFor($page);
-			// This page has a parent with the 'Disabled' option
-			if(!$settings) {
+			if(!$page->isContentReviewOverdue($page)) {
 				continue;
 			}
 			
-			$owners = $settings->ContentReviewOwners();
-			if(!$owners->count()) {
-				continue;
-			}
-			if(!$settings->ReviewPeriodDays) {
-				continue;
-			}
-			// Calculate next time this page should be reviewed from the LastEdited datea
-			$nextReviewUnixSec = strtotime($page->LastEdited . ' + '.$settings->ReviewPeriodDays . ' days');
-			if($nextReviewUnixSec > time()) {
-				continue;
-			}
-			
-			foreach($owners as $owner) {
+			$settings = $page->getContentReviewSetting($page);
+			foreach($settings->ContentReviewOwners() as $owner) {
 				if(!isset(self::$member_cache[$owner->ID])) {
 					self::$member_cache[$owner->ID] = $owner;
 				}
@@ -105,34 +90,12 @@ class ContentReviewEmails extends BuildTask {
 	
 	/**
 	 * 
-	 * @param SiteTree $page
-	 * @return DataObject or false if no settings found
-	 */
-	protected function findContentSettingFor($page) {
-		while($parent = $page->Parent()) {
-			// Root page, use siteconfig
-			if(!$parent->exists()) {
-				return SiteConfig::current_site_config();
-			}
-			if($parent->ContentReviewType == 'Custom') {
-				return $parent;
-			}
-			if($parent->ContentReviewType == 'Disabled') {
-				return false;
-			}
-			$page = $parent;
-		}
-		throw new Exception('This shouldnt really happen, as usual.');
-	}
-	
-	/**
-	 * 
 	 * @param int $owner
 	 * @param array $pages
 	 */
-	protected function notify_user($ownerID, array $pages) {
+	protected function notifyOwner($ownerID, array $pages) {
 		$owner = self::$member_cache[$ownerID];
-		echo $owner->Email.PHP_EOL;
+		echo "----- ".$owner->Email." -----".PHP_EOL;
 			foreach($pages as $page) {
 				echo $page->Title.PHP_EOL;
 			}
