@@ -39,21 +39,31 @@ Member:
 Page:
     home:
         Title: Home
+        ContentReviewType: Custom
         NextReviewDate: 2010-02-01
+        ReviewPeriodDays: 10
     about:
         Title: About Us
+        ContentReviewType: Custom
         NextReviewDate: 2010-02-07
+        ReviewPeriodDays: 10
     staff:
         Title: Staff
+        ContentReviewType: Custom
         NextReviewDate: 2010-02-14
+        ReviewPeriodDays: 10
         ContentReviewUsers: =>Member.author
     contact:
         Title: Contact Us
+        ContentReviewType: Custom
+        ReviewPeriodDays: 10
         NextReviewDate: 2010-02-21
         ContentReviewGroups: =>Group.authorgroup
     no-review:
         Title: Page without review date
+        ContentReviewType: Custom
         ContentReviewUsers: =>Member.author
     group-owned:
         Title: Page owned by group
+        ContentReviewType: Custom
         ContentReviewGroups: =>Group.authorgroup

@@ -105,7 +105,7 @@ class PagesDueForReviewReport extends SS_Report {
 						if(!$setting) {
 							return 'disabled';
 						}
-						return $item->getNextReviewDatePlease($setting, $item)->Full();
+						return $item->get_next_review_date($setting, $item)->Full();
 					}
 					return $value;
 				}

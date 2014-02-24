@@ -51,18 +51,22 @@ Page:
         NextReviewDate: 2010-02-01
         ContentReviewUsers: =>Member.editor
         ReviewPeriodDays: 10
+        ParentID: 0
     disabled:
-        Title: Disabled
+        Title: disabled
         ContentReviewType: Disabled
+        ParentID: 0
     inherit:
         Title: inherit
         ContentReviewType: Inherit
+        ParentID: 0
     page-1:
-        Title: About Us
+        Title: page 1
         ContentReviewType: Custom
-        NextReviewDate: 2010-02-07
         ReviewPeriodDays: 5
+        NextReviewDate: 2010-02-01
+        ParentID: 0
     page-1-1:
-        Title: Staff
+        Title: page 1 1
         ContentReviewType: Inherit
-        Parent: =>Page.page-1
+        ParentID: =>Page.page-1

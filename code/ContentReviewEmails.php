@@ -33,23 +33,25 @@ class ContentReviewEmails extends BuildTask {
 		$now = class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate();
 		
 		// First grab all the pages with a custom setting
-		$customSettingsPages = Page::get('Page')
-			->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
-			->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
-			->where('"SiteTree"."ContentReviewType" = \'Custom\' AND "SiteTree"."NextReviewDate" <= \''.$now.'\' AND' .
-					' ("OwnerGroups"."ID" IS NOT NULL OR "OwnerUsers"."ID" IS NOT NULL)')
-		;
+		//$customSettingsPages = Page::get('Page')
+		//	->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
+		//	->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
+		//	->where('"SiteTree"."ContentReviewType" = \'Custom\' AND "SiteTree"."NextReviewDate" <= \''.$now.'\' AND' .
+		//			' ("OwnerGroups"."ID" IS NOT NULL OR "OwnerUsers"."ID" IS NOT NULL)')
+		//;
 		
-		$this->getOverduePagesForOwners($customSettingsPages, $overduePages);
+		//$this->getOverduePagesForOwners($customSettingsPages, $overduePages);
 		
 		// Then grab all the pages with that inherits their settings
-		$inheritedSettingsPages = Page::get('Page')
-			->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
-			->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
-			->where('"SiteTree"."ContentReviewType" = \'Inherit\'')
-		;
+		//$inheritedSettingsPages = Page::get('Page')
+		//	->leftJoin('Group_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerGroups"."SiteTreeID"', 'OwnerGroups')
+		//	->leftJoin('Member_SiteTreeContentReview', '"SiteTree"."ID" = "OwnerUsers"."SiteTreeID"', "OwnerUsers")
+		//	->where('"SiteTree"."ContentReviewType" = \'Inherit\'')
+		//;
 		
-		$this->getOverduePagesForOwners($inheritedSettingsPages, $overduePages);
+		
+		$pages = Page::get();
+		$this->getOverduePagesForOwners($pages, $overduePages);
 		
 		// Lets send one email to one owner with all the pages in there instead of no of pages of emails
 		foreach($overduePages as $memberID => $pages) {
@@ -66,15 +68,19 @@ class ContentReviewEmails extends BuildTask {
 	 * 
 	 * @param SS_list $pages
 	 * @param array &$pages
-	 * @return type
+	 * @return array
 	 */
 	protected function getOverduePagesForOwners(SS_list $pages, array &$overduePages) {
 		foreach($pages as $page) {
-			if(!$page->isContentReviewOverdue($page)) {
+			
+			// Update the NextReviewDate cache for this page
+			//$page->updateNextReviewDate($forceWrite = true);
+			
+			if(!$page->isContentReviewOverdue()) {
 				continue;
 			}
 			
-			$settings = $page->getContentReviewSetting($page);
+			$settings = SiteTreeContentReview::get_options($page);
 			foreach($settings->ContentReviewOwners() as $owner) {
 				if(!isset(self::$member_cache[$owner->ID])) {
 					self::$member_cache[$owner->ID] = $owner;

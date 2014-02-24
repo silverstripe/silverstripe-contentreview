@@ -36,7 +36,7 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$this->assertEquals(null, $page->NextReviewDate);
 	}
 	
-	public function testSetReviewDate10Days() {
+	public function testAdvanceReviewDate10Days() {
 		$page = new Page();
 		$page->ReviewPeriodDays = 10;
 		$this->assertTrue($page->advanceReviewDate());
@@ -44,7 +44,7 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$this->assertEquals(date('Y-m-d', strtotime('now + 10 days')), $page->NextReviewDate);
 	}
 	
-	public function testSetReviewDateNull() {
+	public function testAdvanceReviewDateNull() {
 		$page = new Page();
 		$page->ReviewPeriodDays = 0;
 		$this->assertFalse($page->advanceReviewDate());

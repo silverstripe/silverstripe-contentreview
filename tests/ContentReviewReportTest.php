@@ -5,6 +5,7 @@ class ContentReviewReportTest extends FunctionalTest {
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
 	public function testReportContent() {
+		$this->markTestIncomplete();
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		$report = new PagesDueForReviewReport();

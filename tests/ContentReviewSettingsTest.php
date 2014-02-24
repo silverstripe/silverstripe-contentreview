@@ -7,62 +7,156 @@ class ContentReviewSettingsTest extends SapphireTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewSettingsTest.yml';
 	
+	
+	public function testAdvanceReviewFromCustomSettings() {
+		$page = $this->objFromFixture('Page', 'custom');
+		$this->assertTrue($page->advanceReviewDate());
+		$page->write();
+		$this->assertEquals(date('Y-m-d', strtotime('now + '.$page->ReviewPeriodDays.' days')), $page->NextReviewDate);
+	}
+	
+	public function testAdvanceReviewFromInheritedSettings() {
+		$page = $this->objFromFixture('Page', 'page-1-1');
+		$parentPage = $this->objFromFixture('Page', 'page-1');
+		$this->assertTrue($page->advanceReviewDate());
+		$page->write();
+		$this->assertEquals(date('Y-m-d', strtotime('now + '.$parentPage->ReviewPeriodDays.' days')), $page->NextReviewDate);
+	}
+	
+	public function testAdvanceReviewFromInheritedSiteConfigSettings() {
+		$page = $this->objFromFixture('Page', 'inherit');
+		$siteConfig = $this->objFromFixture('SiteConfig', 'default');
+		$this->assertTrue($page->advanceReviewDate());
+		$page->write();
+		$this->assertEquals(date('Y-m-d', strtotime('now + '.$siteConfig->ReviewPeriodDays.' days')), $page->NextReviewDate);
+	}
+	
 	public function testGetSettingsObjectFromCustom() {
 		$page = $this->objFromFixture('Page', 'custom');
 		$this->assertEquals('Custom', $page->ContentReviewType);
-		$setting = $page->getContentReviewSetting($page);
+		$setting = SiteTreeContentReview::get_options($page);
 		$this->assertEquals($page, $setting);
 	}
 	
 	public function testGetSettingsObjectFromDisabled() {
 		$page = $this->objFromFixture('Page', 'disabled');
 		$this->assertEquals('Disabled', $page->ContentReviewType);
-		$setting = $page->getContentReviewSetting($page);
+		$setting = SiteTreeContentReview::get_options($page);
 		$this->assertFalse($setting);
 	}
 	
 	public function testGetSettingsObjectFromInheritPage() {
 		$page = $this->objFromFixture('Page', 'page-1-1');
 		$this->assertEquals('Inherit', $page->ContentReviewType);
-		$settings = $page->getContentReviewSetting($page);
+		$settings = SiteTreeContentReview::get_options($page);
 		$this->assertEquals($this->objFromFixture('Page', 'page-1'), $settings);
 	}
 
 	public function testGetSettingsObjectFromInheritedRootPage() {
 		$page = $this->objFromFixture('Page', 'inherit');
 		$this->assertEquals('Inherit', $page->ContentReviewType);
-		$settings = $page->getContentReviewSetting($page);
+		$settings = SiteTreeContentReview::get_options($page);
 		$this->assertEquals($this->objFromFixture('SiteConfig', 'default'), $settings);
 	}
 	
 	public function testGetNextReviewDateFromCustomSettings() {
 		$page = $this->objFromFixture('Page', 'custom');
-		$settings = $page->getContentReviewSetting($page);
-		$date = $page->getNextReviewDatePlease($settings, $page);
+		$settings = SiteTreeContentReview::get_options($page);
+		$date = SiteTreeContentReview::get_next_review_date($settings, $page);
 		$this->assertEquals('2010-02-01', $date->format('Y-m-d'));
 	}
 	
 	public function testGetNextReviewDateFromSiteConfigInheritedSetting() {
-		$page = $this->objFromFixture('Page', 'page-1-1');
-		$settings = $page->getContentReviewSetting($page);
-		$nextReviewDate = $page->getNextReviewDatePlease($settings, $page);
-		$this->assertInstanceOf('Date', $nextReviewDate);
+		$page = $this->objFromFixture('Page', 'inherit');
+		$settings = SiteTreeContentReview::get_options($page);
+		$nextReviewDate = SiteTreeContentReview::get_next_review_date($settings, $page);
 		
-		$expected = strtotime('+ '.$settings->ReviewPeriodDays.' days', $page->obj('LastEdited')->format('U'));
-		$this->assertEquals(date('Y-m-d', $expected), $nextReviewDate->format('Y-m-d'));
+		$this->assertInstanceOf('Date', $nextReviewDate);
+		$expected = $this->addDaysToDate(SS_Datetime::now(), $this->objFromFixture('SiteConfig', 'default')->ReviewPeriodDays);
+		$this->assertEquals($expected , $nextReviewDate->format('Y-m-d'));
 	}
 	
 	public function testGetNextReviewDateFromPageInheritedSetting() {
-		$page = $this->objFromFixture('Page', 'inherit');
-		$settings = $page->getContentReviewSetting($page);
-		$nextReviewDate = $page->getNextReviewDatePlease($settings, $page);
+		$page = $this->objFromFixture('Page', 'page-1-1');
+		$settings = SiteTreeContentReview::get_options($page);
 		
+		$nextReviewDate = SiteTreeContentReview::get_next_review_date($settings, $page);
 		$this->assertInstanceOf('Date', $nextReviewDate);
-		$expected = strtotime('+ '.$settings->ReviewPeriodDays.' days', $page->obj('LastEdited')->format('U'));
-		$this->assertEquals(date('Y-m-d', $expected), $nextReviewDate->format('Y-m-d'));
+		// It should be the same as the parents reviewdate
+		$expected = $this->objFromFixture('Page', 'page-1')->NextReviewDate;
+		$this->assertEquals($expected, $nextReviewDate->format('Y-m-d'));
 	}
 	
+	public function testUpdateNextReviewDateFromCustomToDisabled() {
+		$page = $this->objFromFixture('Page', 'custom');
+		// before write()
+		$this->assertEquals('2010-02-01', $page->NextReviewDate);
+		
+		// Change and write
+		$page->ContentReviewType = 'Disabled';
+		$page->write();
+		
+		// clear cache
+		DataObject::flush_and_destroy_cache();
+		unset($page);
+		
+		// After write()
+		$page = $this->objFromFixture('Page', 'custom');
+		$this->assertNull($page->NextReviewDate);
+	}
 	
+	public function testUpdateNextReviewDateFromDisabledToCustom() {
+		$page = $this->objFromFixture('Page', 'disabled');
+		// before
+		$this->assertNull($page->NextReviewDate);
+		
+		// Change and write
+		$page->ContentReviewType = 'Custom';
+		$page->ReviewPeriodDays = '7';
+		$page->write();
+		// clear cache
+		DataObject::flush_and_destroy_cache();
+		unset($page);
+		
+		// After write()
+		$page = $this->objFromFixture('Page', 'disabled');
+		$expected = date('Y-m-d', strtotime('+ '.$page->ReviewPeriodDays.' days'));
+		$this->assertEquals($expected, $page->NextReviewDate);
+	}
 	
+	public function testParentChangedOptionsAndChildShouldToo() {
+		$parentPage = $this->objFromFixture('Page', 'page-1');
+		$childPage = $this->objFromFixture('Page', 'page-1-1');
+		
+		// BEFORE: parent page have a period of five days, so childPage should have a 
+		// review date LastEdited + 5 days
+		$expected = $this->addDaysToDate($childPage->obj('LastEdited'), $parentPage->ReviewPeriodDays);
+		$this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
+		
+		
+		$oldChildDate = $childPage->NextReviewDate;
+		// But if we change the parent page ReviewPeriodDays to 10, the childs should 
+		// change as well
+		$parentPage->ReviewPeriodDays = 10;
+		$parentPage->write();
+		
+		// Flush all the caches!
+		DataObject::flush_and_destroy_cache();
+		
+		$parentPage = $this->objFromFixture('Page', 'page-1');
+		$childPage = $this->objFromFixture('Page', 'page-1-1');
+		
+		// AFTER: parent page have a period of five days, so childPage should have a 
+		// review date LastEdited + 5 days
+		$this->assertNotEquals($oldChildDate, $childPage->NextReviewDate);
+		
+		$this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
+	}
+	
+	// helper method for this test class
+	private function addDaysToDate($date, $days, $format='Y-m-d') {
+		$sec = strtotime('+ '. $days .' days', $date->format('U'));
+		return date($format, $sec);
+	}
 	
 }
