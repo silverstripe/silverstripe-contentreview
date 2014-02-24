@@ -66,10 +66,16 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @param SiteTree $page
 	 * @return Date | false - returns false if the content review have disabled
 	 */
-	public function getReviewDate(DataObject $options, SiteTree $page) {
+	public function getReviewDate(SiteTree $page=null) {
+		if($page === null) {
+			$page = $this->owner;
+		}
 		if($page->obj('NextReviewDate')->exists()) {
 			return $page->obj('NextReviewDate');
 		}
+		
+		$options = $this->owner->getOptions();
+		
 		if(!$options) {
 			return false;
 		}
@@ -385,10 +391,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 				$this->owner->NextReviewDate = null;
 				// Take from Parent page
 				if($settings && $this->owner->parent()->exists()) {
-					$nextDate = $this->getReviewDate($settings, $this->owner->parent());
+					$nextDate = $this->getReviewDate($this->owner->parent());
 				// Inherit from siteconfig
 				} elseif($settings instanceof SiteConfig) {
-					$nextDate = $this->getReviewDate($settings, $this->owner);
+					$nextDate = $this->getReviewDate();
 				// No setting, parent disabled
 				} else {
 					 $nextDate = null;
@@ -400,7 +406,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 				// No review date provided, use today + period
 				} else {
 					$this->owner->NextReviewDate = null;
-					$nextDate = $this->getReviewDate($settings, $this->owner);
+					$nextDate = $this->getReviewDate();
 				}
 			}
 			if(is_object($nextDate)) {

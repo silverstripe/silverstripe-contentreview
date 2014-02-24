@@ -56,13 +56,13 @@ class ContentReviewSettingsTest extends SapphireTest {
 	
 	public function testGetNextReviewDateFromCustomSettings() {
 		$page = $this->objFromFixture('Page', 'custom');
-		$date = $page->getReviewDate($page->getOptions(), $page);
+		$date = $page->getReviewDate();
 		$this->assertEquals('2010-02-01', $date->format('Y-m-d'));
 	}
 	
 	public function testGetNextReviewDateFromSiteConfigInheritedSetting() {
 		$page = $this->objFromFixture('Page', 'inherit');
-		$nextReviewDate = $page->getReviewDate($page->getOptions(), $page);
+		$nextReviewDate = $page->getReviewDate();
 		
 		$this->assertInstanceOf('Date', $nextReviewDate);
 		$expected = $this->addDaysToDate(SS_Datetime::now(), $this->objFromFixture('SiteConfig', 'default')->ReviewPeriodDays);
@@ -71,7 +71,7 @@ class ContentReviewSettingsTest extends SapphireTest {
 	
 	public function testGetNextReviewDateFromPageInheritedSetting() {
 		$page = $this->objFromFixture('Page', 'page-1-1');
-		$nextReviewDate = $page->getReviewDate($page->getOptions(), $page);
+		$nextReviewDate = $page->getReviewDate();
 		
 		$this->assertInstanceOf('Date', $nextReviewDate);
 		// It should be the same as the parents reviewdate
