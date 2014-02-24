@@ -42,6 +42,18 @@ class ContentReviewSettingsTest extends SapphireTest {
 		$this->assertFalse($page->getOptions());
 	}
 	
+	public function testGetOptionObjectFromInheritedDisabled() {
+		$page = $this->objFromFixture('Page', 'page-2-1-1');
+		$this->assertEquals('Inherit', $page->ContentReviewType);
+		$this->assertFalse($page->getOptions());
+	}
+	
+	public function testGetOptionObjectFromDeeplyInheritedPage() {
+		$page = $this->objFromFixture('Page', 'page-3-1-1-1');
+		$this->assertEquals('Inherit', $page->ContentReviewType);
+		$this->assertInstanceOf('SiteConfig', $page->getOptions());
+	}
+	
 	public function testGetSettingsObjectFromInheritPage() {
 		$page = $this->objFromFixture('Page', 'page-1-1');
 		$this->assertEquals('Inherit', $page->ContentReviewType);

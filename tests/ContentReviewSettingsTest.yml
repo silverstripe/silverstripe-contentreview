@@ -51,22 +51,44 @@ Page:
         NextReviewDate: 2010-02-01
         ContentReviewUsers: =>Member.editor
         ReviewPeriodDays: 10
-        ParentID: 0
     disabled:
         Title: disabled
         ContentReviewType: Disabled
-        ParentID: 0
     inherit:
         Title: inherit
         ContentReviewType: Inherit
-        ParentID: 0
     page-1:
         Title: page 1
         ContentReviewType: Custom
         ReviewPeriodDays: 5
         NextReviewDate: 2010-02-01
-        ParentID: 0
     page-1-1:
         Title: page 1 1
         ContentReviewType: Inherit
         ParentID: =>Page.page-1
+    page-2:
+        Title: page 2
+        ContentReviewType: Inherit
+    page-2-1:
+        Title: page 2 1
+        ContentReviewType: Disabled
+        ParentID: =>Page.page-2
+    page-2-1-1:
+        Title: page 2 1 1
+        ContentReviewType: Inherit
+        ParentID: =>Page.page-2-1
+    page-3:
+        Title: page 3
+        ContentReviewType: Inherit
+    page-3-1:
+        Title: page 3 1
+        ContentReviewType: Inherit
+        ParentID: =>Page.page-3
+    page-3-1-1:
+        Title: page 3 1 1
+        ContentReviewType: Inherit
+        ParentID: =>Page.page-3-1 
+    page-3-1-1-1:
+        Title: page 3 1 1 1
+        ContentReviewType: Inherit
+        ParentID: =>Page.page-3-1-1

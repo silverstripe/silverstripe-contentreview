@@ -387,8 +387,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 				$nextDate = null;
 			// Changed to Inherit
 			} elseif($this->owner->ContentReviewType == 'Inherit') {
-				// clear out the old value so the get_next_review_date() don't fetch it again
-				$this->owner->NextReviewDate = null;
 				// Take from Parent page
 				if($settings && $this->owner->parent()->exists()) {
 					$nextDate = $this->getReviewDate($this->owner->parent());
@@ -417,7 +415,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		}
 		
 		// Oh yey.. now we need to update all the child pages that inherit this setting
-		// We can only change children after this record has been saved, otherwise the stageChildren
+		// We can only change children after this record has been created, otherwise the stageChildren
 		// method will grab all pages in the DB (this messes up unittesting)
 		if(!$this->owner->exists()) {
 			return;
