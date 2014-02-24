@@ -36,24 +36,6 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$this->assertEquals(null, $page->NextReviewDate);
 	}
 	
-	public function testAdvanceReviewDate10Days() {
-		$page = new Page();
-		$page->ContentReviewType = 'Custom';
-		$page->ReviewPeriodDays = 10;
-		$this->assertTrue($page->advanceReviewDate());
-		$page->write();
-		$this->assertEquals(date('Y-m-d', strtotime('now + 10 days')), $page->NextReviewDate);
-	}
-	
-	public function testAdvanceReviewDateNull() {
-		$page = new Page();
-		$page->ContentReviewType = 'Custom';
-		$page->ReviewPeriodDays = 0;
-		$this->assertFalse($page->advanceReviewDate());
-		$page->write();
-		$this->assertEquals(null, $page->NextReviewDate);
-	}
-	
 	public function testAddReviewNote() {
 		$author = $this->objFromFixture('Member', 'author');
 		$page = $this->objFromFixture('Page', 'home');

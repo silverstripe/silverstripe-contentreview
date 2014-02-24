@@ -7,6 +7,24 @@ class ContentReviewSettingsTest extends SapphireTest {
 
 	public static $fixture_file = 'contentreview/tests/ContentReviewSettingsTest.yml';
 	
+	public function testAdvanceReviewDate10Days() {
+		$page = new Page();
+		$page->ContentReviewType = 'Custom';
+		$page->ReviewPeriodDays = 10;
+		$this->assertTrue($page->advanceReviewDate());
+		$page->write();
+		$this->assertEquals(date('Y-m-d', strtotime('now + 10 days')), $page->NextReviewDate);
+	}
+	
+	public function testAdvanceReviewDateNull() {
+		$page = new Page();
+		$page->ContentReviewType = 'Custom';
+		$page->ReviewPeriodDays = 0;
+		$this->assertFalse($page->advanceReviewDate());
+		$page->write();
+		$this->assertEquals(null, $page->NextReviewDate);
+	}
+	
 	public function testAdvanceReviewFromCustomSettings() {
 		$page = $this->objFromFixture('Page', 'custom');
 		$this->assertTrue($page->advanceReviewDate());
