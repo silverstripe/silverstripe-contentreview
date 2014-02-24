@@ -72,16 +72,12 @@ class ContentReviewEmails extends BuildTask {
 	 */
 	protected function getOverduePagesForOwners(SS_list $pages, array &$overduePages) {
 		foreach($pages as $page) {
-			
-			// Update the NextReviewDate cache for this page
-			//$page->updateNextReviewDate($forceWrite = true);
-			
 			if(!$page->isContentReviewOverdue()) {
 				continue;
 			}
 			
-			$settings = SiteTreeContentReview::get_options($page);
-			foreach($settings->ContentReviewOwners() as $owner) {
+			$option = $page->getOptions();
+			foreach($option->ContentReviewOwners() as $owner) {
 				if(!isset(self::$member_cache[$owner->ID])) {
 					self::$member_cache[$owner->ID] = $owner;
 				}

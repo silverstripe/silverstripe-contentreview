@@ -62,24 +62,22 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	
 	/**
 	 * 
-	 * @param DataObject $setting
+	 * @param DataObject $options
 	 * @param SiteTree $page
 	 * @return Date | false - returns false if the content review have disabled
 	 */
-	public static function get_next_review_date(DataObject $setting, SiteTree $page) {
+	public function getReviewDate(DataObject $options, SiteTree $page) {
 		if($page->obj('NextReviewDate')->exists()) {
 			return $page->obj('NextReviewDate');
 		}
-		
-		if(!$setting) {
+		if(!$options) {
 			return false;
 		}
-		
-		if(!$setting->ReviewPeriodDays) {
+		if(!$options->ReviewPeriodDays) {
 			return false;
 		}
 		// Failover to check on ReviewPeriodDays + LastEdited
-		$nextReviewUnixSec = strtotime(' + '.$setting->ReviewPeriodDays . ' days', SS_Datetime::now()->format('U'));
+		$nextReviewUnixSec = strtotime(' + '.$options->ReviewPeriodDays . ' days', SS_Datetime::now()->format('U'));
 		$date = Date::create('NextReviewDate');
 		$date->setValue(date('Y-m-d H:i:s', $nextReviewUnixSec));
 		return $date;
@@ -87,22 +85,25 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	
 	/**
 	 * Get the object that have the information about the content
-	 * review settings
+	 * review settings. Either 
+	 *  - a SiteTreeContentReview decorated object
+	 *  - the default SiteTree config 
+	 *  - false if this page have it's content review disabled
 	 * 
 	 * Will go through parents and root pages will use the siteconfig 
 	 * if their setting is Inherit.
 	 * 
-	 * @param SiteTree $page
 	 * @return DataObject or false if no settings found
 	 */
-	public static function get_options($page) {
-		if($page->ContentReviewType == 'Custom') {
-			return $page;
+	public function getOptions() {
+		if($this->owner->ContentReviewType == 'Custom') {
+			return $this->owner;
 		}
-		if($page->ContentReviewType == 'Disabled') {
+		if($this->owner->ContentReviewType == 'Disabled') {
 			return false;
 		}
 		
+		$page = $this->owner;
 		// $page is inheriting it's settings from it's parent, find
 		// the first valid parent with a valid setting
 		while($parent = $page->Parent()) {
@@ -142,10 +143,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @return string
 	 */
 	public function getEditorName() {
-		if($member = Member::currentUser()) {
+		$member = Member::currentUser();
+		if($member) {
 			 return $member->FirstName .' '. $member->Surname;
 		}
-		return NULL;
+		return null;
 	}
 	
 	/**
@@ -317,32 +319,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	}
 	
 	/**
-	 * Update the NextReviewDate and save the dataobject,
-	 * this is typically done after the ContentReviewType has changed
-	 * 
-	 * @param DataObject $settings
-	 * @param bool $forceWrite
-	 */
-	public function updateNextReviewDate($forceWrite = false) {
-		$settings = self::get_options($this->owner);
-		
-		if(!$settings && $this->owner->NextReviewDate) {
-			$this->owner->NextReviewDate = null;
-		}
-		
-		if($settings) {
-			$nextDate = self::get_next_review_date($settings, $this->owner);
-			if($nextDate && $nextDate) {
-				$this->owner->NextReviewDate = $nextDate->getValue();
-			}
-		}
-		
-		if($forceWrite) {
-			$this->owner->write();
-		}
-	}
-	
-	/**
 	 * 
 	 * @param \FieldList $actions
 	 */
@@ -395,7 +371,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		
 		// This contains the DataObject that have the content review settings
 		// for this object, it might be this page, one of its parent or SiteConfig
-		$settings = self::get_options($this->owner);
+		$settings = $this->owner->getOptions();
 		
 		// If the user changed the Type, we need to recalculate the
 		// Next review date
@@ -409,10 +385,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 				$this->owner->NextReviewDate = null;
 				// Take from Parent page
 				if($settings && $this->owner->parent()->exists()) {
-					$nextDate = self::get_next_review_date($settings, $this->owner->parent());
+					$nextDate = $this->getReviewDate($settings, $this->owner->parent());
 				// Inherit from siteconfig
 				} elseif($settings instanceof SiteConfig) {
-					$nextDate = self::get_next_review_date($settings, $this->owner);
+					$nextDate = $this->getReviewDate($settings, $this->owner);
 				// No setting, parent disabled
 				} else {
 					 $nextDate = null;
@@ -424,7 +400,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 				// No review date provided, use today + period
 				} else {
 					$this->owner->NextReviewDate = null;
-					$nextDate = self::get_next_review_date($settings, $this->owner);
+					$nextDate = $this->getReviewDate($settings, $this->owner);
 				}
 			}
 			if(is_object($nextDate)) {

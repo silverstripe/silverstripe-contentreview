@@ -4,9 +4,8 @@
  * This class tests that settings are inherited correctly based on the inherited, custom or disabled settings
  */
 class ContentReviewSettingsTest extends SapphireTest {
-	
+
 	public static $fixture_file = 'contentreview/tests/ContentReviewSettingsTest.yml';
-	
 	
 	public function testAdvanceReviewFromCustomSettings() {
 		$page = $this->objFromFixture('Page', 'custom');
@@ -34,42 +33,36 @@ class ContentReviewSettingsTest extends SapphireTest {
 	public function testGetSettingsObjectFromCustom() {
 		$page = $this->objFromFixture('Page', 'custom');
 		$this->assertEquals('Custom', $page->ContentReviewType);
-		$setting = SiteTreeContentReview::get_options($page);
-		$this->assertEquals($page, $setting);
+		$this->assertEquals($page, $page->getOptions());
 	}
 	
 	public function testGetSettingsObjectFromDisabled() {
 		$page = $this->objFromFixture('Page', 'disabled');
 		$this->assertEquals('Disabled', $page->ContentReviewType);
-		$setting = SiteTreeContentReview::get_options($page);
-		$this->assertFalse($setting);
+		$this->assertFalse($page->getOptions());
 	}
 	
 	public function testGetSettingsObjectFromInheritPage() {
 		$page = $this->objFromFixture('Page', 'page-1-1');
 		$this->assertEquals('Inherit', $page->ContentReviewType);
-		$settings = SiteTreeContentReview::get_options($page);
-		$this->assertEquals($this->objFromFixture('Page', 'page-1'), $settings);
+		$this->assertEquals($this->objFromFixture('Page', 'page-1'), $page->getOptions());
 	}
 
 	public function testGetSettingsObjectFromInheritedRootPage() {
 		$page = $this->objFromFixture('Page', 'inherit');
 		$this->assertEquals('Inherit', $page->ContentReviewType);
-		$settings = SiteTreeContentReview::get_options($page);
-		$this->assertEquals($this->objFromFixture('SiteConfig', 'default'), $settings);
+		$this->assertEquals($this->objFromFixture('SiteConfig', 'default'), $page->getOptions());
 	}
 	
 	public function testGetNextReviewDateFromCustomSettings() {
 		$page = $this->objFromFixture('Page', 'custom');
-		$settings = SiteTreeContentReview::get_options($page);
-		$date = SiteTreeContentReview::get_next_review_date($settings, $page);
+		$date = $page->getReviewDate($page->getOptions(), $page);
 		$this->assertEquals('2010-02-01', $date->format('Y-m-d'));
 	}
 	
 	public function testGetNextReviewDateFromSiteConfigInheritedSetting() {
 		$page = $this->objFromFixture('Page', 'inherit');
-		$settings = SiteTreeContentReview::get_options($page);
-		$nextReviewDate = SiteTreeContentReview::get_next_review_date($settings, $page);
+		$nextReviewDate = $page->getReviewDate($page->getOptions(), $page);
 		
 		$this->assertInstanceOf('Date', $nextReviewDate);
 		$expected = $this->addDaysToDate(SS_Datetime::now(), $this->objFromFixture('SiteConfig', 'default')->ReviewPeriodDays);
@@ -78,9 +71,8 @@ class ContentReviewSettingsTest extends SapphireTest {
 	
 	public function testGetNextReviewDateFromPageInheritedSetting() {
 		$page = $this->objFromFixture('Page', 'page-1-1');
-		$settings = SiteTreeContentReview::get_options($page);
+		$nextReviewDate = $page->getReviewDate($page->getOptions(), $page);
 		
-		$nextReviewDate = SiteTreeContentReview::get_next_review_date($settings, $page);
 		$this->assertInstanceOf('Date', $nextReviewDate);
 		// It should be the same as the parents reviewdate
 		$expected = $this->objFromFixture('Page', 'page-1')->NextReviewDate;
@@ -133,7 +125,6 @@ class ContentReviewSettingsTest extends SapphireTest {
 		$expected = $this->addDaysToDate($childPage->obj('LastEdited'), $parentPage->ReviewPeriodDays);
 		$this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
 		
-		
 		$oldChildDate = $childPage->NextReviewDate;
 		// But if we change the parent page ReviewPeriodDays to 10, the childs should 
 		// change as well
@@ -149,7 +140,6 @@ class ContentReviewSettingsTest extends SapphireTest {
 		// AFTER: parent page have a period of five days, so childPage should have a 
 		// review date LastEdited + 5 days
 		$this->assertNotEquals($oldChildDate, $childPage->NextReviewDate);
-		
 		$this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
 	}
 	
@@ -158,5 +148,4 @@ class ContentReviewSettingsTest extends SapphireTest {
 		$sec = strtotime('+ '. $days .' days', $date->format('U'));
 		return date($format, $sec);
 	}
-	
 }

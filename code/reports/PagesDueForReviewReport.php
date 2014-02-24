@@ -101,7 +101,7 @@ class PagesDueForReviewReport extends SS_Report {
 						return 'disabled';
 					}
 					if($item->ContentReviewType == 'Inherit') {
-						$setting = $item->getContentReviewSetting($item);
+						$setting = SiteTreeContentReview::getOptions($item);
 						if(!$setting) {
 							return 'disabled';
 						}
@@ -117,7 +117,7 @@ class PagesDueForReviewReport extends SS_Report {
 						return 'disabled';
 					}
 					if($item->ContentReviewType == 'Inherit') {
-						$setting = $item->getContentReviewSetting($item);
+						$setting = SiteTreeContentReview::getOptions($item);
 						if(!$setting) {
 							return 'disabled';
 						}
@@ -158,9 +158,7 @@ class PagesDueForReviewReport extends SS_Report {
 			// If there's no review dates set, default to all pages due for review now
 			$reviewDate = new Zend_Date(SS_Datetime::now()->Format('U'));
 			$reviewDate->add(1, Zend_Date::DAY);
-			$records = $records->where('"ContentReviewType" != \'Disabled\'');
-			//$records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
-			
+			$records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
