@@ -20,7 +20,6 @@ Group:
         Code: authorgroup
         Permissions: =>Permission.cmsmain2,=>Permission.workflowadmin2
 
-    
 Member:
     author:
         FirstName: Test
