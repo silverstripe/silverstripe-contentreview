@@ -24,6 +24,22 @@ class ContentReviewDefaultSettings extends DataExtension {
 	);
 	
 	/**
+	 * 
+	 * @return string
+	 */
+	public function getOwnerNames() {
+		$names = array();
+		foreach($this->OwnerGroups() as $group) {
+			$names[] = $group->getBreadcrumbs(' > ');
+		}
+		
+		foreach($this->OwnerUsers() as $group) {
+			$names[] = $group->getName();
+		}
+		return implode(', ', $names);
+	}
+	
+	/**
 	 * @return ManyManyList
 	 */
 	public function OwnerGroups() {

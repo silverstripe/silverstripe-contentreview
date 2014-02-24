@@ -257,6 +257,27 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	
 	/**
 	 * 
+	 */
+	public function getNextReviewDatePlease(DataObject $settings, SiteTree $page) {
+		if(!($settings instanceof DataObject)) {
+			throw new BadMethodCallException('$settings must be a DataObject');
+		}
+		if($page->obj('NextReviewDate')->exists()) {
+			return $page->obj('NextReviewDate');
+		}
+		
+		if(!$settings->ReviewPeriodDays) {
+			return false;
+		}
+		// Failover to check on ReviewPeriodDays + LastEdited
+		$nextReviewUnixSec = strtotime($page->LastEdited . ' + '.$settings->ReviewPeriodDays . ' days');
+		$date = Date::create('NextReviewDate');
+		$date->setValue(date('Y-m-d H:i:s', $nextReviewUnixSec));
+		return $date;
+	}
+	
+	/**
+	 * 
 	 * @param \FieldList $actions
 	 */
 	public function updateCMSActions(\FieldList $actions) {
@@ -328,6 +349,12 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		if($page->ContentReviewType == 'Custom') {
 			return $page;
 		}
+		if($page->ContentReviewType == 'Disabled') {
+			return false;
+		}
+		
+		// $page is inheriting it's settings from it's parent, find
+		// the first valid parent with a valid setting
 		while($parent = $page->Parent()) {
 			// Root page, use siteconfig
 			if(!$parent->exists()) {

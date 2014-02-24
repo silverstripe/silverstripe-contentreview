@@ -25,7 +25,8 @@ class PagesDueForReviewReport extends SS_Report {
 
 		// We need to be a bit fancier when subsites is enabled
 		if(class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-
+			
+			throw new Exception('feature missing, check with subsites');
 			// javascript for subsite specific owner dropdown
 			Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
 			Requirements::javascript('contentreview/javascript/PagesDueForReview.js');
@@ -86,12 +87,44 @@ class PagesDueForReviewReport extends SS_Report {
 				'title' => 'Page name',
 				'formatting' => '<a href=\"' . $linkBase . '/$ID\" title=\"Edit page\">$value</a>'
 			),
+			'ContentReviewType' => array(
+				'title' => 'Settings are',
+				'formatting' => function($value, $item) {
+					return $value;
+				}
+			),
 			'NextReviewDate' => array(
 				'title' => 'Review Date',
-				'casting' => 'Date->Full'
+				'casting' => 'Date->Full',
+				'formatting' => function($value, $item) {
+					if($item->ContentReviewType == 'Disabled') {
+						return 'disabled';
+					}
+					if($item->ContentReviewType == 'Inherit') {
+						$setting = $item->getContentReviewSetting($item);
+						if(!$setting) {
+							return 'disabled';
+						}
+						return $item->getNextReviewDatePlease($setting, $item)->Full();
+					}
+					return $value;
+				}
 			),
 			'OwnerNames' => array(
-				'title' => 'Owner'
+				'title' => 'Owner',
+				'formatting' => function($value, $item) {
+					if($item->ContentReviewType == 'Disabled') {
+						return 'disabled';
+					}
+					if($item->ContentReviewType == 'Inherit') {
+						$setting = $item->getContentReviewSetting($item);
+						if(!$setting) {
+							return 'disabled';
+						}
+						return $setting->getOwnerNames();
+					}
+					return $value;
+				}
 			),
 			'LastEditedByName' => 'Last edited by',
 			'AbsoluteLink' => array(
@@ -125,7 +158,9 @@ class PagesDueForReviewReport extends SS_Report {
 			// If there's no review dates set, default to all pages due for review now
 			$reviewDate = new Zend_Date(SS_Datetime::now()->Format('U'));
 			$reviewDate->add(1, Zend_Date::DAY);
-			$records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
+			$records = $records->where('"ContentReviewType" != \'Disabled\'');
+			//$records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString('YYYY-MM-dd')));
+			
 		} else {
 			// Review date before
 			if(!empty($params['ReviewDateBefore'])) {
