@@ -346,7 +346,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		if($this->owner->obj('NextReviewDate')->InFuture()) {
 			return false;
 		}
-		if($this->OwnerGroups()->count() == 0 && $this->OwnerUsers()->count() == 0) {
+		
+		$options = $this->getOptions();
+		
+		if($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
 			return false;
 		}
 		
@@ -355,10 +358,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			return true;
 		}
 		
-		if($member->inGroups($this->OwnerGroups())) {
+		if($member->inGroups($options->OwnerGroups())) {
 			return true;
 		}
-		if($this->OwnerUsers()->find('ID', $member->ID)) {
+		
+		if($options->OwnerUsers()->find('ID', $member->ID)) {
 			return true;
 		}
 		return false;

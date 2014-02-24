@@ -58,6 +58,10 @@ Page:
         ReviewPeriodDays: 10
         NextReviewDate: 2010-02-21
         ContentReviewGroups: =>Group.authorgroup
+    contact-child:
+        Title: Contact Us Child
+        ContentReviewType: inherit
+        ParentID: =>Page.contact
     no-review:
         Title: Page without review date
         ContentReviewType: Custom
