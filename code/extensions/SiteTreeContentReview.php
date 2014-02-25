@@ -233,10 +233,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			));
 			$logs = GridField::create('ROReviewNotes', 'Review Notes', $this->owner->ReviewLogs(), $logConfig);
 			
+			
+			$optionsFrom = ReadonlyField::create('ROType', _t('ContentReview.SETTINGSFROM', "Options are"), $this->owner->ContentReviewType);
 			$fields->addFieldsToTab("Root.ContentReview", array(
 				$contentOwners,
 				$nextReviewAt->performReadonlyTransformation(),
 				$reviewFreq,
+				$optionsFrom,
 				$logs
 			));
 			return;
