@@ -22,11 +22,6 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 	 */
 	public function parameterFields() {
 		$params = new FieldList();
-
-		// We need to be a bit fancier when subsites is enabled
-		if(class_exists('Subsite') && Subsite::get()->count()) {
-			die('No subsite support yet!');
-		}
 		$params->push(new CheckboxField('ShowVirtualPages', 'Show Virtual Pages'));
 		return $params;
 	}
@@ -61,6 +56,20 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 						$liveLink ? '(live)' : '(draft)'
 					);
 				}
+			),
+			'ContentReviewType' => array(
+				'title' => 'Settings are',
+				'formatting' => function($value, $item) use($linkBase) {
+					if($item->ContentReviewType == 'Inherit')  {
+						$options = $item->getOptions();
+						if($options && $options instanceof SiteConfig) {
+							return 'Inherited from <a href="admin/settings">Settings</a>';
+						} elseif($options) {
+							return 'Inherited from <a href="'.$linkBase.$options->ID.'">'.$options->Title.'</a>';
+						}
+					}
+					return $value;
+				}
 			)
 		);
 
@@ -75,10 +84,11 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 	 * @return DataList
 	 */
 	public function sourceRecords($params, $sort, $limit) {
+		Versioned::reading_stage('Stage');
 		$records = SiteTree::get();
 
 		// If there's no review dates set, default to all pages due for review now
-		$records = $records->where('"NextReviewDate" IS NULL OR "OwnerNames" IS NULL OR "OwnerNames" = \'\'');
+		// $records = $records->where('"NextReviewDate" IS NULL OR "OwnerNames" IS NULL OR "OwnerNames" = \'\'');
 
 		// Show virtual pages?
 		if(empty($params['ShowVirtualPages'])) {
@@ -88,26 +98,34 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 				implode("','", array_values($virtualPageClasses))
 			));
 		}
-
-		// Turn a query into records
-		if($sort) {
-			$parts = explode(' ', $sort);
-			$field = $parts[0];
-			$direction = $parts[1];
-
-			if($field == 'AbsoluteLink') {
-				$sort = '"URLSegment" ' . $direction;
-			} elseif($field == 'Subsite.Title') {
-				$records = $records->leftJoin("Subsite", '"Subsite"."ID" = "SiteTree"."SubsiteID"');
+		
+		
+		$records->sort('ParentID');
+		// Trim out calculated values
+		$list = new ArrayList();
+		foreach($records as $record) {
+			if(!$this->hasReviewSchedule($record)) {
+				$list->push($record);
 			}
-
-			if($field != "LastEditedByName") {
-				$records = $records->sort($sort);
-			}
-
-			if($limit) $records = $records->limit($limit['limit'], $limit['start']);
+		}
+		return $list;
+	}
+	
+	/**
+	 * 
+	 * @param DataObject $record
+	 * @return boolean
+	 */
+	protected function hasReviewSchedule(DataObject $record) {
+		if(!$record->obj('NextReviewDate')->exists()) {
+			return false;
 		}
 
-		return $records;
+		$options = $record->getOptions();
+		if($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+			return false;
+		}
+
+		return true;
 	}
 }
