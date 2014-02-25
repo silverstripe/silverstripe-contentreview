@@ -62,6 +62,19 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	
 	/**
 	 * 
+	 * @param \FieldList $actions
+	 */
+	public function updateCMSActions(\FieldList $actions) {
+		if($this->canBeReviewedBy(Member::currentUser())) {
+			$reviewAction = FormAction::create('reviewed', _t('ContentReview.BUTTONREVIEWED', 'Content reviewed'))
+				->setAttribute('data-icon', 'pencil')
+				->setAttribute('data-text-alternate', _t('ContentReview.BUTTONREVIEWED', 'Content reviewed'));
+			$actions->push($reviewAction);
+		}
+	}
+	
+	/**
+	 * 
 	 * @param SiteTree $page
 	 * @return Date | false - returns false if the content review have disabled
 	 */
@@ -235,6 +248,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			
 			
 			$optionsFrom = ReadonlyField::create('ROType', _t('ContentReview.SETTINGSFROM', "Options are"), $this->owner->ContentReviewType);
+			
 			$fields->addFieldsToTab("Root.ContentReview", array(
 				$contentOwners,
 				$nextReviewAt->performReadonlyTransformation(),
@@ -325,19 +339,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		$this->owner->NextReviewDate = $nextDate;
 		$this->owner->write();
 		return (bool)$nextDate;
-	}
-	
-	/**
-	 * 
-	 * @param \FieldList $actions
-	 */
-	public function updateCMSActions(\FieldList $actions) {
-		if($this->canBeReviewedBy(Member::currentUser())) {
-			$reviewAction = FormAction::create('reviewed', _t('ContentReview.BUTTONREVIEWED', 'Content reviewed'))
-				->setAttribute('data-icon', 'pencil')
-				->setAttribute('data-text-alternate', _t('ContentReview.BUTTONREVIEWED', 'Content reviewed'));
-			$actions->push($reviewAction);
-		}
 	}
 	
 	/**
