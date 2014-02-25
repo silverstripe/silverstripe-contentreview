@@ -5,7 +5,6 @@ class ContentReviewReportTest extends FunctionalTest {
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
 	public function testReportContent() {
-		$this->markTestIncomplete();
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		$report = new PagesDueForReviewReport();
@@ -20,18 +19,18 @@ class ContentReviewReportTest extends FunctionalTest {
 		), 'NextReviewDate ASC', false);
 		
 		$this->assertEquals($results->column('Title'), array(
-			'Home',
-			'About Us',
+			'Contact Us',
 			'Staff',
-			'Contact Us'
+			'About Us',
+			'Home'
 		));
 		
 		SS_Datetime::set_mock_now('2010-02-13 00:00:00');
 		$results = $report->sourceRecords(array(
 		), 'NextReviewDate ASC', false);
 		$this->assertEquals($results->column('Title'), array(
-			'Home',
-			'About Us'
+			'About Us',
+			'Home'
 		));
 		
 		SS_Datetime::clear_mock_now();
