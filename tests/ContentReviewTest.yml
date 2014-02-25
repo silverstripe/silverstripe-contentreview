@@ -36,11 +36,13 @@ Member:
         Email: visitor@example.com
     
 Page:
+# Cant be reviewed, no owners
     home:
         Title: Home
         ContentReviewType: Custom
         NextReviewDate: 2010-02-01
         ReviewPeriodDays: 10
+# Cant be reviewed, no owners
     about:
         Title: About Us
         ContentReviewType: Custom
@@ -62,10 +64,12 @@ Page:
         Title: Contact Us Child
         ContentReviewType: inherit
         ParentID: =>Page.contact
+# Cant be reviewed, no NextReviewDate
     no-review:
         Title: Page without review date
         ContentReviewType: Custom
         ContentReviewUsers: =>Member.author
+# Cant be reviewed, no NextReviewDate
     group-owned:
         Title: Page owned by group
         ContentReviewType: Custom
