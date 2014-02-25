@@ -1,5 +1,7 @@
 # Content Review module
 
+[![Build Status](https://travis-ci.org/silverstripe-labs/silverstripe-contentreview.png?branch=feature_improvements)](https://travis-ci.org/silverstripe-labs/silverstripe-contentreview)
+
 This module helps with ensuring that a websites content are correct and up-to-date so that visitors 
 can rely on the information provided by the client.
 
