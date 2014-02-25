@@ -24,43 +24,43 @@ class PagesDueForReviewReport extends SS_Report {
 		$params = new FieldList();
 
 		// We need to be a bit fancier when subsites is enabled
-		if(class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
-			
-			throw new Exception('feature missing, check with subsites');
-			// javascript for subsite specific owner dropdown
-			Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
-			Requirements::javascript('contentreview/javascript/PagesDueForReview.js');
-
-			// Remember current subsite
-			$existingSubsite = Subsite::currentSubsiteID();
-
-			$map = array();
-
-			// Create a map of all potential owners from all applicable sites
-			$sites = Subsite::accessible_sites('CMS_ACCESS_CMSMain');
-			foreach($sites as $site) {
-				Subsite::changeSubsite($site);
-
-				$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-				// Key-preserving merge
-				foreach($cmsUsers->map('ID', 'Title') as $k => $v) {
-					$map[$k] = $v;
-				}
-			}
-
-			$map = $map + array('' => 'Any', '-1' => '(no owner)');
-
-			$params->push(new DropdownField("ContentReviewOwnerID", 'Page owner', $map));
-
-			// Restore current subsite
-			Subsite::changeSubsite($existingSubsite);
-		} else {
+//		if(class_exists('Subsite') && $subsites = DataObject::get('Subsite')) {
+//			
+//			throw new Exception('feature missing, check with subsites');
+//			// javascript for subsite specific owner dropdown
+//			Requirements::javascript(THIRDPARTY_DIR . '/jquery-livequery/jquery.livequery.js');
+//			Requirements::javascript('contentreview/javascript/PagesDueForReview.js');
+//
+//			// Remember current subsite
+//			$existingSubsite = Subsite::currentSubsiteID();
+//
+//			$map = array();
+//
+//			// Create a map of all potential owners from all applicable sites
+//			$sites = Subsite::accessible_sites('CMS_ACCESS_CMSMain');
+//			foreach($sites as $site) {
+//				Subsite::changeSubsite($site);
+//
+//				$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
+//				// Key-preserving merge
+//				foreach($cmsUsers->map('ID', 'Title') as $k => $v) {
+//					$map[$k] = $v;
+//				}
+//			}
+//
+//			$map = $map + array('' => 'Any', '-1' => '(no owner)');
+//
+//			$params->push(new DropdownField("ContentReviewOwnerID", 'Page owner', $map));
+//
+//			// Restore current subsite
+//			Subsite::changeSubsite($existingSubsite);
+//		} else {
 			$cmsUsers = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 			$map = $cmsUsers->map('ID', 'Title', '(no owner)')->toArray();
 			unset($map['']);
 			$map = array('' => 'Any', '-1' => '(no owner)') + $map;
 			$params->push(new DropdownField("ContentReviewOwnerID", 'Page owner', $map));
-		}
+//		}
 
 		$params->push(
 			DateField::create('ReviewDateAfter', 'Review date after or on')
@@ -68,7 +68,7 @@ class PagesDueForReviewReport extends SS_Report {
 		);
 		$params->push(
 			DateField::create('ReviewDateBefore', 'Review date before or on', date('d/m/Y', strtotime('midnight')))
-				->setConfig('showcalendar', true)	
+				->setConfig('showcalendar', true)
 		);
 
 		$params->push(new CheckboxField('ShowVirtualPages', 'Show Virtual Pages'));
@@ -81,17 +81,15 @@ class PagesDueForReviewReport extends SS_Report {
 	 * @return array
 	 */
 	public function columns() {
+		
+		Versioned::reading_stage('Stage');
+		
 		$linkBase = singleton('CMSPageEditController')->Link('show') . '/';
+		
 		$fields = array(
 			'Title' => array(
 				'title' => 'Page name',
 				'formatting' => '<a href=\"' . $linkBase . '/$ID\" title=\"Edit page\">$value</a>'
-			),
-			'ContentReviewType' => array(
-				'title' => 'Settings are',
-				'formatting' => function($value, $item) {
-					return $value;
-				}
 			),
 			'NextReviewDate' => array(
 				'title' => 'Review Date',
@@ -101,11 +99,11 @@ class PagesDueForReviewReport extends SS_Report {
 						return 'disabled';
 					}
 					if($item->ContentReviewType == 'Inherit') {
-						$setting = SiteTreeContentReview::getOptions($item);
+						$setting = $item->getOptions();
 						if(!$setting) {
 							return 'disabled';
 						}
-						return $item->get_next_review_date($setting, $item)->Full();
+						return $item->obj('NextReviewDate')->Full();
 					}
 					return $value;
 				}
@@ -117,7 +115,7 @@ class PagesDueForReviewReport extends SS_Report {
 						return 'disabled';
 					}
 					if($item->ContentReviewType == 'Inherit') {
-						$setting = SiteTreeContentReview::getOptions($item);
+						$setting = $item->getOptions();
 						if(!$setting) {
 							return 'disabled';
 						}
@@ -138,7 +136,21 @@ class PagesDueForReviewReport extends SS_Report {
 						$liveLink ? '(live)' : '(draft)'
 					);
 				}
-			)
+			),
+			'ContentReviewType' => array(
+				'title' => 'Settings are',
+				'formatting' => function($value, $item) use($linkBase) {
+					if($item->ContentReviewType == 'Inherit')  {
+						$options = $item->getOptions();
+						if($options && $options instanceof SiteConfig) {
+							return 'Inherited from <a href="admin/settings">Settings</a>';
+						} elseif($options) {
+							return 'Inherited from <a href="'.$linkBase.$options->ID.'">'.$options->Title.'</a>';
+						}
+					}
+					return $value;
+				}
+			),
 		);
 
 		return $fields;
@@ -194,24 +206,23 @@ class PagesDueForReviewReport extends SS_Report {
 		}
 
 		// Turn a query into records
-		if($sort) {
-			$parts = explode(' ', $sort);
-			$field = $parts[0];
-			$direction = $parts[1];
-
-			if($field == 'AbsoluteLink') {
-				$sort = '"URLSegment" ' . $direction;
-			} elseif($field == 'Subsite.Title') {
-				$records = $records->leftJoin("Subsite", '"Subsite"."ID" = "SiteTree"."SubsiteID"');
-			}
-
-			if($field != "LastEditedByName") {
-				$records = $records->sort($sort);
-			}
-
-			if($limit) $records = $records->limit($limit['limit'], $limit['start']);
-		}
-
-		return $records;
+//		if($sort) {
+//			$parts = explode(' ', $sort);
+//			$field = $parts[0];
+//			$direction = $parts[1];
+//
+//			if($field == 'AbsoluteLink') {
+//				$sort = '"URLSegment" ' . $direction;
+//			} elseif($field == 'Subsite.Title') {
+//				$records = $records->leftJoin("Subsite", '"Subsite"."ID" = "SiteTree"."SubsiteID"');
+//			}
+//
+//			if($field != "LastEditedByName") {
+//				$records = $records->sort($sort);
+//			}
+//
+//			if($limit) $records = $records->limit($limit['limit'], $limit['start']);
+//		}
+		return $records->sort('NextReviewDate', 'DESC');
 	}
 }
