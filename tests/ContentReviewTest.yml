@@ -62,7 +62,7 @@ Page:
         ContentReviewGroups: =>Group.authorgroup
     contact-child:
         Title: Contact Us Child
-        ContentReviewType: inherit
+        ContentReviewType: Inherit
         ParentID: =>Page.contact
 # Cant be reviewed, no NextReviewDate
     no-review:
