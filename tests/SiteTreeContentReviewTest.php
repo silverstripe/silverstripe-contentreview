@@ -4,6 +4,27 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
+	public function testOwnerNames() {
+		$editor = $this->objFromFixture('Member', 'editor');
+		$this->logInAs($editor);
+		
+		$page = new Page();		
+		$page->ReviewPeriodDays = 10;
+		$page->ContentReviewType ='Custom';
+		$page->ContentReviewUsers()->push($editor);
+		$page->write();
+
+		$this->assertTrue($page->doPublish());
+		$this->assertEquals($page->OwnerNames, "Test Editor", 'Test Editor should be the owner');
+		
+		$page = $this->objFromFixture('Page', 'about');
+		$page->OwnerUsers()->removeAll();
+		$page->write();
+		
+		$this->assertTrue($page->doPublish());
+		$this->assertEquals('', $page->OwnerNames);
+	}
+	
 	public function testPermissionsExists() {
 		$perms = singleton('SiteTreeContentReview')->providePermissions();
 		$this->assertTrue(isset($perms['EDIT_CONTENT_REVIEW_FIELDS']));

@@ -132,12 +132,16 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @return string
 	 */
 	public function getOwnerNames() {
+		$options = $this->getOptions();
 		$names = array();
-		foreach($this->OwnerGroups() as $group) {
+		if(!$options) {
+			return '';
+		}
+		foreach($options->OwnerGroups() as $group) {
 			$names[] = $group->getBreadcrumbs(' > ');
 		}
 		
-		foreach($this->OwnerUsers() as $group) {
+		foreach($options->OwnerUsers() as $group) {
 			$names[] = $group->getName();
 		}
 		return implode(', ', $names);
