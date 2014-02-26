@@ -15,30 +15,42 @@ jQuery(function($) {
 		$('.cms-edit-form #ContentReviewType').entwine({
 			// Constructor: onmatch
 			onmatch: function() {
-				// TODO Decouple
-				var dropdown;
-				if(this.attr('id') == 'ContentReviewType') dropdown = $('.contentReviewSettings');
-		
-				this.find('.optionset :input').bind('change', function(e) {
-					var wrapper = $(this).closest('.middleColumn').parent('div');
-					if(e.target.value == 'Custom') {
-						wrapper.addClass('remove-splitter');
-						dropdown['show']();
-					}
-					else {
-						wrapper.removeClass('remove-splitter');
-						dropdown['hide']();	
-					}
+				var self = this;
+				this.find('.optionset :input').on('change', function(e) {
+					self.show_option(e.target.value);
 				});
 		
 				// initial state
 				var currentVal = this.find('input[name=' + this.attr('id') + ']:checked').val();
-				dropdown[currentVal == 'Custom' ? 'show' : 'hide']();
-				
+				this.show_option(currentVal);
 				this._super();
 			},
 			onunmatch: function() {
+				this.find('.optionset :input').off('change');
 				this._super();
+			},
+			
+			show_option: function(value) {
+				if(value === 'Custom') {
+					this._custom();
+				} else if(value === 'Inherit') {
+					this._inherited();
+				} else {
+					this._disabled();
+				}
+			},
+			
+			_custom: function() {
+				$('.custom-settings')['show']();
+				$('.inherited-settings')['hide']();	
+			}, 
+			_inherited: function() {
+				$('.inherited-settings')['show']();	
+				$('.custom-settings')['hide']();
+			},
+			_disabled: function() {
+				$('.inherited-settings')['hide']();	
+				$('.custom-settings')['hide']();
 			}
 		});	
 		
