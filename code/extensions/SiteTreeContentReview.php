@@ -18,6 +18,15 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		'LastEditedByName' => 'Varchar(255)',
 		'OwnerNames' => 'Varchar(255)'
 	);
+
+	
+	/**
+	 *
+	 * @var array
+	 */
+	private static $defaults = array(
+		'ContentReviewType' => 'Inherit'
+	);
 	
 	/**
 	 *
@@ -383,43 +392,25 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		$this->owner->LastEditedByName=$this->owner->getEditorName();
 		$this->owner->OwnerNames = $this->owner->getOwnerNames();
 		
-		// This contains the DataObject that have the content review settings
-		// for this object, it might be this page, one of its parent or SiteConfig
-		$settings = $this->owner->getOptions();
-		
 		// If the user changed the Type, we need to recalculate the
 		// Next review date
 		if($this->owner->isChanged('ContentReviewType', 2)) {
+			
 			// Changed to Disabled
 			if($this->owner->ContentReviewType == 'Disabled') {
-				$nextDate = null;
-			// Changed to Inherit
-			} elseif($this->owner->ContentReviewType == 'Inherit') {
-				// Take from Parent page
-				if($settings && $this->owner->parent()->exists()) {
-					$nextDate = $this->getReviewDate($this->owner->parent());
-				// Inherit from siteconfig
-				} elseif($settings instanceof SiteConfig) {
-					$nextDate = $this->getReviewDate();
-				// No setting, parent disabled
-				} else {
-					 $nextDate = null;
-				}
+				$this->setDefaultReviewDateForDisabled();
 			// Changed to Custom
+			} elseif($this->owner->ContentReviewType == 'Custom') {
+				$this->setDefaultReviewDateForCustom();
+			// Changed to Inherit
 			} else {
-				if($nextDate = $this->owner->NextReviewDate) {
-					$nextDate = $this->owner->NextReviewDate;
-				// No review date provided, use today + period
-				} else {
-					$this->owner->NextReviewDate = null;
-					$nextDate = $this->getReviewDate();
-				}
+				$this->setDefaultReviewDateForInherited();
 			}
-			if(is_object($nextDate)) {
-				$this->owner->NextReviewDate = $nextDate->getValue();
-			} else {
-				$this->owner->NextReviewDate = $nextDate;
-			}
+		}
+		
+		// Ensure that a inherited page always have a next review date
+		if($this->owner->ContentReviewType == 'Inherit' && !$this->owner->NextReviewDate) {
+			$this->setDefaultReviewDateForInherited();
 		}
 		
 		// Oh yey.. now we need to update all the child pages that inherit this setting
@@ -429,11 +420,14 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			return;
 		}
 		
-		if($this->owner->isChanged('ReviewPeriodDays', 2) && !$this->owner->isChanged('ContentReviewType', 2)) {
+		// parent page change it's review period 
+		// && !$this->owner->isChanged('ContentReviewType', 2)
+		if($this->owner->isChanged('ReviewPeriodDays', 2)) {
 			$nextReviewUnixSec = strtotime(' + '.$this->owner->ReviewPeriodDays . ' days', SS_Datetime::now()->format('U'));
-			$this->owner->NextReviewDate = date('Y-m-d');
+			$this->owner->NextReviewDate = date('Y-m-d', $nextReviewUnixSec);
 		}
 		
+		//
 		if($this->owner->isChanged('NextReviewDate', 2)) {
 			$children = $this->owner->stageChildren(true)->filter('ContentReviewType', 'Inherit');
 			foreach($children as $child) {
@@ -442,7 +436,53 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 */
+	private function setDefaultReviewDateForDisabled() {
+		$this->owner->NextReviewDate = null; 
+	}
+	
+	/**
+	 * 
+	 */
+	protected function setDefaultReviewDateForCustom() {
+		if($this->owner->NextReviewDate) {
+			return;
+		}
+		
+		$this->owner->NextReviewDate = null;
+		$nextDate = $this->getReviewDate();
+		
+		if(is_object($nextDate)) {
+			$this->owner->NextReviewDate = $nextDate->getValue(); 
+		} else {
+			$this->owner->NextReviewDate = $nextDate; 
+		}
+		
+	}
+	
+	/**
+	 * 
+	 */
+	protected function setDefaultReviewDateForInherited() {
+		$options = $this->getOptions();
+		$nextDate = null;
+		// Set the review date to be the same as the parents reviewdate
+		if($options && $this->owner->parent()->exists()) {
+			$nextDate = $this->getReviewDate($this->owner->parent());
+		// Use the defualt settings
+		} elseif($options instanceof SiteConfig) {
+			$nextDate = $this->getReviewDate();
+		} 
+		if(is_object($nextDate)) {
+			$this->owner->NextReviewDate = $nextDate->getValue(); 
+		} else {
+			$this->owner->NextReviewDate = $nextDate; 
+		}
+	}
+	
 	/**
 	 * Provide permissions to the CMS
 	 * 

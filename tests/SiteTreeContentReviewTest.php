@@ -4,6 +4,14 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
+	protected $requiredExtensions = array(
+		"SiteTree" => array("SiteTreeContentReview"),
+		"Group" => array("ContentReviewOwner"),
+		"Member" => array("ContentReviewOwner"),
+		"CMSPageEditController" => array("ContentReviewCMSExtension"),
+		"SiteConfig" => array("ContentReviewDefaultSettings"),
+	);
+	
 	public function testOwnerNames() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);

@@ -7,6 +7,14 @@ class ContentReviewSettingsTest extends SapphireTest {
 
 	public static $fixture_file = 'contentreview/tests/ContentReviewSettingsTest.yml';
 	
+	protected $requiredExtensions = array(
+		"SiteTree" => array("SiteTreeContentReview"),
+		"Group" => array("ContentReviewOwner"),
+		"Member" => array("ContentReviewOwner"),
+		"CMSPageEditController" => array("ContentReviewCMSExtension"),
+		"SiteConfig" => array("ContentReviewDefaultSettings"),
+	);
+	
 	public function testAdvanceReviewDate10Days() {
 		$page = new Page();
 		$page->ContentReviewType = 'Custom';
@@ -167,15 +175,20 @@ class ContentReviewSettingsTest extends SapphireTest {
 		$parentPage = $this->objFromFixture('Page', 'page-1');
 		$childPage = $this->objFromFixture('Page', 'page-1-1');
 		
-		// AFTER: parent page have a period of five days, so childPage should have a 
-		// review date LastEdited + 5 days
+		// AFTER: parent page have a period of 10 days, so childPage should have a 
+		// review date now + 10 days
 		$this->assertNotEquals($oldChildDate, $childPage->NextReviewDate);
+		$this->assertEquals($this->addDaysToDate(date('Y-m-d'), 10), $childPage->NextReviewDate);
 		$this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
 	}
 	
 	// helper method for this test class
 	private function addDaysToDate($date, $days, $format='Y-m-d') {
-		$sec = strtotime('+ '. $days .' days', $date->format('U'));
+		if(is_object($date)) {
+			$sec = strtotime('+ '. $days .' days', $date->format('U'));
+		} else {
+			$sec = strtotime('+ '. $days .' days', strtotime($date));
+		}
 		return date($format, $sec);
 	}
 }

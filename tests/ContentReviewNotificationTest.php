@@ -4,6 +4,14 @@ class ContentReviewNotificationTest extends SapphireTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
+	protected $requiredExtensions = array(
+		"SiteTree" => array("SiteTreeContentReview"),
+		"Group" => array("ContentReviewOwner"),
+		"Member" => array("ContentReviewOwner"),
+		"CMSPageEditController" => array("ContentReviewCMSExtension"),
+		"SiteConfig" => array("ContentReviewDefaultSettings"),
+	);
+	
 	public function testContentReviewEmails() {
 		SS_Datetime::set_mock_now('2010-02-24 12:00:00');
 		

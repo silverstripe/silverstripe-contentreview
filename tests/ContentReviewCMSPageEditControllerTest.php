@@ -4,6 +4,14 @@ class ContentReviewCMSPageEditControllerTest extends FunctionalTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
+	protected $requiredExtensions = array(
+		"SiteTree" => array("SiteTreeContentReview"),
+		"Group" => array("ContentReviewOwner"),
+		"Member" => array("ContentReviewOwner"),
+		"CMSPageEditController" => array("ContentReviewCMSExtension"),
+		"SiteConfig" => array("ContentReviewDefaultSettings"),
+	);
+	
 	public function testReviewedThrowsExceptionWithNoRecordID() {
 		$this->setExpectedException('SS_HTTPResponse_Exception', 'No record ID', 404);
 		$controller = new CMSPageEditController();
