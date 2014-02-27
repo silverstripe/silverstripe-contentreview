@@ -313,15 +313,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			new HeaderField(_t('ContentReview.REVIEWHEADER', "Content review"), 2),
 			$viewersOptionsField,
 			CompositeField::create(
-				ReadonlyField::create('ROContentOwners', _t('ContentReview.CONTENTOWNERS', 'Content Owners'), $this->getOwnerNames()),
-				ReadonlyField::create('RONextReviewDate', _t("ContentReview.NEXTREVIEWDATE", "Next review date"), $this->owner->NextReviewDate)
-			)->addExtraClass('inherited-settings'),
-			CompositeField::create(
 				$userField,
 				$groupField,
 				$reviewDate,
 				$reviewFrequency
 			)->addExtraClass('custom-settings'),
+			ReadonlyField::create('ROContentOwners', _t('ContentReview.CONTENTOWNERS', 'Content Owners'), $this->getOwnerNames()),
+			ReadonlyField::create('RONextReviewDate', _t("ContentReview.NEXTREVIEWDATE", "Next review date"), $this->owner->NextReviewDate),
 			$notesField
 		));
 	}

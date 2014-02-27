@@ -16,7 +16,7 @@ jQuery(function($) {
 			// Constructor: onmatch
 			onmatch: function() {
 				var self = this;
-				this.find('.optionset :input').on('change', function(e) {
+				this.find('.optionset :input').bind('change', function(e) {
 					self.show_option(e.target.value);
 				});
 		
@@ -26,8 +26,7 @@ jQuery(function($) {
 				this._super();
 			},
 			onunmatch: function() {
-				this.find('.optionset :input').off('change');
-				this._super();
+				return this._super();
 			},
 			
 			show_option: function(value) {
@@ -42,15 +41,18 @@ jQuery(function($) {
 			
 			_custom: function() {
 				$('.custom-settings')['show']();
-				$('.inherited-settings')['hide']();	
+				$('#ROContentOwners')['hide']();	
+				$('#RONextReviewDate')['hide']();	
 			}, 
 			_inherited: function() {
-				$('.inherited-settings')['show']();	
 				$('.custom-settings')['hide']();
+				$('#ROContentOwners')['show']();	
+				$('#RONextReviewDate')['show']();	
 			},
 			_disabled: function() {
-				$('.inherited-settings')['hide']();	
 				$('.custom-settings')['hide']();
+				$('#ROContentOwners')['hide']();	
+				$('#RONextReviewDate')['hide']();	
 			}
 		});	
 		
