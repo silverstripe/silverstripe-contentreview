@@ -40,19 +40,16 @@ jQuery(function($) {
 			},
 			
 			_custom: function() {
-				$('.custom-settings')['show']();
-				$('#ROContentOwners')['hide']();	
-				$('#RONextReviewDate')['hide']();	
+				$('.custom-settings').show();
+				$('.inherited-settings').hide();	
 			}, 
 			_inherited: function() {
-				$('.custom-settings')['hide']();
-				$('#ROContentOwners')['show']();	
-				$('#RONextReviewDate')['show']();	
+				$('.inherited-settings').show();	
+				$('.custom-settings').hide();
 			},
 			_disabled: function() {
-				$('.custom-settings')['hide']();
-				$('#ROContentOwners')['hide']();	
-				$('#RONextReviewDate')['hide']();	
+				$('.inherited-settings').hide();	
+				$('.custom-settings').hide();
 			}
 		});	
 		
