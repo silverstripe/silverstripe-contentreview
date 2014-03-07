@@ -1,6 +1,8 @@
 # Content Review module
 
 [![Build Status](https://travis-ci.org/silverstripe-labs/silverstripe-contentreview.png?branch=feature_improvements)](https://travis-ci.org/silverstripe-labs/silverstripe-contentreview)
+[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/badges/quality-score.png?s=e68f2c583f03c7eab0326781f6219f0ed58c9ad8)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/)
+[![Code Coverage](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/badges/coverage.png?s=42151d66ef5121363face01c03c94dc479baa408)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/)
 
 This module helps with ensuring that a websites content are correct and up-to-date so that visitors 
 can rely on the information provided by the client.
