@@ -70,6 +70,36 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	}
 	
 	/**
+	 * Takes a list of groups and members and return a list of unique member
+	 * 
+	 * @param SS_List $groups
+	 * @param SS_List $members
+	 * @return ArrayList
+	 */
+	public static function merge_owners(SS_List $groups, SS_List $members) {
+		$contentReviewOwners = new ArrayList();
+		if($groups->count()) {
+			$groupIDs = array();
+			foreach($groups as $group) {
+				$familyIDs = $group->collateFamilyIDs();
+				if(is_array($familyIDs)) {
+					$groupIDs = array_merge($groupIDs, array_values($familyIDs));
+				}
+			}
+			array_unique($groupIDs);
+			if(count($groupIDs)) {
+				$groupMembers = DataObject::get('Member')->where("\"Group\".\"ID\" IN (" . implode(",",$groupIDs) . ")")
+				->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
+				->leftJoin("Group", "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
+				$contentReviewOwners->merge($groupMembers);
+			}
+		}
+		$contentReviewOwners->merge($members);
+		$contentReviewOwners->removeDuplicates();
+		return $contentReviewOwners;
+	}
+	
+	/**
 	 * 
 	 * @param \FieldList $actions
 	 */
@@ -189,27 +219,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 	 * @return \ArrayList
 	 */
 	public function ContentReviewOwners() {
-		$contentReviewOwners = new ArrayList();
-		$toplevelGroups = $this->OwnerGroups();
-		if($toplevelGroups->count()) {
-			$groupIDs = array();
-			foreach($toplevelGroups as $group) {
-				$familyIDs = $group->collateFamilyIDs();
-				if(is_array($familyIDs)) {
-					$groupIDs = array_merge($groupIDs, array_values($familyIDs));
-				}
-			}
-			array_unique($groupIDs);
-			if(count($groupIDs)) {
-				$groupMembers = DataObject::get('Member')->where("\"Group\".\"ID\" IN (" . implode(",",$groupIDs) . ")")
-				->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
-				->leftJoin("Group", "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
-				$contentReviewOwners->merge($groupMembers);
-			}
-		}
-		$contentReviewOwners->merge($this->OwnerUsers());
-		$contentReviewOwners->removeDuplicates();
-		return $contentReviewOwners;
+		return SiteTreeContentReview::merge_owners($this->OwnerGroups(), $this->OwnerUsers());
 	}
 	
 	/**

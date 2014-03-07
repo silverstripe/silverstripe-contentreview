@@ -26,17 +26,6 @@ class ContentReviewCMSPageEditControllerTest extends FunctionalTest {
 		$controller->reviewed(array('ID'=>'FAIL', 'Message' => null), $dummyForm);
 	}
 	
-	public function testReviewedThrowsExceptionWithWrongAccess() {
-		$visitor = $this->objFromFixture('Member', 'visitor');
-		$this->loginAs($visitor);		
-		$page = $this->objFromFixture('Page', 'home');
-		$data = array(
-			'action_reviewed' => 1
-		);
-		$response = $this->post('admin/pages/edit/EditForm', $data);
-		$this->assertEquals(403, $response->getStatusCode());
-	}
-	
 	public function testReviewedWithAuthor() {
 		$author = $this->objFromFixture('Member', 'author');
 		$this->loginAs($author);		

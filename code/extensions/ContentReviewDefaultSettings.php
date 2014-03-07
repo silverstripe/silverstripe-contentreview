@@ -101,26 +101,7 @@ class ContentReviewDefaultSettings extends DataExtension {
 	 * @return \ArrayList
 	 */
 	public function ContentReviewOwners() {
-		$contentReviewOwners = new ArrayList();
-		$toplevelGroups = $this->OwnerGroups();
-		if($toplevelGroups->count()) {
-			$groupIDs = array();
-			foreach($toplevelGroups as $group) {
-				$familyIDs = $group->collateFamilyIDs();
-				if(is_array($familyIDs)) {
-					$groupIDs = array_merge($groupIDs, array_values($familyIDs));
-				}
-			}
-			array_unique($groupIDs);
-			if(count($groupIDs)) {
-				$groupMembers = DataObject::get('Member')->where("\"Group\".\"ID\" IN (" . implode(",",$groupIDs) . ")")
-				->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
-				->leftJoin("Group", "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
-				$contentReviewOwners->merge($groupMembers);
-			}
-		}
-		$contentReviewOwners->merge($this->OwnerUsers());
-		$contentReviewOwners->removeDuplicates();
-		return $contentReviewOwners;
+		return new ArrayList();
+		return SiteTreeContentReview::merge_owners($this->OwnerGroups(), $this->OwnerUsers());
 	}
 }
