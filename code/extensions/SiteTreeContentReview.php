@@ -511,4 +511,25 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 			)
 		);
 	}
+
+	/**
+	 * If the queuedjobs module is installed, queue up the first job for 9am tomorrow morning (by default)
+	 */
+	public function requireDefaultRecords() {
+		if(class_exists('ContentReviewNotificationJob')) {
+			// Ensure there is not already a job queued
+			if(QueuedJobDescriptor::get()->filter('Implementation', 'ContentReviewNotificationJob')->first()) return;
+
+			$nextRun = new ContentReviewNotificationJob();
+			$runHour = Config::inst()->get('ContentReviewNotificationJob', 'first_run_hour');
+			$firstRunTime = date('Y-m-d H:i:s', mktime($runHour, 0, 0, date("m"), date("d")+1, date("y")));
+
+			singleton('QueuedJobService')->queueJob(
+				$nextRun,
+				$firstRunTime
+			);
+
+			DB::alteration_message(sprintf('Added ContentReviewNotificationJob to run at %s', $firstRunTime));
+		}
+	}
 }
