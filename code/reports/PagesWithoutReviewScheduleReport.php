@@ -31,11 +31,14 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 	 * @return array
 	 */
 	public function columns() {
-		$linkBase = singleton('CMSPageEditController')->Link('show') . '/';
+		$linkBase = singleton('CMSPageEditController')->Link('show');
+		$linkPath = parse_url($linkBase, PHP_URL_PATH);
+		$linkQuery = parse_url($linkBase, PHP_URL_QUERY);
+
 		$fields = array(
 			'Title' => array(
 				'title' => 'Page name',
-				'formatting' => '<a href=\"' . $linkBase . '/$ID\" title=\"Edit page\">$value</a>'
+				'formatting' => sprintf('<a href=\"%s/$ID?%s\" title=\"Edit page\">$value</a>', $linkPath, $linkQuery)
 			),
 			'NextReviewDate' => array(
 				'title' => 'Review Date',
@@ -59,13 +62,19 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 			),
 			'ContentReviewType' => array(
 				'title' => 'Settings are',
-				'formatting' => function($value, $item) use($linkBase) {
+				'formatting' => function($value, $item) use($linkPath, $linkQuery) {
 					if($item->ContentReviewType == 'Inherit')  {
 						$options = $item->getOptions();
 						if($options && $options instanceof SiteConfig) {
 							return 'Inherited from <a href="admin/settings">Settings</a>';
 						} elseif($options) {
-							return 'Inherited from <a href="'.$linkBase.$options->ID.'">'.$options->Title.'</a>';
+							return sprintf(
+								'Inherited from <a href="%s/%d?%s">%s</a>',
+								$linkPath,
+								$options->ID,
+								$linkQuery,
+								$options->Title
+							);
 						}
 					}
 					return $value;
