@@ -4,39 +4,37 @@
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/badges/quality-score.png?s=e68f2c583f03c7eab0326781f6219f0ed58c9ad8)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/)
 [![Code Coverage](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/badges/coverage.png?s=42151d66ef5121363face01c03c94dc479baa408)](https://scrutinizer-ci.com/g/silverstripe-labs/silverstripe-contentreview/)
 
-This module helps with ensuring that a websites content are correct and up-to-date so that visitors 
-can rely on the information provided by the client.
+This module helps keep your website content accurate and up-to-date, which keeps your users happy. 
 
-For a reviewer this often includes checking links, grammar, factual information and look and feel.
-
-
-## Roles
+It does so by sending reviewers reminder emails to go in and check the content. For a reviewer this 
+often includes checking links, grammar, factual information and look and feel.
 
 There are two types of roles with this module. 
 
- * Content Owner; are responsible to periodically review a page.
- * Website Responsible; ensures that pages have an scheduled content review with an Content Owner.
+ * Website owner; (typically assigned to the Administrator group) ensures that a website is accurate and up-to-date, by delegating responsibility to content reviewers.
+ * Content reviewer; responsible for keeping a website or part of a website accurate and up-to-date.
 
 ## Features
 
- * Content owner will receive a notification when a pages review date is due with links to the page and the CMS edit form 
- * Content owners can mark a page as 'reviewed' via the CMS Page edit view.
- * Website Responsible can assign a content owner (members or groups) to a page (and optionally all sub-pages) and a schedule of how often the content should be reviewed.
- * Website Responsible can see a “pages due for review” report
- * Website Responsible can see a “pages without content owner” report
- * Website Responsible can set a default Content Owner and schedule for all pages without a review schedule.
+ * Content reviewer will receive an email notification when a page is due for review. 
+ * Content reviewer can mark a page as 'reviewed', and provide review notes.
+ * Website owner can assign content reviewers to a page and set when the content should be reviewed.
+ * Website owner can see a report of pages and their reviewed status.
+ * Content reviewers can be assigned to a page, a page and all sub-pages, or globally.
+ * The content review schedule can be automatic, e.g. every month, and/or a specific date. 
 
-## Wished features:
+## Wishlist features:
 
- * Reminder emails that notifies Content Owner and Website responsible that a review is over due.
- * Emails are customisable in the CMS
-
+ * Overdue review reminder emails.
+ * Customisable reminder emails.
 
 ## Requirements
 
- * SilverStripe framework and CMS 3.1
- * Database: MySQL, PostgreSQL, SQLite or MSSQL
- * PHP 5.3 or newer
+ * SilverStripe Framework and CMS
+
+## Composer installation
+
+	composer require silverstripe/contentreview
 
 ## Manual installation
 
@@ -45,10 +43,6 @@ to `contentreview`.
 
 Run dev/build either via the webserver by opening the url `http://<your-host>/dev/build` or 
 by running the dev/build via a CLI.
-
-## Composer installation
-
-	composer require silverstripe/contentreview dev-feature_improvements
 
 ## Configuration
 
@@ -59,12 +53,12 @@ In order for the contentreview module to send emails, you need to *either*:
 
 ## Usage
 
-To set up a content review schedule the Website responsible needs the permission first. It can be 
-set up by and administrator in the Security Admin under the 'Content Permission' for a group.
+To set up content review schedules you need to log in as a user with the 'Set content owners and review dates' permission. This can either 
+be an administrator who has all permissions, or by giving a group the specific permission. 
 
 ![](docs/en/images/content-review-permission.png)
 
-To set a schedule for a page you need to open the `Settings > Content Review` setting for that page.
+To set a content review schedule for a page go to `Settings > Content Review`.
 
 ![](docs/en/images/content-review-settings.png)
 
@@ -73,7 +67,14 @@ and previous reviews in the same view, but cannot change anything.
 
 ![](docs/en/images/content-review-settings-ro.png)
 
+## Testing
+
+cd to the site root, and run 
+	php vendor/bin/behat
+
+or to test this module when used on a website
+	php vendor/bin/behat contentreview/tests
 
 ## Migration
 
- * Todo, make a migration script from latest master
+ * If you are upgrading from an older version, you may need to run the ContentReviewOwnerMigrationTask
