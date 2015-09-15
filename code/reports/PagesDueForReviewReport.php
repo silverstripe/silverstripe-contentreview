@@ -116,7 +116,7 @@ class PagesDueForReviewReport extends SS_Report {
 	 * @param array $params
 	 * @param string $sort
 	 * @param array $limit
-	 * @return DataList
+	 * @return SS_List
 	 */
 	public function sourceRecords($params, $sort, $limit) {
 		Versioned::reading_stage('Stage');
@@ -159,6 +159,18 @@ class PagesDueForReviewReport extends SS_Report {
 			$records = $records->filter('OwnerNames:PartialMatch', $ownerNames);
 		}
 		
-		return $records->sort('NextReviewDate', 'DESC');
+		// Make sure we get results from all subsites, because only the main site has the Reports section
+		$subsiteFilterBefore = null;
+		if(class_exists('Subsite')){
+			$subsiteFilterBefore = Subsite::disable_subsite_filter(true);
+		}
+		
+		$r = new ArrayList($records->sort('NextReviewDate', 'DESC')->toArray());
+		
+		if(class_exists('Subsite')){
+			Subsite::disable_subsite_filter($subsiteFilterBefore);
+		}
+		
+		return $r;
 	}
 }
