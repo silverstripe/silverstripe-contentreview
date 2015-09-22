@@ -12,7 +12,7 @@ class ContentReviewReportTest extends FunctionalTest {
 		"SiteConfig" => array("ContentReviewDefaultSettings"),
 	);
 	
-	public function testReportContent() {
+	public function testPagesDueForReviewReport() {
 		$editor = $this->objFromFixture('Member', 'editor');
 		$this->logInAs($editor);
 		$report = new PagesDueForReviewReport();
@@ -24,8 +24,8 @@ class ContentReviewReportTest extends FunctionalTest {
 		$results = $report->sourceRecords(array(
 			'ReviewDateAfter' => '01/01/2010',
 			'ReviewDateBefore' => '12/12/2010'
-		), 'NextReviewDate ASC', false);
-		
+		));
+
 		$this->assertEquals(array(
 			'Contact Us',
 			'Contact Us Child',
@@ -35,14 +35,32 @@ class ContentReviewReportTest extends FunctionalTest {
 		), $results->column('Title'));
 		
 		SS_Datetime::set_mock_now('2010-02-13 00:00:00');
-		$results = $report->sourceRecords(array(
-		), 'NextReviewDate ASC', false);
+		$results = $report->sourceRecords(array());
 		$this->assertEquals(array(
 			'About Us',
 			'Home'
 		), $results->column('Title'));
 		
 		SS_Datetime::clear_mock_now();
+	}
+	
+	public function testPagesWithoutReviewScheduleReport() {
+		$editor = $this->objFromFixture('Member', 'editor');
+		$this->logInAs($editor);
+		$report = new PagesWithoutReviewScheduleReport();
+	
+		$report->parameterFields();
+		$report->columns();
+		$report->title();
+	
+		$results = $report->sourceRecords();
+	
+		$this->assertEquals(array(
+			'Home',
+			'About Us',
+			'Page without review date',
+			'Page owned by group',
+		), $results->column('Title'));
 	}
 	
 }

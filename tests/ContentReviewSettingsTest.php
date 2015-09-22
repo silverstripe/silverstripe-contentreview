@@ -82,8 +82,10 @@ class ContentReviewSettingsTest extends SapphireTest {
 	
 	public function testGetSettingsObjectFromInheritPage() {
 		$page = $this->objFromFixture('Page', 'page-1-1');
+		$parentPage = $this->objFromFixture('Page', 'page-1');
 		$this->assertEquals('Inherit', $page->ContentReviewType);
-		$this->assertEquals($this->objFromFixture('Page', 'page-1'), $page->getOptions());
+		$this->assertEquals(get_class($parentPage), get_class($page->getOptions()));
+		$this->assertEquals($parentPage->ID, $page->getOptions()->ID);
 	}
 
 	public function testGetSettingsObjectFromInheritedRootPage() {

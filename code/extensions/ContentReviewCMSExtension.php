@@ -70,7 +70,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension {
 		$SQL_id = Convert::raw2sql($data['ID']);
 		$page = SiteTree::get()->byID($SQL_id);
 		if($page && !$page->canEdit()) {
-			return Security::permissionFailure($this);
+			return Security::permissionFailure();
 		}
 		if(!$page || !$page->ID) {
 			throw new SS_HTTPResponse_Exception("Bad record ID #$SQL_id", 404);

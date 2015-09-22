@@ -1,6 +1,6 @@
 <?php
 
-class ContentReviewCMSPageEditControllerTest extends FunctionalTest {
+class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
@@ -43,7 +43,7 @@ class ContentReviewCMSPageEditControllerTest extends FunctionalTest {
 	
 	public function testSaveReview() {
 		$author = $this->objFromFixture('Member', 'author');
-		$this->loginAs($author);		
+		$this->loginAs($author);	
 		$page = $this->objFromFixture('Page', 'home');
 		
 		$data = array(

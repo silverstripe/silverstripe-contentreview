@@ -1,6 +1,6 @@
 <?php
 
-class SiteTreeContentReviewTest extends FunctionalTest {
+class SiteTreeContentReviewTest extends ContentReviewBaseTest {
 	
 	public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
 	
@@ -22,6 +22,7 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$page->ContentReviewUsers()->push($editor);
 		$page->write();
 
+		$this->assertTrue($page->canPublish());
 		$this->assertTrue($page->doPublish());
 		$this->assertEquals($page->OwnerNames, "Test Editor", 'Test Editor should be the owner');
 		
@@ -29,6 +30,7 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$page->OwnerUsers()->removeAll();
 		$page->write();
 		
+		$this->assertTrue($page->canPublish());
 		$this->assertTrue($page->doPublish());
 		$this->assertEquals('', $page->OwnerNames);
 	}
@@ -171,4 +173,5 @@ class SiteTreeContentReviewTest extends FunctionalTest {
 		$this->assertNull($fields->fieldByName('action_reviewed'));
 		SS_Datetime::clear_mock_now();
 	}
+	
 }

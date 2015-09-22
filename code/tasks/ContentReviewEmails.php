@@ -22,31 +22,21 @@ class ContentReviewEmails extends BuildTask {
 	 * @param SS_HTTPRequest $request
 	 */
 	public function run($request) {
-		// Disable subsite filter (if installed)
-		if (ClassInfo::exists('Subsite')) {
-			$oldSubsiteState = Subsite::$disable_subsite_filter;
-			Subsite::$disable_subsite_filter = true;
-		}
-		
-		$overduePages = array();
+		$c = ContentReviewCompatability::start();
 		
 		$now = class_exists('SS_Datetime') ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate();
 		
 		// First grab all the pages with a custom setting
 		$pages = Page::get('Page')->where('"SiteTree"."NextReviewDate" <= \''.$now.'\'');
 		
-		$this->getOverduePagesForOwners($pages, $overduePages);
-		
+		$overduePages = $this->getOverduePagesForOwners($pages);
 		
 		// Lets send one email to one owner with all the pages in there instead of no of pages of emails
 		foreach($overduePages as $memberID => $pages) {
 			$this->notifyOwner($memberID, $pages);
 		}
 		
-		// Revert subsite filter (if installed)
-		if(ClassInfo::exists('Subsite')) {
-			Subsite::$disable_subsite_filter = $oldSubsiteState;
-		}
+		ContentReviewCompatability::done($c);
 	}
 	
 	/**
@@ -55,7 +45,8 @@ class ContentReviewEmails extends BuildTask {
 	 * @param array &$pages
 	 * @return array
 	 */
-	protected function getOverduePagesForOwners(SS_list $pages, array &$overduePages) {
+	protected function getOverduePagesForOwners(SS_list $pages) {
+		$overduePages = array();
 		
 		foreach($pages as $page) {
 			if(!$page->canBeReviewedBy()) {

@@ -88,12 +88,11 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 	/**
 	 * 
 	 * @param array $params
-	 * @param string $sort
-	 * @param array $limit
 	 * @return SS_List
 	 */
-	public function sourceRecords($params, $sort, $limit) {
+	public function sourceRecords($params = array()) {
 		Versioned::reading_stage('Stage');
+		$c = ContentReviewCompatability::start();
 		$records = SiteTree::get();
 
 		// If there's no review dates set, default to all pages due for review now
@@ -108,21 +107,8 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 			));
 		}
 		
-		
 		$records->sort('ParentID');
-		
-		// Make sure we get results from all subsites, because only the main site has the Reports section
-		$subsiteFilterBefore = null;
-		if(class_exists('Subsite')){
-			$subsiteFilterBefore = Subsite::disable_subsite_filter(true);
-		}
-		
 		$records = $records->toArray();
-		
-		if(class_exists('Subsite')){
-			Subsite::disable_subsite_filter($subsiteFilterBefore);
-		}
-		
 		
 		// Trim out calculated values
 		$list = new ArrayList();
@@ -131,6 +117,8 @@ class PagesWithoutReviewScheduleReport extends SS_Report {
 				$list->push($record);
 			}
 		}
+		
+		ContentReviewCompatability::done($c);
 		return $list;
 	}
 	

@@ -443,11 +443,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider 
 		
 		//
 		if($this->owner->isChanged('NextReviewDate', 2)) {
+			$c = ContentReviewCompatability::start();
 			$children = $this->owner->stageChildren(true)->filter('ContentReviewType', 'Inherit');
 			foreach($children as $child) {
 				$child->NextReviewDate = $this->owner->NextReviewDate;
 				$child->write();
 			}
+			ContentReviewCompatability::done($c);
 		}
 	}
 	
