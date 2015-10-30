@@ -119,9 +119,9 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     public function updateCMSActions(FieldList $actions)
     {
         if ($this->canBeReviewedBy(Member::currentUser())) {
-            $reviewAction = FormAction::create("reviewed", _t("ContentReview.BUTTONREVIEWED", "Content reviewed"))
+            $reviewAction = FormAction::create("reviewed", _t("ContentReview.BUTTONREVIEWED", "Review content"))
                 ->setAttribute("data-icon", "pencil")
-                ->setAttribute("data-text-alternate", _t("ContentReview.BUTTONREVIEWED", "Content reviewed"));
+                ->setAttribute("data-text-alternate", _t("ContentReview.BUTTONREVIEWED", "Review content"));
 
             $actions->push($reviewAction);
         }
