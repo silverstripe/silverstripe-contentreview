@@ -1,17 +1,14 @@
 <?php
 
 /**
- * Description of GroupContentReview
- *
- * @codeCoverageIgnore
+ * Description of GroupContentReview.
  */
-class ContentReviewOwner extends DataExtension {
-	
-	/**
-	 *
-	 * @var array
-	 */
-	private static $many_many = array(
-		"SiteTreeContentReview" => "SiteTree"
-	);
+class ContentReviewOwner extends DataExtension
+{
+    /**
+     * @var array
+     */
+    private static $many_many = array(
+        "SiteTreeContentReview" => "SiteTree",
+    );
 }
