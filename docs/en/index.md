@@ -2,8 +2,8 @@
 
 [![Build Status](http://img.shields.io/travis/silverstripe/silverstripe-contentreview.svg?style=flat-square)](https://travis-ci.org/silverstripe/silverstripe-contentreview)
 [![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-contentreview.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview)
-[![Version](http://img.shields.io/packagist/v/silverstripe/contentreview.svg?style=flat-square)](https://packagist.org/packages/silverstripe/silverstripe-contentreview)
-[![License](http://img.shields.io/packagist/l/silverstripe/contentreview.svg?style=flat-square)](LICENSE.md)
+[![Version](http://img.shields.io/packagist/v/silverstripe/contentreview.svg?style=flat-square)](https://packagist.org/packages/silverstripe/contentreview)
+[![License](http://img.shields.io/packagist/l/silverstripe/contentreview.svg?style=flat-square)](license.md)
 
 This module helps keep your website content accurate and up-to-date, which keeps your users happy.
 
