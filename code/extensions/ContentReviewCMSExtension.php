@@ -27,7 +27,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension {
 		if(!isset($data['ID'])) {
 			throw new SS_HTTPResponse_Exception("No record ID", 404);
 		}
-		$SQL_id = Convert::raw2sql($data['ID']);
+		$SQL_id = (int) $data['ID'];
 		$record = SiteTree::get()->byID($SQL_id);
 		
 		if(!$record || !$record->ID) {
@@ -67,7 +67,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension {
 		if(!isset($data['ID'])) {
 			throw new SS_HTTPResponse_Exception("No record ID", 404);
 		}
-		$SQL_id = Convert::raw2sql($data['ID']);
+		$SQL_id = (int) $data['ID'];
 		$page = SiteTree::get()->byID($SQL_id);
 		if($page && !$page->canEdit()) {
 			return Security::permissionFailure();

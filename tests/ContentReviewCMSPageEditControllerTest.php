@@ -20,7 +20,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest {
 	}
 	
 	public function testReviewedThrowsExceptionWithWrongRecordID() {
-		$this->setExpectedException('SS_HTTPResponse_Exception', 'Bad record ID #FAIL', 404);
+		$this->setExpectedException('SS_HTTPResponse_Exception');
 		$controller = new CMSPageEditController();
 		$dummyForm = new CMSForm($controller, 'EditForm', new FieldList(), new FieldList());
 		$controller->reviewed(array('ID'=>'FAIL', 'Message' => null), $dummyForm);
