@@ -26,7 +26,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
     public function reviewed($data, Form $form)
     {
         if (!isset($data["ID"])) {
-            throw new SS_HTTPResponse_Exception('No record ID', 404);
+            throw new SS_HTTPResponse_Exception("No record ID", 404);
         }
 
         $id = (int) $data["ID"];
@@ -40,12 +40,14 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
             return Security::permissionFailure($this->owner);
         }
 
-        $fields = new FieldList();
+        $reviewNotes = TextareaField::create("ReviewNotes", _t("ContentReview.REVIEWNOTES", "Review notes"));
+		$reviewNotes->setDescription(_t("ContentReview.REVIEWNOTESDESCRIPTION ", "Add comments for the content of this page."));
+		$fields = new FieldList();
         $fields->push(HiddenField::create("ID", "ID", $id));
-        $fields->push(TextareaField::create("ReviewNotes", "Review notes"));
+        $fields->push($reviewNotes);
 
         $actions = new FieldList(
-            FormAction::create("save_review", "Save")
+            FormAction::create("save_review", _t("ContentReview.SAVE", "Save"))
         );
 
         $form = CMSForm::create($this->owner, "EditForm", $fields, $actions)->setHTMLID("Form_EditForm");
