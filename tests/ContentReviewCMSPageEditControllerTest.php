@@ -88,7 +88,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
             "ReviewNotes"        => "This is the best page ever",
         );
 
-        $response = $this->post("admin/pages/edit/EditForm", $data);
+        $response = $this->post("admin/pages/edit/AddReviewForm", $data);
 
         $this->assertEquals("OK", $response->getStatusDescription());
         $this->assertEquals(200, $response->getStatusCode());

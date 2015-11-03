@@ -6,6 +6,7 @@
  */
 abstract class ContentReviewBaseTest extends FunctionalTest
 {
+
     /**
      * @var bool
      */
@@ -38,5 +39,7 @@ abstract class ContentReviewBaseTest extends FunctionalTest
                 SiteTree::add_extension("Translatable");
             }
         }
+
+        parent::tearDown();
     }
 }
