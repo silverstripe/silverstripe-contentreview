@@ -1,0 +1,35 @@
+en:
+  ContentReview:
+    ADDGROUP: 'Add groups'
+    ADDUSERS: 'Add users'
+    BUTTONREVIEWED: 'Review content'
+    CONTENTOWNERS: 'Content Owners'
+    CUSTOM: 'Custom settings'
+    DEFAULTSETTINGSHELP: 'These content review settings will apply to all pages that does not have specific Content Review schedule.'
+    DISABLE: 'Disable content review'
+    INHERIT: 'Inherit from parent page'
+    NEXTREVIEWDATADESCRIPTION: 'Leave blank for no review'
+    NEXTREVIEWDATE: 'Next review date'
+    OPTIONS: Options
+    OWNERGROUPSDESCRIPTION: 'Page owners that are responsible for reviews'
+    OWNERUSERSDESCRIPTION: 'Page owners that are responsible for reviews'
+    PAGEOWNERGROUPS: Groups
+    PAGEOWNERUSERS: Users
+    REVIEWFREQUENCY: 'Review frequency'
+    REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future whenever the page is published'
+    REVIEWHEADER: 'Content review'
+    REVIEWNOTES: 'Review notes'
+    'REVIEWNOTESDESCRIPTION ': 'Add comments for the content of this page.'
+    SAVE: Save
+    SETTINGSFROM: 'Options are'
+  ContentReviewEmails:
+    REVIEWPAGELINK: 'Review the page in the CMS'
+    SUBJECT: 'Page(s) are due for content review'
+    VIEWPUBLISHEDLINK: 'View this page on the website'
+  ContentReviewLog:
+    PLURALNAME: 'Content Review Logs'
+    SINGULARNAME: 'Content Review Log'
+  PagesDueForReviewReport:
+    TITLE: 'Pages due for review'
+  PagesWithoutReviewScheduleReport:
+    TITLE: 'Pages without a scheduled review.'
