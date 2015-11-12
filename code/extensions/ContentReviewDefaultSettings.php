@@ -112,10 +112,7 @@ class ContentReviewDefaultSettings extends DataExtension
      *
      * @return ArrayList
      */
-    public function ContentReviewOwners()
-    {
-        return new ArrayList();
-
+    public function ContentReviewOwners() {
         return SiteTreeContentReview::merge_owners($this->OwnerGroups(), $this->OwnerUsers());
     }
 }

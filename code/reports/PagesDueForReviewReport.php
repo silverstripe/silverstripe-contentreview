@@ -23,16 +23,18 @@ class PagesDueForReviewReport extends SS_Report
         $filtersList = new FieldList();
 
         $filtersList->push(
-            DateField::create("ReviewDateAfter", "Review date after or on")
+            DateField::create("ReviewDateAfter", _t("PagesDueForReviewReport.REVIEWDATEAFTER", "Review date after or on"))
                 ->setConfig("showcalendar", true)
         );
 
         $filtersList->push(
-            DateField::create("ReviewDateBefore", "Review date before or on", date("d/m/Y", strtotime("midnight")))
+            DateField::create("ReviewDateBefore", _t("PagesDueForReviewReport.REVIEWDATEBEFORE", "Review date before or on"), date("d/m/Y", strtotime("midnight")))
                 ->setConfig("showcalendar", true)
         );
 
-        $filtersList->push(new CheckboxField("ShowVirtualPages", "Show Virtual Pages"));
+        $filtersList->push(new CheckboxField("ShowVirtualPages", _t("PagesDueForReviewReport.SHOWVIRTUALPAGES", "Show Virtual Pages")));
+
+        $filtersList->push(new CheckboxField("OnlyMyPages", _t("PagesDueForReviewReport.ONLYMYPAGES", "Only Show pages assigned to me")));
 
         return $filtersList;
     }
@@ -159,7 +161,23 @@ class PagesDueForReviewReport extends SS_Report
             $records = $records->filter("OwnerNames:PartialMatch", $ownerNames);
         }
 
-        $records = new ArrayList($records->sort("NextReviewDate", "DESC")->toArray());
+        // Only show pages assigned to the current user?
+        // This come last because it transforms $records to an ArrayList.
+        if (!empty($params["OnlyMyPages"])) {
+            $currentUser = Member::currentUser();
+
+            $records = $records->filterByCallback(function($page) use ($currentUser) {
+                $options = $page->getOptions();
+
+                foreach ($options->ContentReviewOwners() as $owner) {
+                    if ($currentUser->ID == $owner->ID) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+        }
 
         ContentReviewCompatability::done($compatibility);
 
