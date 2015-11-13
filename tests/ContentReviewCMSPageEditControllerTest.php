@@ -30,7 +30,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
 
         $dummyForm = new CMSForm($controller, "EditForm", new FieldList(), new FieldList());
 
-        $controller->reviewed(array(
+        $controller->savereview(array(
             "ID"      => null,
             "Message" => null,
         ), $dummyForm);
@@ -45,7 +45,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
 
         $dummyForm = new CMSForm($controller, "EditForm", new FieldList(), new FieldList());
 
-        $controller->reviewed(array(
+        $controller->savereview(array(
             "ID"      => "FAIL",
             "Message" => null,
         ), $dummyForm);
@@ -62,10 +62,11 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         $page = $this->objFromFixture("Page", "home");
 
         $data = array(
-            "action_reviewed" => 1,
+            "action_savereview" => 1,
             "ID"              => $page->ID,
         );
 
+        $this->get('admin/pages/edit/show/' . $page->ID);
         $response = $this->post("admin/pages/edit/EditForm", $data);
 
         $this->assertEquals("OK", $response->getStatusDescription());
@@ -83,13 +84,14 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         $page = $this->objFromFixture("Page", "home");
 
         $data = array(
-            "action_save_review" => 1,
+            "action_savereview" => 1,
             "ID"                 => $page->ID,
             "ReviewNotes"        => "This is the best page ever",
         );
 
-        $response = $this->post("admin/pages/edit/AddReviewForm", $data);
-
+        $this->get('admin/pages/edit/show/' . $page->ID);
+        $response = $this->post("admin/pages/edit/EditForm", $data);
+        
         $this->assertEquals("OK", $response->getStatusDescription());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(1, $page->ReviewLogs()->count());

@@ -258,7 +258,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         $fields = $page->getCMSActions();
 
-        $this->assertNotNull($fields->fieldByName("action_reviewed"));
+        $this->assertNotNull($fields->fieldByName("ActionMenus.ReviewContent"));
 
         SS_Datetime::clear_mock_now();
     }
@@ -277,7 +277,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         $fields = $page->getCMSActions();
 
-        $this->assertNull($fields->fieldByName("action_reviewed"));
+        $this->assertNull($fields->fieldByName("ActionMenus.ReviewContent"));
 
         SS_Datetime::clear_mock_now();
     }

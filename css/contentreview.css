@@ -1,0 +1,36 @@
+.review-notes textarea {
+    resize: none;
+    width: 284px;
+    height: 60px;
+    box-sizing: border-box;
+    margin: 4px 8px;
+}
+
+.cms .ss-ui-action-tabset.action-menus.ss-tabset .ui-tabs-panel .review-notes label.left {
+    padding: 0;
+    margin: 0 0 4px 10px;
+}
+
+.cms .ss-ui-action-tabset.action-menus.ss-tabset .ui-tabs-panel .review-notes .cms-sitetree-information p.meta-info {
+    color: #f46b00;
+    font-weight: bold;
+}
+
+.cms .ss-ui-action-tabset.action-menus.ss-tabset ul.ui-tabs-nav li.contentreview-tab a {
+    width: 20px;
+    height: 20px;
+    background: url('../images/icon-bell.png') center center no-repeat;
+    background-position: 0 0;
+    text-indent: -9999px;
+    padding: 0;
+    margin: 2px 4px 0 12px;
+}
+
+.cms .ss-ui-action-tabset.action-menus.ss-tabset ul.ui-tabs-nav li.contentreview-tab a:hover,
+.cms .ss-ui-action-tabset.action-menus.ss-tabset ul.ui-tabs-nav li.contentreview-tab a:focus {
+    background-position: 0 -20px;
+} 
+
+.cms .ss-ui-action-tabset.action-menus.ss-tabset .ui-tabs-panel.contentreview-tab {
+    max-width: 300px;
+}
