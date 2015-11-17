@@ -3,13 +3,17 @@ en:
     ADDGROUP: 'Add groups'
     ADDUSERS: 'Add users'
     BUTTONREVIEWED: 'Review content'
+    COMMENTS: '(optional) Add comments...'
     CONTENTOWNERS: 'Content Owners'
+    CONTENTREVIEW: 'Content due for review'
     CUSTOM: 'Custom settings'
     DEFAULTSETTINGSHELP: 'These content review settings will apply to all pages that does not have specific Content Review schedule.'
     DISABLE: 'Disable content review'
     INHERIT: 'Inherit from parent page'
+    MARKREVIEWED: 'Mark as reviewed'
     NEXTREVIEWDATADESCRIPTION: 'Leave blank for no review'
     NEXTREVIEWDATE: 'Next review date'
+    NOCOMMENTS: '(no comments)'
     OPTIONS: Options
     OWNERGROUPSDESCRIPTION: 'Page owners that are responsible for reviews'
     OWNERUSERSDESCRIPTION: 'Page owners that are responsible for reviews'
@@ -20,6 +24,7 @@ en:
     REVIEWHEADER: 'Content review'
     REVIEWNOTES: 'Review notes'
     'REVIEWNOTESDESCRIPTION ': 'Add comments for the content of this page.'
+    REVIEWSUCCESSFUL: 'Content reviewed successfully'
     SAVE: Save
     SETTINGSFROM: 'Options are'
   ContentReviewEmails:
