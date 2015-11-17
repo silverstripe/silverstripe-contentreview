@@ -6,8 +6,7 @@
 			<tbody>
 				<tr>
 					<td scope="row" colspan="2" class="typography">
-						<h2><% _t('ContentReviewEmails.EMAIL_HEADING','Page(s) due for review') %></h2>
-						<p>There are $Pages.Count pages that are due for review today by you.</p>
+						$EmailBody
 					</td>
 				</tr>
 				<% loop Pages %>

@@ -6,23 +6,15 @@
 class ContentReviewEmails extends BuildTask
 {
     /**
-     * Holds a cached array for looking up members via their ID.
-     *
-     * @var array
-     */
-    protected static $member_cache = array();
-
-    /**
      * @param SS_HTTPRequest $request
      */
     public function run($request)
     {
         $compatibility = ContentReviewCompatability::start();
 
-        $now = class_exists("SS_Datetime") ? SS_Datetime::now()->URLDate() : SSDatetime::now()->URLDate();
-
         // First grab all the pages with a custom setting
-        $pages = Page::get("Page")->where("\"SiteTree\".\"NextReviewDate\" <= '{$now}'");
+        $pages = Page::get()
+            ->filter('NextReviewDate:LessThanOrEqual', SS_Datetime::now()->URLDate());
 
         $overduePages = $this->getOverduePagesForOwners($pages);
 
@@ -52,10 +44,6 @@ class ContentReviewEmails extends BuildTask
             $option = $page->getOptions();
 
             foreach ($option->ContentReviewOwners() as $owner) {
-                if (!isset(self::$member_cache[$owner->ID])) {
-                    self::$member_cache[$owner->ID] = $owner;
-                }
-
                 if (!isset($overduePages[$owner->ID])) {
                     $overduePages[$owner->ID] = new ArrayList();
                 }
@@ -73,22 +61,69 @@ class ContentReviewEmails extends BuildTask
      */
     protected function notifyOwner($ownerID, SS_List $pages)
     {
-        $owner = self::$member_cache[$ownerID];
-        $sender = Security::findAnAdministrator();
-        $senderEmail = ($sender->Email) ? $sender->Email : Config::inst()->get("Email", "admin_email");
+        // Prepare variables
+        $siteConfig = SiteConfig::current_site_config();
+        $owner = Member::get()->byID($ownerID);
+        $templateVariables = $this->getTemplateVariables($owner, $siteConfig, $pages);
 
-        $subject = _t("ContentReviewEmails.SUBJECT", "Page(s) are due for content review");
+        // Build email
         $email = new Email();
         $email->setTo($owner->Email);
-        $email->setFrom($senderEmail);
-        $email->setTemplate("ContentReviewEmail");
-        $email->setSubject($subject);
-        $email->populateTemplate(array(
-            "Recipient" => $owner,
-            "Sender"    => $sender,
-            "Pages"     => $pages,
-        ));
+        $email->setFrom($siteConfig->ReviewFrom);
+        $email->setSubject($siteConfig->ReviewSubject);
 
+        // Get user-editable body
+        $body = $this->getEmailBody($siteConfig, $templateVariables);
+
+        // Populate mail body with fixed template
+        $email->setTemplate($siteConfig->config()->content_review_template);
+        $email->populateTemplate($templateVariables);
+        $email->populateTemplate(array(
+            'EmailBody' => $body,
+            'Recipient' => $owner,
+            'Pages' => $pages,
+        ));
         $email->send();
+    }
+
+    /**
+     * Get string value of HTML body with all variable evaluated.
+     *
+     * @param SiteConfig $config
+     * @param array List of safe template variables to expose to this template
+     *
+     * @return HTMLText
+     */
+    protected function getEmailBody($config, $variables)
+    {
+        $template = SSViewer::fromString($config->ReviewBody);
+        $value = $template->process(new ArrayData($variables));
+
+        // Cast to HTML
+        return DBField::create_field('HTMLText', (string) $value);
+    }
+
+    /**
+     * Gets list of safe template variables and their values which can be used
+     * in both the static and editable templates.
+     *
+     * {@see ContentReviewAdminHelp.ss}
+     *
+     * @param Member     $recipient
+     * @param SiteConfig $config
+     * @param SS_List    $pages
+     *
+     * @return array
+     */
+    protected function getTemplateVariables($recipient, $config, $pages)
+    {
+        return array(
+            'Subject' => $config->ReviewSubject,
+            'PagesCount' => $pages->count(),
+            'FromEmail' => $config->ReviewFrom,
+            'ToFirstName' => $recipient->FirstName,
+            'ToSurname' => $recipient->Surname,
+            'ToEmail' => $recipient->Email,
+        );
     }
 }

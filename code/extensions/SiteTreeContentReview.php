@@ -122,7 +122,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             Requirements::css("contentreview/css/contentreview.css");
             
             $reviewTitle = LiteralField::create(
-                "ReviewContentNotesLabel", 
+                "ReviewContentNotesLabel",
                 "<label class=\"left\" for=\"Form_EditForm_ReviewNotes\">" . _t("ContentReview.CONTENTREVIEW", "Content due for review") . "</label>"
             );
             
