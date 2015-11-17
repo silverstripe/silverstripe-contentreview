@@ -37,11 +37,11 @@ class ContentReviewReportTest extends FunctionalTest
         ));
 
         $this->assertEquals(array(
-            "Contact Us",
             "Contact Us Child",
-            "Staff",
-            "About Us",
             "Home",
+            "About Us",
+            "Staff",
+            "Contact Us",
         ), $results->column("Title"));
 
         SS_Datetime::set_mock_now("2010-02-13 00:00:00");
@@ -49,8 +49,8 @@ class ContentReviewReportTest extends FunctionalTest
         $results = $report->sourceRecords(array());
 
         $this->assertEquals(array(
-            "About Us",
             "Home",
+            "About Us",
         ), $results->column("Title"));
 
         SS_Datetime::clear_mock_now();
