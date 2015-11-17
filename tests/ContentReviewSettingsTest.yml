@@ -1,94 +1,96 @@
 Permission:
-    cmsmain1:
-        Code: CMS_ACCESS_CMSMain
-    cmsmain2:
-        Code: CMS_ACCESS_CMSMain
-    setreviewdates:
-        Code: EDIT_CONTENT_REVIEW_FIELDS
-    workflowadmin1:
-        Code: IS_WORKFLOW_ADMIN
-    workflowadmin2:
-        Code: IS_WORKFLOW_ADMIN
+  cmsmain1:
+    Code: CMS_ACCESS_CMSMain
+  cmsmain2:
+    Code: CMS_ACCESS_CMSMain
+  setreviewdates:
+    Code: EDIT_CONTENT_REVIEW_FIELDS
+  workflowadmin1:
+    Code: IS_WORKFLOW_ADMIN
+  workflowadmin2:
+    Code: IS_WORKFLOW_ADMIN
 
 Group:
-    webmastergroup:
-        Title: Edit existing pages
-        Code: editorgroup
-        Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
-    editorgroup:
-        Title: Edit existing pages
-        Code: editorgroup
-        Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
-    authorgroup:
-        Title: Author existing pages
-        Code: authorgroup
-        Permissions: =>Permission.cmsmain2,=>Permission.workflowadmin2
+  webmastergroup:
+    Title: Edit existing pages
+    Code: editorgroup
+    Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
+  editorgroup:
+    Title: Edit existing pages
+    Code: editorgroup
+    Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
+  authorgroup:
+    Title: Author existing pages
+    Code: authorgroup
+    Permissions: =>Permission.cmsmain2,=>Permission.workflowadmin2
 
 Member:
-    webmaster:
-        FirstName: Web
-        Surname: Master
-        Email: webmaster@example.com
-        Groups: =>Group.webmastergroup
-    author:
-        FirstName: Test
-        Surname: Author
-        Email: author@example.com
-        Groups: =>Group.authorgroup
-    editor:
-        FirstName: Test
-        Surname: Editor
-        Groups: =>Group.editorgroup
+  webmaster:
+    FirstName: Web
+    Surname: Master
+    Email: webmaster@example.com
+    Groups: =>Group.webmastergroup
+  author:
+    FirstName: Test
+    Surname: Author
+    Email: author@example.com
+    Groups: =>Group.authorgroup
+  editor:
+    FirstName: Test
+    Surname: Editor
+    Groups: =>Group.editorgroup
 SiteConfig:
-    default:
-        ContentReviewUsers: =>Member.webmaster
-        ContentReviewGroups: =>Group.webmastergroup
-        ReviewPeriodDays: 30
+  default:
+    ContentReviewUsers: =>Member.webmaster
+    ContentReviewGroups: =>Group.webmastergroup
+    ReviewPeriodDays: 30
 Page:
-    custom:
-        Title: custom
-        ContentReviewType: Custom
-        NextReviewDate: 2010-02-01
-        ContentReviewUsers: =>Member.editor
-        ReviewPeriodDays: 10
-    disabled:
-        Title: disabled
-        ContentReviewType: Disabled
-    inherit:
-        Title: inherit
-        ContentReviewType: Inherit
-    page-1:
-        Title: page 1
-        ContentReviewType: Custom
-        ReviewPeriodDays: 5
-        NextReviewDate: 2010-02-01
-    page-1-1:
-        Title: page 1 1
-        ContentReviewType: Inherit
-        ParentID: =>Page.page-1
-    page-2:
-        Title: page 2
-        ContentReviewType: Inherit
-    page-2-1:
-        Title: page 2 1
-        ContentReviewType: Disabled
-        ParentID: =>Page.page-2
-    page-2-1-1:
-        Title: page 2 1 1
-        ContentReviewType: Inherit
-        ParentID: =>Page.page-2-1
-    page-3:
-        Title: page 3
-        ContentReviewType: Inherit
-    page-3-1:
-        Title: page 3 1
-        ContentReviewType: Inherit
-        ParentID: =>Page.page-3
-    page-3-1-1:
-        Title: page 3 1 1
-        ContentReviewType: Inherit
-        ParentID: =>Page.page-3-1 
-    page-3-1-1-1:
-        Title: page 3 1 1 1
-        ContentReviewType: Inherit
-        ParentID: =>Page.page-3-1-1
+  custom:
+    Title: custom
+    ContentReviewType: Custom
+    NextReviewDate: 2010-02-01
+    ContentReviewUsers: =>Member.editor
+    ReviewPeriodDays: 10
+  disabled:
+    Title: disabled
+    ContentReviewType: Disabled
+  inherit:
+    Title: inherit
+    ContentReviewType: Inherit
+  page-1:
+    Title: page 1
+    ContentReviewType: Custom
+    ReviewPeriodDays: 5
+    NextReviewDate: 2010-02-01
+  page-1-1:
+    Title: page 1 1
+    ContentReviewType: Inherit
+    ReviewPeriodDays: 1
+    NextReviewDate: 2011-04-12
+    ParentID: =>Page.page-1
+  page-2:
+    Title: page 2
+    ContentReviewType: Inherit
+  page-2-1:
+    Title: page 2 1
+    ContentReviewType: Disabled
+    ParentID: =>Page.page-2
+  page-2-1-1:
+    Title: page 2 1 1
+    ContentReviewType: Inherit
+    ParentID: =>Page.page-2-1
+  page-3:
+    Title: page 3
+    ContentReviewType: Inherit
+  page-3-1:
+    Title: page 3 1
+    ContentReviewType: Inherit
+    ParentID: =>Page.page-3
+  page-3-1-1:
+    Title: page 3 1 1
+    ContentReviewType: Inherit
+    ParentID: =>Page.page-3-1 
+  page-3-1-1-1:
+    Title: page 3 1 1 1
+    ContentReviewType: Inherit
+    ParentID: =>Page.page-3-1-1

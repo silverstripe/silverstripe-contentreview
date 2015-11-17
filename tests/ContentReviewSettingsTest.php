@@ -68,17 +68,19 @@ class ContentReviewSettingsTest extends SapphireTest
 
     public function testAdvanceReviewFromInheritedSettings()
     {
-        /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "page-1-1");
-
-        /** @var Page|SiteTreeContentReview $parentPage */
+		// When a parent page is advanced, the next review date of the child is not automatically advanced
         $parentPage = $this->objFromFixture("Page", "page-1");
+		$this->assertTrue($parentPage->advanceReviewDate());
+		$parentPage->write();
+		
+        $page = $this->objFromFixture("Page", "page-1-1");
+		$this->assertEquals(date("Y-m-d", strtotime("now + 5 days")), $parentPage->NextReviewDate);
+		$this->assertEquals('2011-04-12', $page->NextReviewDate);
 
+		// When a sub page is advanced, the next review date is advanced by the number of days in the parent
         $this->assertTrue($page->advanceReviewDate());
-
         $page->write();
-
-        $this->assertEquals(date("Y-m-d", strtotime("now + " . $parentPage->ReviewPeriodDays . " days")), $page->NextReviewDate);
+        $this->assertEquals(date("Y-m-d", strtotime("now + 5 days")), $page->NextReviewDate);
     }
 
     public function testAdvanceReviewFromInheritedSiteConfigSettings()
@@ -183,19 +185,11 @@ class ContentReviewSettingsTest extends SapphireTest
 
     public function testGetNextReviewDateFromPageInheritedSetting()
     {
-        /** @var Page|SiteTreeContentReview $page */
+		// Although page-1-1 inherits from page-1, it has an independent review date
         $page = $this->objFromFixture("Page", "page-1-1");
-
         $nextReviewDate = $page->getReviewDate();
-
         $this->assertInstanceOf("Date", $nextReviewDate);
-
-        /** @var Page|SiteTreeContentReview $nextPage */
-        $nextPage = $this->objFromFixture("Page", "page-1");
-
-        $expected = $nextPage->NextReviewDate;
-
-        $this->assertEquals($expected, $nextReviewDate->format("Y-m-d"));
+        $this->assertEquals('2011-04-12', $nextReviewDate->format("Y-m-d"));
     }
 
     public function testUpdateNextReviewDateFromCustomToDisabled()
@@ -248,13 +242,10 @@ class ContentReviewSettingsTest extends SapphireTest
         /** @var Page|SiteTreeContentReview $childPage */
         $childPage = $this->objFromFixture("Page", "page-1-1");
 
-        // BEFORE: parent page have a period of five days, so childPage should have a 
-        // review date LastEdited + 5 days
-        $this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
+		// Parent and child pages have different review dates
+        $this->assertNotEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
 
-        $oldChildDate = $childPage->NextReviewDate;
-        // But if we change the parent page ReviewPeriodDays to 10, the childs should 
-        // change as well
+        // But if we change the parent page ReviewPeriodDays to 10, the childs stays the same
         $parentPage->ReviewPeriodDays = 10;
         $parentPage->write();
 
@@ -267,11 +258,14 @@ class ContentReviewSettingsTest extends SapphireTest
         /** @var Page|SiteTreeContentReview $page */
         $childPage = $this->objFromFixture("Page", "page-1-1");
 
-        // AFTER: parent page have a period of 10 days, so childPage should have
-        // a review date now + 10 days.
-        $this->assertNotEquals($oldChildDate, $childPage->NextReviewDate);
+        // The parent page's date advances, but not the child's
+        $this->assertEquals('2011-04-12', $childPage->NextReviewDate);
+        $this->assertEquals($this->addDaysToDate(date("Y-m-d"), 10), $parentPage->NextReviewDate);
+
+		// Reviewing the child page should, however, advance its review by 10 days
+		$childPage->advanceReviewDate();
+		$childPage->write();
         $this->assertEquals($this->addDaysToDate(date("Y-m-d"), 10), $childPage->NextReviewDate);
-        $this->assertEquals($parentPage->NextReviewDate, $childPage->NextReviewDate);
     }
 
     /**
