@@ -352,7 +352,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         $userField = ListboxField::create("OwnerUsers", _t("ContentReview.PAGEOWNERUSERS", "Users"), $usersMap)
             ->setMultiple(true)
-			->addExtraClass('custom-setting')
+            ->addExtraClass('custom-setting')
             ->setAttribute("data-placeholder", _t("ContentReview.ADDUSERS", "Add users"))
             ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
@@ -365,7 +365,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         $groupField = ListboxField::create("OwnerGroups", _t("ContentReview.PAGEOWNERGROUPS", "Groups"), $groupsMap)
             ->setMultiple(true)
-			->addExtraClass('custom-setting')
+            ->addExtraClass('custom-setting')
             ->setAttribute("data-placeholder", _t("ContentReview.ADDGROUP", "Add groups"))
             ->setDescription(_t("ContentReview.OWNERGROUPSDESCRIPTION", "Page owners that are responsible for reviews"));
 
@@ -376,11 +376,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             ->setDescription(_t("ContentReview.NEXTREVIEWDATADESCRIPTION", "Leave blank for no review"));
 
         $reviewFrequency = DropdownField::create(
-			"ReviewPeriodDays",
-			_t("ContentReview.REVIEWFREQUENCY", "Review frequency"),
-			self::get_schedule()
-		)
-			->addExtraClass('custom-setting')
+            "ReviewPeriodDays",
+            _t("ContentReview.REVIEWFREQUENCY", "Review frequency"),
+            self::get_schedule()
+        )
+            ->addExtraClass('custom-setting')
             ->setDescription(_t("ContentReview.REVIEWFREQUENCYDESCRIPTION", "The review date will be set to this far in the future whenever the page is published"));
 
         $notesField = GridField::create("ReviewNotes", "Review Notes", $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
@@ -519,7 +519,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
     protected function setDefaultReviewDateForCustom()
     {
-		// Don't overwrite existing value
+        // Don't overwrite existing value
         if ($this->owner->NextReviewDate) {
             return;
         }
@@ -536,10 +536,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
     protected function setDefaultReviewDateForInherited()
     {
-		// Don't overwrite existing value
-		if($this->owner->NextReviewDate) {
-			return;
-		}
+        // Don't overwrite existing value
+        if ($this->owner->NextReviewDate) {
+            return;
+        }
 
         $options = $this->getOptions();
         $nextDate = null;

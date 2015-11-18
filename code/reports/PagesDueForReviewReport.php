@@ -167,7 +167,7 @@ class PagesDueForReviewReport extends SS_Report
         if (!empty($params["OnlyMyPages"])) {
             $currentUser = Member::currentUser();
 
-            $records = $records->filterByCallback(function($page) use ($currentUser) {
+            $records = $records->filterByCallback(function ($page) use ($currentUser) {
                 $options = $page->getOptions();
 
                 foreach ($options->ContentReviewOwners() as $owner) {
