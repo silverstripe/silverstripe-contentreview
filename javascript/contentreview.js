@@ -40,16 +40,15 @@ jQuery(function($) {
 			},
 			
 			_custom: function() {
-				$('.custom-settings').show();
-				$('.inherited-settings').hide();	
+				$('.review-settings').show();
+				$('.field.custom-setting').show();
 			}, 
 			_inherited: function() {
-				$('.inherited-settings').show();	
-				$('.custom-settings').hide();
+				$('.review-settings').show();
+				$('.field.custom-setting').hide();
 			},
 			_disabled: function() {
-				$('.inherited-settings').hide();	
-				$('.custom-settings').hide();
+				$('.review-settings').hide();
 			}
 		});	
 		
