@@ -89,7 +89,7 @@ class PagesDueForReviewReport extends SS_Report
             ),
             "ContentReviewType" => array(
                 "title" => "Settings are",
-                "formatting" => function ($value, $item) use ($linkPath,$linkQuery) {
+                "formatting" => function ($value, $item) use ($linkPath, $linkQuery) {
                     if ($item->ContentReviewType == "Inherit") {
                         $options = $item->getOptions();
                         if ($options && $options instanceof SiteConfig) {
@@ -117,7 +117,8 @@ class PagesDueForReviewReport extends SS_Report
      * @param array $params
      *
      * @return SS_List
-     */public function sourceRecords($params = array())
+     */
+    public function sourceRecords($params = array())
     {
         Versioned::reading_stage("Stage");
 

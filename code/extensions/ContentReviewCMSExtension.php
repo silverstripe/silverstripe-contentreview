@@ -6,7 +6,6 @@
  */
 class ContentReviewCMSExtension extends LeftAndMainExtension
 {
-
     /**
      * @var array
      */

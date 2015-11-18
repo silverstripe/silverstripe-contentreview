@@ -6,7 +6,6 @@
  */
 abstract class ContentReviewBaseTest extends FunctionalTest
 {
-
     /**
      * @var bool
      */
