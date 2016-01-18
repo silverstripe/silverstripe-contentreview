@@ -425,10 +425,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         $nextDate = false;
         $options = $this->getOptions();
 
-        if ($options && $options->ReviewPeriodDays) {
+        if ($options && $options->ReviewPeriodDays > 0) {
             $nextDate = date('Y-m-d', strtotime('+ ' . $options->ReviewPeriodDays . ' days', SS_Datetime::now()->format('U')));
 
             $this->owner->NextReviewDate = $nextDate;
+            $this->owner->write();
+        } else {
+            $this->owner->NextReviewDate = null;
             $this->owner->write();
         }
 
@@ -454,8 +457,12 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         $options = $this->getOptions();
 
-        if ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+        if (!$options) {
             return false;
+        } else {
+            if ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+                return false;
+            }
         }
 
         if (!$member) {
