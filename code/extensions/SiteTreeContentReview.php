@@ -459,10 +459,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         if (!$options) {
             return false;
-        } else {
-            if ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
-                return false;
-            }
+        } elseif ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+			return false;
         }
 
         if (!$member) {
