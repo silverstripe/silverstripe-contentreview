@@ -9,6 +9,9 @@ en:
     CUSTOM: 'Custom settings'
     DEFAULTSETTINGSHELP: 'These content review settings will apply to all pages that does not have specific Content Review schedule.'
     DISABLE: 'Disable content review'
+    EMAILFROM: 'From email address'
+    EMAILSUBJECT: 'Subject line'
+    EMAILTEMPLATE: 'Email template'
     INHERIT: 'Inherit from parent page'
     MARKREVIEWED: 'Mark as reviewed'
     NEXTREVIEWDATADESCRIPTION: 'Leave blank for no review'
@@ -35,6 +38,12 @@ en:
     PLURALNAME: 'Content Review Logs'
     SINGULARNAME: 'Content Review Log'
   PagesDueForReviewReport:
+    ONLYMYPAGES: 'Only Show pages assigned to me'
+    REVIEWDATEAFTER: 'Review date after or on'
+    REVIEWDATEBEFORE: 'Review date before or on'
+    SHOWVIRTUALPAGES: 'Show Virtual Pages'
     TITLE: 'Pages due for review'
   PagesWithoutReviewScheduleReport:
     TITLE: 'Pages without a scheduled review.'
+  Review:
+    EMAILFROM_RIGHTTITLE: 'e.g: do-not-reply@site.com'
