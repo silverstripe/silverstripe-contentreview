@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.1]
+
+- Update documentation and configuration to supported module standard
+- Fix documentation links
+
 ## [3.0.0]
 
 - Replace review page form with inline form
