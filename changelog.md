@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.2]
+
+* fix(ContentReviewNotificationJob): Changed to use ->config() system so that the next_run_hour can be configured in YAML.
+* BUG Prevent non-real draft changes forcing record to appear as changed when saved
+
 ## [3.0.1]
 
 - Update documentation and configuration to supported module standard
