@@ -120,24 +120,24 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     {
         if ($this->canBeReviewedBy(Member::currentUser())) {
             Requirements::css("contentreview/css/contentreview.css");
-            
+
             $reviewTitle = LiteralField::create(
                 "ReviewContentNotesLabel",
                 "<label class=\"left\" for=\"Form_EditForm_ReviewNotes\">" . _t("ContentReview.CONTENTREVIEW", "Content due for review") . "</label>"
             );
-            
+
             $ReviewNotes = LiteralField::create("ReviewNotes", "<textarea class=\"no-change-track\" id=\"Form_EditForm_ReviewNotes\" name=\"ReviewNotes\" placeholder=\"" . _t("ContentReview.COMMENTS", "(optional) Add comments...") . "\" class=\"text\"></textarea>");
-                                
+
             $quickReviewAction = FormAction::create("savereview", _t("ContentReview.MARKREVIEWED", "Mark as reviewed"))
                 ->setAttribute("data-icon", "pencil")
                 ->setAttribute("data-text-alternate", _t("ContentReview.MARKREVIEWED", "Mark as reviewed"));
-            
+
             $allFields = CompositeField::create($reviewTitle, $ReviewNotes, $quickReviewAction)
                 ->addExtraClass('review-notes field');
-            
+
             $reviewTab = Tab::create('ReviewContent', $allFields);
             $reviewTab->addExtraClass('contentreview-tab');
-            
+
             $actions->fieldByName('ActionMenus')->insertBefore($reviewTab, 'MoreOptions');
         }
     }
@@ -257,7 +257,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         $member = Member::currentUser();
 
         if ($member) {
-            return $member->FirstName . " " . $member->Surname;
+            return $member->getTitle();
         }
 
         return null;
@@ -483,8 +483,12 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function onBeforeWrite()
     {
-        $this->owner->LastEditedByName = $this->owner->getEditorName();
-        $this->owner->OwnerNames = $this->owner->getOwnerNames();
+        // Only update if DB fields have been changed
+        $changedFields = $this->owner->getChangedFields(true, 2);
+        if($changedFields) {
+            $this->owner->LastEditedByName = $this->owner->getEditorName();
+            $this->owner->OwnerNames = $this->owner->getOwnerNames();
+        }
 
         // If the user changed the type, we need to recalculate the review date.
         if ($this->owner->isChanged("ContentReviewType", 2)) {
@@ -509,7 +513,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             return;
         }
 
-        // parent page change it's review period 
+        // parent page change its review period
         // && !$this->owner->isChanged('ContentReviewType', 2)
         if ($this->owner->isChanged("ReviewPeriodDays", 2)) {
             $nextReviewUnixSec = strtotime(" + " . $this->owner->ReviewPeriodDays . " days", SS_Datetime::now()->format("U"));

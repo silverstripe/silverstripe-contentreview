@@ -244,6 +244,38 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         SS_Datetime::clear_mock_now();
     }
 
+    public function testUnModifiedPagesDontChangeEditor() {
+        SS_Datetime::set_mock_now("2013-03-01 12:00:00");
+
+        /** @var Member $author */
+        $author = $this->objFromFixture("Member", "author");
+        $this->logInAs($author);
+
+        // Page which is un-modified doesn't advance version of have an editor assigned
+        $contactPage = $this->objFromFixture("Page", "contact");
+        $contactPageVersion = $contactPage->Version;
+        $contactPage->write();
+        $this->assertEmpty($contactPage->LastEditedByName);
+        $this->assertEquals(
+            $contactPageVersion,
+            Versioned::get_versionnumber_by_stage('SiteTree', 'Stage', $contactPage->ID, false)
+        );
+
+        // Page with modifications gets marked
+        $homePage = $this->objFromFixture("Page", "home");
+        $homePageVersion = $homePage->Version;
+        $homePage->Content = '<p>Welcome!</p>';
+        $homePage->write();
+        $this->assertNotEmpty($homePage->LastEditedByName);
+        $this->assertEquals($author->getTitle(), $homePage->LastEditedByName);
+        $this->assertGreaterThan(
+            $homePageVersion,
+            Versioned::get_versionnumber_by_stage('SiteTree', 'Stage', $homePage->ID, false)
+        );
+
+        SS_Datetime::clear_mock_now();
+    }
+
     public function testReviewActionVisibleForAuthor()
     {
         SS_Datetime::set_mock_now("2020-03-01 12:00:00");
