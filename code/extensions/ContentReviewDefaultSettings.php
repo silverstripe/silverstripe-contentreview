@@ -18,6 +18,8 @@ class ContentReviewDefaultSettings extends DataExtension
         'ReviewFrom' => 'Varchar(255)',
         'ReviewSubject' => 'Varchar(255)',
         'ReviewBody' => 'HTMLText',
+        'FirstReviewDaysBefore' => 'Int',
+        'SecondReviewDaysBefore' => 'Int'
     );
 
     /**
@@ -28,6 +30,7 @@ class ContentReviewDefaultSettings extends DataExtension
     private static $defaults = array(
         'ReviewSubject' => 'Page(s) are due for content review',
         'ReviewBody' => '<h2>Page(s) due for review</h2><p>There are $PagesCount pages that are due for review today by you.</p>',
+        'FirstReviewDaysBefore' => 'Int'
     );
 
     /**
@@ -111,6 +114,20 @@ class ContentReviewDefaultSettings extends DataExtension
             ));
 
         $fields->addFieldToTab('Root.ContentReview', $reviewFrequency);
+
+        $FirstReviewDaysBefore = NumericField::create(
+            'FirstReviewDaysBefore',
+            _t('ContentReview.FIRSTREVIEWDAYSBEFORE', 'First review reminder # days before final review')
+        );
+
+        $fields->addFieldToTab('Root.ContentReview', $FirstReviewDaysBefore);
+
+        $SecondReviewDaysBefore = NumericField::create(
+            'SecondReviewDaysBefore',
+            _t('ContentReview.SECONDREVIEWDAYSBEFORE', 'Second review reminder # days before final review')
+        );
+
+        $fields->addFieldToTab('Root.ContentReview', $SecondReviewDaysBefore);
 
         $users = Permission::get_members_by_permission(array(
             'CMS_ACCESS_CMSMain',
