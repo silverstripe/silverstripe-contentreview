@@ -12,9 +12,28 @@ class ContentReviewEmails extends BuildTask
     {
         $compatibility = ContentReviewCompatability::start();
 
+        $now = SS_Datetime::now();
+
         // First grab all the pages with a custom setting
         $pages = Page::get()
-            ->filter('NextReviewDate:LessThanOrEqual', SS_Datetime::now()->URLDate());
+            ->filter('NextReviewDate:LessThanOrEqual', $now->URLDate());
+
+        // Calculate whether today is the date a First or Second review should occur
+        $config = SiteConfig::current_site_config();
+        $firstReview = $config->FirstReviewDaysBefore;
+        $secondReview = $config->SecondReviewDaysBefore;
+        // Subtract the number of days prior to the review, from the current date
+
+        // Get all pages where the NextReviewDate is still in the future
+        $pendingPages = Page::get()->filter('NextReviewDate:GreaterThan', $now->URLDate());
+
+        // for each of these pages, check if today is the date the First or Second reminder should be sent
+        foreach ($pendingPages as $page) {
+            $notifyDate1 = date('Y-m-d', strtotime($page->NextReviewDate . ' -' . $firstReview . ' day'));
+            $notifyDate2 = date('Y-m-d', strtotime($page->NextReviewDate . ' -' . $secondReview . ' day'));
+        }
+
+        die();
 
         $overduePages = $this->getOverduePagesForOwners($pages);
 
@@ -83,7 +102,9 @@ class ContentReviewEmails extends BuildTask
             'Recipient' => $owner,
             'Pages' => $pages,
         ));
-        $email->send();
+
+        Debug::show($email);
+        //$email->send();
     }
 
     /**
