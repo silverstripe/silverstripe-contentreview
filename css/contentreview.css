@@ -11,6 +11,13 @@
     margin: 0 0 4px 10px;
 }
 
+.cms .ss-ui-action-tabset.action-menus.ss-tabset .ui-tabs-panel .review-notes .quick-info {
+    padding: 6px;
+    margin: 4px 8px;
+    border: 1px solid #b3b3b3;
+    border-radius: 4px;
+}
+
 .cms .ss-ui-action-tabset.action-menus.ss-tabset .ui-tabs-panel .review-notes .cms-sitetree-information p.meta-info {
     color: #f46b00;
     font-weight: bold;
