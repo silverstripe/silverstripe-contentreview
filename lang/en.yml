@@ -12,6 +12,7 @@ en:
     EMAILFROM: 'From email address'
     EMAILSUBJECT: 'Subject line'
     EMAILTEMPLATE: 'Email template'
+    FIRSTREVIEWDAYSBEFORE: 'First review reminder # days before final review'
     INHERIT: 'Inherit from parent page'
     MARKREVIEWED: 'Mark as reviewed'
     NEXTREVIEWDATADESCRIPTION: 'Leave blank for no review'
@@ -25,10 +26,12 @@ en:
     REVIEWFREQUENCY: 'Review frequency'
     REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future whenever the page is published'
     REVIEWHEADER: 'Content review'
+    REVIEWINFO: 'Review information'
     REVIEWNOTES: 'Review notes'
     'REVIEWNOTESDESCRIPTION ': 'Add comments for the content of this page.'
     REVIEWSUCCESSFUL: 'Content reviewed successfully'
     SAVE: Save
+    SECONDREVIEWDAYSBEFORE: 'Second review reminder # days before final review'
     SETTINGSFROM: 'Options are'
   ContentReviewEmails:
     REVIEWPAGELINK: 'Review the page in the CMS'
