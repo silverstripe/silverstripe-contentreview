@@ -450,6 +450,83 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         return (bool) $nextDate;
     }
+    
+    public function canRemind(Member $member = null) {
+        if (!$this->owner->obj("NextReviewDate")->exists()) {
+            return false;
+        }
+
+        // If today is not the date of the first reminder, return false
+        $config = SiteConfig::current_site_config();
+        $firstReview = $config->FirstReviewDaysBefore;
+        $now = SS_Datetime::now();
+        $notifyDate1 = date('Y-m-d', strtotime($this->owner->NextReviewDate . ' -' . $firstReview . ' days'));
+
+        // If today is not the first reminder date
+        if (!$notifyDate1 == $now->URLDate()) {
+            return false;
+        }
+        
+        $options = $this->getOptions();
+
+        if (!$options) {
+            return false;
+        } elseif ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+            return false;
+        }
+
+        if (!$member) {
+            return true;
+        }
+
+        if ($member->inGroups($options->OwnerGroups())) {
+            return true;
+        }
+
+        if ($options->OwnerUsers()->find("ID", $member->ID)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canRemindAgain(Member $member = null) {
+        if (!$this->owner->obj("NextReviewDate")->exists()) {
+            return false;
+        }
+
+        // If today is not the date of the second reminder, return false
+        $config = SiteConfig::current_site_config();
+        $secondReview = $config->SecondReviewDaysBefore;
+        $now = SS_Datetime::now();
+        $notifyDate2 = date('Y-m-d', strtotime($this->owner->NextReviewDate . ' -' . $secondReview . ' days'));
+
+        if (!$notifyDate2 == $now->URLDate()) {
+            return false;
+        }
+
+        $options = $this->getOptions();
+
+        if (!$options) {
+            return false;
+        } elseif ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+            return false;
+        }
+
+        if (!$member) {
+            return true;
+        }
+
+        if ($member->inGroups($options->OwnerGroups())) {
+            return true;
+        }
+
+        if ($options->OwnerUsers()->find("ID", $member->ID)) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Check if a review is due by a member for this owner.
