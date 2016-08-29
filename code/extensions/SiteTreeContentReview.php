@@ -418,11 +418,14 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      * @param Member $reviewer
      * @param string $message
      */
-    public function addReviewNote(Member $reviewer, $message)
+    public function addReviewNote(Member $reviewer, $message, $reviewInfo = null)
     {
         $reviewLog = ContentReviewLog::create();
         $reviewLog->Note = $message;
         $reviewLog->ReviewerID = $reviewer->ID;
+        if ($reviewInfo) {
+            $reviewLog->ReviewInfo = $reviewInfo;
+        }
         $this->owner->ReviewLogs()->add($reviewLog);
     }
 
