@@ -46,26 +46,6 @@ class ContentReviewEmails extends BuildTask
             }
         }
 
-
-
-
-
-Debug::show('====================================================================FIRST REMINDER');
-        foreach ($firstReminderPages as $p) {
-            Debug::show($p->Title);
-        }
-Debug::show('====================================================================SECOND REMINDER');
-        foreach ($secondReminderPages as $p) {
-            Debug::show($p->Title);
-        }
-Debug::show('====================================================================DUE/OVERDUE');
-        foreach ($pages as $p) {
-            Debug::show($p->Title);
-        }
-        //die();
-
-
-
         $overduePages = $this->getNotifiablePagesForOwners($pages);
 
         // Send one email to one owner with all the pages in there instead of no of pages of emails.
@@ -109,6 +89,12 @@ Debug::show('===================================================================
         return $overduePages;
     }
     
+    /**
+     * Send an email to the configured team indicating which notices are at 'first reminder' or 'second reminder' status
+     * The 'days before due' value for each of these is configurable in settings.
+     * ie. a value of 30 for the 'first reminder' setting means a page with a review date exactly 30 days from due, will
+     * be present in the email sent to the configured address.
+     */
     protected function notifyTeam($firstReminderPages, $secondReminderPages) {
         // Prepare variables
         $siteConfig = SiteConfig::current_site_config();
@@ -117,14 +103,11 @@ Debug::show('===================================================================
 
         // Build email
         $email = new Email();
-        $email->setTo($siteConfig->Email);
+        $email->setTo($siteConfig->ReviewReminderEmail);
         $email->setFrom($siteConfig->ReviewFrom);
 
-        $subject = $siteConfig->ReviewSubject;
+        $subject = $siteConfig->ReviewSubjectReminder;
         $email->setSubject($subject);
-
-
-
 
         // Get user-editable body
         $bodyFirstReminder = $this->getEmailBody($siteConfig, $templateVariables1, 'reminder1');
@@ -136,16 +119,11 @@ Debug::show('===================================================================
         $email->populateTemplate(array(
             'EmailBodyFirstReminder' => $bodyFirstReminder,
             'EmailBodySecondReminder' => $bodySecondReminder,
-            'Recipient' => $siteConfig->ReviewReminderEmail,
             'FirstReminderPages' => $firstReminderPages,
             'SecondReminderPages' => $secondReminderPages,
         ));
 
-        Debug::show($email);
-        //$email->send();
-
-
-
+        $email->send();
     }
 
     /**
@@ -180,8 +158,7 @@ Debug::show('===================================================================
             'Pages' => $pages,
         ));
 
-        Debug::show($email);
-        //$email->send();
+        $email->send();
     }
 
     /**

@@ -34,8 +34,8 @@ class ContentReviewDefaultSettings extends DataExtension
     private static $defaults = array(
         'ReviewSubjectReminder' => 'Page(s) are approaching content review date',
         'ReviewSubject' => 'Page(s) are due for content review',
-        'ReviewBodyFirstReminder' => '<h2>Page(s) 1 month from review</h2><p>There are $PagesCount pages that are due for review by you 1 month from today.</p>',
-        'ReviewBodySecondReminder' => '<h2>Page(s) 1 week from from review</h2><p>There are $PagesCount pages that are due for review by you 1 week from today.</p>',
+        'ReviewBodyFirstReminder' => '<h2>Page(s) 1 month from review</h2><p>There are $FirstReminderPagesCount pages that are due for review by you 1 month from today.</p>',
+        'ReviewBodySecondReminder' => '<h2>Page(s) 1 week from from review</h2><p>There are $SecondReminderPagesCount pages that are due for review by you 1 week from today.</p>',
         'ReviewBody' => '<h2>Page(s) due for review</h2><p>There are $PagesCount pages that are due for review today by you.</p>',
         'ReviewReminderEmail' => 'govt.nz@dia.govt.nz',
         'FirstReviewDaysBefore' => '30',
@@ -125,19 +125,6 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $fields->addFieldToTab('Root.ContentReview', $reviewFrequency);
 
-        $FirstReviewDaysBefore = NumericField::create(
-            'FirstReviewDaysBefore',
-            _t('ContentReview.FIRSTREVIEWDAYSBEFORE', 'First review reminder # days before final review')
-        );
-
-        $fields->addFieldToTab('Root.ContentReview', $FirstReviewDaysBefore);
-
-        $SecondReviewDaysBefore = NumericField::create(
-            'SecondReviewDaysBefore',
-            _t('ContentReview.SECONDREVIEWDAYSBEFORE', 'Second review reminder # days before final review')
-        );
-
-        $fields->addFieldToTab('Root.ContentReview', $SecondReviewDaysBefore);
 
         $users = Permission::get_members_by_permission(array(
             'CMS_ACCESS_CMSMain',
@@ -170,12 +157,24 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $fields->addFieldToTab('Root.ContentReview', $groupField);
 
+        $FirstReviewDaysBefore = NumericField::create(
+            'FirstReviewDaysBefore',
+            _t('ContentReview.FIRSTREVIEWDAYSBEFORE', 'First review reminder # days before final review')
+        );
+
+        $SecondReviewDaysBefore = NumericField::create(
+            'SecondReviewDaysBefore',
+            _t('ContentReview.SECONDREVIEWDAYSBEFORE', 'Second review reminder # days before final review')
+        );
+
         // Email content
         $fields->addFieldsToTab(
             'Root.ContentReview',
             array(
                 TextField::create('ReviewFrom', _t('ContentReview.EMAILFROM', 'From email address'))
                     ->setRightTitle(_t('Review.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
+                $FirstReviewDaysBefore,
+                $SecondReviewDaysBefore,
                 TextField::create('ReviewReminderEmail','Review reminder email address')
                     ->setRightTitle('e.g: review.reminders@site.com'),
                 TextField::create('ReviewSubjectReminder', _t('ContentReview.EMAILSUBJECTREMINDER', 'Subject line - reminder')),

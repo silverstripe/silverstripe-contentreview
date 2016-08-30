@@ -6,6 +6,20 @@
 [![License](http://img.shields.io/packagist/l/silverstripe/contentreview.svg?style=flat-square)](license.md)
 ![helpfulrobot](https://helpfulrobot.io/silverstripe/contentreview/badge)
 
+**Note:** _Govt.nz customisations to this module are as follows_
+
+Prior to the due date, the content review task will send an email to the address configured in the settings.
+
+This email contains two lists:
+- a list of pages whose review date is exactly 1 month in the future.
+- another list of pages whose review date is exactly 1 week in the future.
+
+Both these times (1 month and 1 week) are defaults only, and can be configured in the settings area.
+
+The email body for these reminder emails is also configurable in the settings.
+
+---
+
 This module helps keep your website content accurate and up-to-date, which keeps your users happy. 
 
 It does so by sending reviewers reminder emails to go in and check the content. For a reviewer this 
