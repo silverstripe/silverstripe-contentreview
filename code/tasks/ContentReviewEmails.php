@@ -18,6 +18,8 @@ class ContentReviewEmails extends BuildTask
         $pages = Page::get()
             ->filter('NextReviewDate:LessThanOrEqual', $now->URLDate());
 
+
+
         // Calculate whether today is the date a First or Second review should occur
         $config = SiteConfig::current_site_config();
         $firstReview = $config->FirstReviewDaysBefore;
@@ -29,39 +31,51 @@ class ContentReviewEmails extends BuildTask
 
         // for each of these pages, check if today is the date the First or Second
         // reminder should be sent, and if so, add it to the appropriate ArrayList
-        $pendingPagesFirstReminder = new ArrayList();
-        $pendingPagesSecondReminder = new ArrayList();
+        $firstReminderPages = new ArrayList();
+        $secondReminderPages = new ArrayList();
 
         foreach ($pendingPages as $page) {
             $notifyDate1 = date('Y-m-d', strtotime($page->NextReviewDate . ' -' . $firstReview . ' days'));
             $notifyDate2 = date('Y-m-d', strtotime($page->NextReviewDate . ' -' . $secondReview . ' days'));
 
             if ($notifyDate1 == $now->URLDate()) {
-                $pendingPagesFirstReminder->push($page);
+                $firstReminderPages->push($page);
             }
             if ($notifyDate2 == $now->URLDate()) {
-                $pendingPagesSecondReminder->push($page);
+                $secondReminderPages->push($page);
             }
         }
 
-        $overduePages = $this->getNotifiablePagesForOwners($pages, "due");
-        $firstReminderPages = $this->getNotifiablePagesForOwners($pendingPagesFirstReminder, "first");
-        $secondReminderPages = $this->getNotifiablePagesForOwners($pendingPagesSecondReminder, "second");
+
+
+
+
+Debug::show('====================================================================FIRST REMINDER');
+        foreach ($firstReminderPages as $p) {
+            Debug::show($p->Title);
+        }
+Debug::show('====================================================================SECOND REMINDER');
+        foreach ($secondReminderPages as $p) {
+            Debug::show($p->Title);
+        }
+Debug::show('====================================================================DUE/OVERDUE');
+        foreach ($pages as $p) {
+            Debug::show($p->Title);
+        }
+        //die();
+
+
+
+        $overduePages = $this->getNotifiablePagesForOwners($pages);
 
         // Send one email to one owner with all the pages in there instead of no of pages of emails.
         foreach ($overduePages as $memberID => $pages) {
-            $this->notifyOwner($memberID, $pages, "due");
+            //$this->notifyOwner($memberID, $pages, "due");
         }
 
-        // Send a separate email with a different subject line for the first reminder
-        foreach ($firstReminderPages as $memberID => $pages) {
-            $this->notifyOwner($memberID, $pages, "first");
-        }
-
-        // Send a separate email with a different subject line for the second reminder
-        foreach ($secondReminderPages as $memberID => $pages) {
-            $this->notifyOwner($memberID, $pages, "second");
-        }
+        // Send an email to the generic address with any first or second reminders
+        $this->notifyTeam($firstReminderPages, $secondReminderPages);
+        die();
 
         ContentReviewCompatability::done($compatibility);
     }
@@ -71,28 +85,16 @@ class ContentReviewEmails extends BuildTask
      *
      * @return array
      */
-    protected function getNotifiablePagesForOwners(SS_list $pages, $type)
+    protected function getNotifiablePagesForOwners(SS_list $pages)
     {
         $overduePages = array();
 
         foreach ($pages as $page) {
 
-            if ($type == "first") {
-                if (!$page->canRemind()) {
-                    continue;
-                }
+            if (!$page->canRemind()) {
+                continue;
             }
-            if ($type == "second") {
-                if (!$page->canRemindAgain()) {
-                    continue;
-                }
-            }
-            if ($type == "due") {
-                if (!$page->canBeReviewedBy()) {
-                    continue;
-                }
-            }
-
+            
             $option = $page->getOptions();
 
             foreach ($option->ContentReviewOwners() as $owner) {
@@ -105,6 +107,45 @@ class ContentReviewEmails extends BuildTask
         }
 
         return $overduePages;
+    }
+    
+    protected function notifyTeam($firstReminderPages, $secondReminderPages) {
+        // Prepare variables
+        $siteConfig = SiteConfig::current_site_config();
+        $templateVariables1 = $this->getTemplateVariables('', $siteConfig, $firstReminderPages, 'reminder1');
+        $templateVariables2 = $this->getTemplateVariables('', $siteConfig, $secondReminderPages, 'reminder2');
+
+        // Build email
+        $email = new Email();
+        $email->setTo($siteConfig->Email);
+        $email->setFrom($siteConfig->ReviewFrom);
+
+        $subject = $siteConfig->ReviewSubject;
+        $email->setSubject($subject);
+
+
+
+
+        // Get user-editable body
+        $bodyFirstReminder = $this->getEmailBody($siteConfig, $templateVariables1, 'reminder1');
+        $bodySecondReminder = $this->getEmailBody($siteConfig, $templateVariables2, 'reminder2');
+
+        // Populate mail body with fixed template
+        $email->setTemplate($siteConfig->config()->content_review_reminder_template);
+        $email->populateTemplate($templateVariables1, $templateVariables2);
+        $email->populateTemplate(array(
+            'EmailBodyFirstReminder' => $bodyFirstReminder,
+            'EmailBodySecondReminder' => $bodySecondReminder,
+            'Recipient' => $siteConfig->ReviewReminderEmail,
+            'FirstReminderPages' => $firstReminderPages,
+            'SecondReminderPages' => $secondReminderPages,
+        ));
+
+        Debug::show($email);
+        //$email->send();
+
+
+
     }
 
     /**
@@ -124,9 +165,7 @@ class ContentReviewEmails extends BuildTask
         $email->setTo($owner->Email);
         $email->setFrom($siteConfig->ReviewFrom);
 
-        if ($type == "first"){$subject = $siteConfig->ReviewSubjectFirstReminder;}
-        if ($type == "second"){$subject = $siteConfig->ReviewSubjectSecondReminder;}
-        if ($type == "due"){$subject = $siteConfig->ReviewSubject;}
+        $subject = $siteConfig->ReviewSubject;
         $email->setSubject($subject);
 
         // Get user-editable body
@@ -155,10 +194,10 @@ class ContentReviewEmails extends BuildTask
      */
     protected function getEmailBody($config, $variables, $type)
     {
-        if ($type == "first") {
+        if ($type == "reminder1") {
             $template = SSViewer::fromString($config->ReviewBodyFirstReminder);
         }
-        if ($type == "second") {
+        if ($type == "reminder2") {
             $template = SSViewer::fromString($config->ReviewBodySecondReminder);
         }
         if ($type == "due") {
@@ -184,20 +223,29 @@ class ContentReviewEmails extends BuildTask
      *
      * @return array
      */
-    protected function getTemplateVariables($recipient, $config, $pages, $type)
+    protected function getTemplateVariables($recipient = null, $config, $pages)
     {
-        if ($type == "first") {$subject = $config->ReviewSubjectFirstReminder;}
-        if ($type == "second") {$subject = $config->ReviewSubjectSecondReminder;}
-        if ($type == "due") {$subject = $config->ReviewSubject;}
+        if ($recipient != null) {
+            return array(
+                'Subject' => $config->ReviewSubject,
+                'PagesCount' => $pages->count(),
+                'FromEmail' => $config->ReviewFrom,
+                'ToFirstName' => $recipient->FirstName,
+                'ToSurname' => $recipient->Surname,
+                'ToEmail' => $recipient->Email
+            );
+        } else {
+            return array(
+                'Subject' => $config->ReviewSubjectReminder,
+                'FirstReminderPagesCount' => $pages->count(),
+                'SecondReminderPagesCount' => $pages->count(),
+                'FromEmail' => $config->ReviewFrom,
+                'ToEmail' => $config->ReviewReminderEmail
+            );
 
-        return array(
-            'Subject' => $subject,
-            'PagesCount' => $pages->count(),
-            'FromEmail' => $config->ReviewFrom,
-            'ToFirstName' => $recipient->FirstName,
-            'ToSurname' => $recipient->Surname,
-            'ToEmail' => $recipient->Email,
-            'Type' => $type
-        );
+        }
+
+
+
     }
 }

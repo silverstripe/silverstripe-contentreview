@@ -17,11 +17,11 @@ class ContentReviewDefaultSettings extends DataExtension
         'ReviewPeriodDays' => 'Int',
         'ReviewFrom' => 'Varchar(255)',
         'ReviewSubject' => 'Varchar(255)',
-        'ReviewSubjectFirstReminder' => 'Varchar(255)',
-        'ReviewSubjectSecondReminder' => 'Varchar(255)',
+        'ReviewSubjectReminder' => 'Varchar(255)',
         'ReviewBody' => 'HTMLText',
         'ReviewBodyFirstReminder' => 'HTMLText',
         'ReviewBodySecondReminder' => 'HTMLText',
+        'ReviewReminderEmail' => 'Text',
         'FirstReviewDaysBefore' => 'Int',
         'SecondReviewDaysBefore' => 'Int'
     );
@@ -32,12 +32,12 @@ class ContentReviewDefaultSettings extends DataExtension
      * @var array
      */
     private static $defaults = array(
-        'ReviewSubjectFirstReminder' => 'Page(s) are 1 month from content review',
-        'ReviewSubjectSecondReminder' => 'Page(s) are 1 week from content review',
+        'ReviewSubjectReminder' => 'Page(s) are approaching content review date',
         'ReviewSubject' => 'Page(s) are due for content review',
         'ReviewBodyFirstReminder' => '<h2>Page(s) 1 month from review</h2><p>There are $PagesCount pages that are due for review by you 1 month from today.</p>',
         'ReviewBodySecondReminder' => '<h2>Page(s) 1 week from from review</h2><p>There are $PagesCount pages that are due for review by you 1 week from today.</p>',
         'ReviewBody' => '<h2>Page(s) due for review</h2><p>There are $PagesCount pages that are due for review today by you.</p>',
+        'ReviewReminderEmail' => 'govt.nz@dia.govt.nz',
         'FirstReviewDaysBefore' => '30',
         'SecondReviewDaysBefore' => '7'
     );
@@ -62,6 +62,7 @@ class ContentReviewDefaultSettings extends DataExtension
      * @var string
      */
     private static $content_review_template = 'ContentReviewEmail';
+    private static $content_review_reminder_template = 'ContentReviewReminderEmail';
 
     /**
      * @return string
@@ -175,12 +176,13 @@ class ContentReviewDefaultSettings extends DataExtension
             array(
                 TextField::create('ReviewFrom', _t('ContentReview.EMAILFROM', 'From email address'))
                     ->setRightTitle(_t('Review.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
-                TextField::create('ReviewSubjectFirstReminder', _t('ContentReview.EMAILSUBJECTFIRSTREMINDER', 'Subject line - First reminder')),
-                TextField::create('ReviewSubjectSecondReminder', _t('ContentReview.EMAILSUBJECTSECONDREMINDER', 'Subject line - Second reminder')),
+                TextField::create('ReviewReminderEmail','Review reminder email address')
+                    ->setRightTitle('e.g: review.reminders@site.com'),
+                TextField::create('ReviewSubjectReminder', _t('ContentReview.EMAILSUBJECTREMINDER', 'Subject line - reminder')),
                 TextField::create('ReviewSubject', _t('ContentReview.EMAILSUBJECT', 'Subject line - Review due')),
-                TextAreaField::create('ReviewBodyFirstReminder', _t('ContentReview.EMAILTEMPLATEFIRSTREMINDER', 'Email template - First reminder')),
-                TextAreaField::create('ReviewBodySecondReminder', _t('ContentReview.EMAILTEMPLATESECONDREMINDER', 'Email template - Second reminder')),
-                TextAreaField::create('ReviewBody', _t('ContentReview.EMAILTEMPLATE', 'Email template - Review due')),
+                TextAreaField::create('ReviewBodyFirstReminder', _t('ContentReview.EMAILTEMPLATEFIRSTREMINDER', 'Email body - First reminder')),
+                TextAreaField::create('ReviewBodySecondReminder', _t('ContentReview.EMAILTEMPLATESECONDREMINDER', 'Email body - Second reminder')),
+                TextAreaField::create('ReviewBody', _t('ContentReview.EMAILTEMPLATE', 'Email body - Review due')),
                 LiteralField::create('TemplateHelp', $this->owner->renderWith('ContentReviewAdminHelp')),
             )
         );
