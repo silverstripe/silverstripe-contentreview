@@ -50,12 +50,11 @@ class ContentReviewEmails extends BuildTask
 
         // Send one email to one owner with all the pages in there instead of no of pages of emails.
         foreach ($overduePages as $memberID => $pages) {
-            //$this->notifyOwner($memberID, $pages, "due");
+            $this->notifyOwner($memberID, $pages, "due");
         }
 
         // Send an email to the generic address with any first or second reminders
         $this->notifyTeam($firstReminderPages, $secondReminderPages);
-        die();
 
         ContentReviewCompatability::done($compatibility);
     }
