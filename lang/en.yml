@@ -26,7 +26,6 @@ en:
     REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future whenever the page is published'
     REVIEWHEADER: 'Content review'
     REVIEWNOTES: 'Review notes'
-    'REVIEWNOTESDESCRIPTION ': 'Add comments for the content of this page.'
     REVIEWSUCCESSFUL: 'Content reviewed successfully'
     SAVE: Save
     SETTINGSFROM: 'Options are'
