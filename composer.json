@@ -1,31 +1,31 @@
 {
-	"name": "silverstripe/contentreview",
-	"type": "silverstripe-module",
-	"description": "Flags pages for periodical author review (incl. reporting)",
-	"homepage": "http://silverstripe.org",
-	"license": "BSD-3-Clause",
-	"keywords": ["silverstripe", "cms", "workflow"],
-	"authors": [
-		{
-			"name": "SilverStripe",
-			"homepage": "http://silverstripe.com"
-		},
-		{
-			"name": "The SilverStripe Community",
-			"homepage": "http://silverstripe.org"
-		}
-	],
-	"require": {
-		"composer/installers": "*",
-		"silverstripe/framework": "~3.1",
-		"silverstripe/cms": "~3.1"
-	},
+    "name": "silverstripe/contentreview",
+    "type": "silverstripe-module",
+    "description": "Flags pages for periodical author review (incl. reporting)",
+    "homepage": "http://silverstripe.org",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "silverstripe",
+        "cms",
+        "workflow"
+    ],
+    "authors": [
+        {
+            "name": "SilverStripe",
+            "homepage": "http://silverstripe.com"
+        },
+        {
+            "name": "The SilverStripe Community",
+            "homepage": "http://silverstripe.org"
+        }
+    ],
+    "require": {
+        "composer/installers": "*",
+        "silverstripe/framework": "~3.1",
+        "silverstripe/cms": "~3.1"
+    },
     "suggests": {
         "silverstripe/queuedjobs": "Automatically schedules content review emails to be sent, only requiring one crontask to be created"
     },
-	"extra": {
-		"branch-alias": {
-			"dev-master": "3.0.x-dev"
-		}
-	}
+    "extra": []
 }
