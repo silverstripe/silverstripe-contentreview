@@ -25,6 +25,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         "NextReviewDate"    => "Date",
         "LastEditedByName"  => "Varchar(255)",
         "OwnerNames"        => "Varchar(255)",
+        "ReviewInfo"        => "Text"
     );
 
     /**
@@ -126,13 +127,22 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
                 "<label class=\"left\" for=\"Form_EditForm_ReviewNotes\">" . _t("ContentReview.CONTENTREVIEW", "Content due for review") . "</label>"
             );
 
+            if (strlen($this->owner->ReviewInfo) > 0) {
+                $reviewInfo = LiteralField::create(
+                    "ReviewContentInfo",
+                    "<p class=\"quick-info\">" . $this->owner->ReviewInfo . "</p>"
+                );
+            } else {
+                $reviewInfo = '';
+            }
+
             $ReviewNotes = LiteralField::create("ReviewNotes", "<textarea class=\"no-change-track\" id=\"Form_EditForm_ReviewNotes\" name=\"ReviewNotes\" placeholder=\"" . _t("ContentReview.COMMENTS", "(optional) Add comments...") . "\" class=\"text\"></textarea>");
 
             $quickReviewAction = FormAction::create("savereview", _t("ContentReview.MARKREVIEWED", "Mark as reviewed"))
                 ->setAttribute("data-icon", "pencil")
                 ->setAttribute("data-text-alternate", _t("ContentReview.MARKREVIEWED", "Mark as reviewed"));
 
-            $allFields = CompositeField::create($reviewTitle, $ReviewNotes, $quickReviewAction)
+            $allFields = CompositeField::create($reviewTitle, $reviewInfo, $ReviewNotes, $quickReviewAction)
                 ->addExtraClass('review-notes field');
 
             $reviewTab = Tab::create('ReviewContent', $allFields);
@@ -383,6 +393,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             ->addExtraClass('custom-setting')
             ->setDescription(_t("ContentReview.REVIEWFREQUENCYDESCRIPTION", "The review date will be set to this far in the future whenever the page is published"));
 
+        $reviewInfoField = TextareaField::create("ReviewInfo", _t("ContentReview.REVIEWINFO", "Review information"));
+
         $notesField = GridField::create("ReviewNotes", "Review Notes", $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
 
         $fields->addFieldsToTab("Root.ContentReview", array(
@@ -395,6 +407,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
                 $reviewFrequency
             )->addExtraClass("review-settings"),
             ReadonlyField::create("ROContentOwners", _t("ContentReview.CONTENTOWNERS", "Content Owners"), $this->getOwnerNames()),
+            $reviewInfoField,
             $notesField,
         ));
     }
@@ -405,11 +418,14 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      * @param Member $reviewer
      * @param string $message
      */
-    public function addReviewNote(Member $reviewer, $message)
+    public function addReviewNote(Member $reviewer, $message, $reviewInfo = null)
     {
         $reviewLog = ContentReviewLog::create();
         $reviewLog->Note = $message;
         $reviewLog->ReviewerID = $reviewer->ID;
+        if ($reviewInfo) {
+            $reviewLog->ReviewInfo = $reviewInfo;
+        }
         $this->owner->ReviewLogs()->add($reviewLog);
     }
 
@@ -425,16 +441,58 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         $nextDate = false;
         $options = $this->getOptions();
 
-        if ($options && $options->ReviewPeriodDays) {
+        if ($options && $options->ReviewPeriodDays > 0) {
             $nextDate = date('Y-m-d', strtotime('+ ' . $options->ReviewPeriodDays . ' days', SS_Datetime::now()->format('U')));
 
             $this->owner->NextReviewDate = $nextDate;
+            $this->owner->write();
+        } else {
+            $this->owner->NextReviewDate = null;
             $this->owner->write();
         }
 
         return (bool) $nextDate;
     }
+    
+    public function canRemind(Member $member = null) {
+        if (!$this->owner->obj("NextReviewDate")->exists()) {
+            return false;
+        }
 
+        // If today is not the date of the first reminder, return false
+        $config = SiteConfig::current_site_config();
+        $firstReview = $config->FirstReviewDaysBefore;
+        $now = SS_Datetime::now();
+        $notifyDate1 = date('Y-m-d', strtotime($this->owner->NextReviewDate . ' -' . $firstReview . ' days'));
+
+        // If today is not the first reminder date
+        if (!$notifyDate1 == $now->URLDate()) {
+            return false;
+        }
+        
+        $options = $this->getOptions();
+
+        if (!$options) {
+            return false;
+        } elseif ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+            return false;
+        }
+
+        if (!$member) {
+            return true;
+        }
+
+        if ($member->inGroups($options->OwnerGroups())) {
+            return true;
+        }
+
+        if ($options->OwnerUsers()->find("ID", $member->ID)) {
+            return true;
+        }
+
+        return false;
+    }
+    
     /**
      * Check if a review is due by a member for this owner.
      *
@@ -454,8 +512,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         $options = $this->getOptions();
 
-        if ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+        if (!$options) {
             return false;
+        } elseif ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+			return false;
         }
 
         if (!$member) {

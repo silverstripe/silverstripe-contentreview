@@ -28,12 +28,10 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
         $page = $this->findRecord($data);
         if (!$page->canEdit()) {
             return Security::permissionFailure($this->owner);
-        }
-
+        }        
         $notes = (!empty($data["ReviewNotes"]) ? $data["ReviewNotes"] : _t("ContentReview.NOCOMMENTS", "(no comments)"));
-        $page->addReviewNote(Member::currentUser(), $notes);
+        $page->addReviewNote(Member::currentUser(), $notes, $page->ReviewInfo);
         $page->advanceReviewDate();
-        
         $this->owner->getResponse()->addHeader("X-Status", _t("ContentReview.REVIEWSUCCESSFUL", "Content reviewed successfully"));
         return $this->owner->redirectBack();
     }

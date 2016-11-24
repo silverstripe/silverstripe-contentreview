@@ -7,6 +7,7 @@ class ContentReviewLog extends DataObject
      */
     private static $db = array(
         "Note" => "Text",
+        "ReviewInfo" => "Text"
     );
 
     /**
@@ -21,9 +22,10 @@ class ContentReviewLog extends DataObject
      * @var array
      */
     private static $summary_fields = array(
-        "Note"           => array("title" => "Note"),
-        "Created"        => array("title" => "Reviewed at"),
-        "Reviewer.Title" => array("title" => "Reviewed by"),
+        "ReviewInfo"        => array("title" => "Review Information"),
+        "Note"              => array("title" => "Note"),
+        "Created"           => array("title" => "Reviewed at"),
+        "Reviewer.Title"    => array("title" => "Reviewed by"),
     );
 
     /**
