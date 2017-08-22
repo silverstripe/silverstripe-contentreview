@@ -94,7 +94,7 @@ class ContentReviewDefaultSettings extends DataExtension
             'ContentReviewHelp',
             _t(
                 'ContentReview.DEFAULTSETTINGSHELP',
-                'These content review settings will apply to all pages that does not have specific Content Review schedule.'
+                'These settings will apply to all pages that do not have a specific Content Review schedule.'
             )
         );
 
@@ -107,7 +107,7 @@ class ContentReviewDefaultSettings extends DataExtension
         )
             ->setDescription(_t(
                 'ContentReview.REVIEWFREQUENCYDESCRIPTION',
-                'The review date will be set to this far in the future whenever the page is published'
+                'The review date will be set to this far in the future, whenever the page is published.'
             ));
 
         $fields->addFieldToTab('Root.ContentReview', $reviewFrequency);
