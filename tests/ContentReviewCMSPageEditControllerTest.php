@@ -67,7 +67,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         );
 
         $this->get('admin/pages/edit/show/' . $page->ID);
-        $response = $this->post("admin/pages/edit/EditForm", $data);
+        $response = $this->post(singleton('CMSPageEditController')->getEditForm($page->ID)->FormAction(), $data);
 
         $this->assertEquals("OK", $response->getStatusDescription());
         $this->assertEquals(200, $response->getStatusCode());
@@ -90,8 +90,8 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         );
 
         $this->get('admin/pages/edit/show/' . $page->ID);
-        $response = $this->post("admin/pages/edit/EditForm", $data);
-        
+        $response = $this->post(singleton('CMSPageEditController')->getEditForm($page->ID)->FormAction(), $data);
+
         $this->assertEquals("OK", $response->getStatusDescription());
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(1, $page->ReviewLogs()->count());
