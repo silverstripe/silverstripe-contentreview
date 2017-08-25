@@ -23,7 +23,7 @@ en:
     PAGEOWNERGROUPS: Groups
     PAGEOWNERUSERS: Users
     REVIEWFREQUENCY: 'Review frequency'
-    REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future, whenever the page is published.'
+    REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future whenever the page is published'
     REVIEWHEADER: 'Content review'
     REVIEWNOTES: 'Review notes'
     REVIEWSUCCESSFUL: 'Content reviewed successfully'
