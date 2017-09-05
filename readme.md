@@ -1,33 +1,33 @@
 # Content Review module
 
-[![Build Status](http://img.shields.io/travis/silverstripe/silverstripe-contentreview.svg?style=flat-square)](https://travis-ci.org/silverstripe/silverstripe-contentreview)
-[![Code Quality](http://img.shields.io/scrutinizer/g/silverstripe/silverstripe-contentreview.svg?style=flat-square)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview)
-[![Version](http://img.shields.io/packagist/v/silverstripe/contentreview.svg?style=flat-square)](https://packagist.org/packages/silverstripe/contentreview)
-[![License](http://img.shields.io/packagist/l/silverstripe/contentreview.svg?style=flat-square)](license.md)
-![helpfulrobot](https://helpfulrobot.io/silverstripe/contentreview/badge)
+[![Build status](https://travis-ci.org/silverstripe/silverstripe-contentreview.png?branch=master)](https://travis-ci.org/silverstripe/silverstripe-contentreview)
+[![Code quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/?branch=master)
+[![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-contentreview/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-contentreview)
+[![Version](http://img.shields.io/packagist/v/silverstripe/contentreview.svg)](https://packagist.org/packages/silverstripe/contentreview)
+[![License](http://img.shields.io/packagist/l/silverstripe/contentreview.svg)](license.md)
 
-This module helps keep your website content accurate and up-to-date, which keeps your users happy. 
+This module helps keep your website content accurate and up-to-date, which keeps your users happy.
 
-It does so by sending reviewers reminder emails to go in and check the content. For a reviewer this 
+It does so by sending reviewers reminder emails to go in and check the content. For a reviewer this
 often includes checking links, grammar, factual information and look and feel.
 
-There are two types of roles with this module. 
+There are two types of roles with this module.
 
  * Website owner; (typically assigned to the Administrator group) ensures that a website is accurate and up-to-date, by delegating responsibility to content reviewers.
  * Content reviewer; responsible for keeping a website or part of a website accurate and up-to-date.
 
 ## Requirements
 
- * SilverStripe ^3.1
+ * SilverStripe ^4.0
 
 ## Features
 
- * Content reviewer will receive an email notification when a page is due for review. 
+ * Content reviewer will receive an email notification when a page is due for review.
  * Content reviewer can mark a page as 'reviewed', and provide review notes.
  * Website owner can assign content reviewers to a page and set when the content should be reviewed.
  * Website owner can see a report of pages and their reviewed status.
  * Content reviewers can be assigned to a page, a page and all sub-pages, or globally.
- * The content review schedule can be automatic, e.g. every month, and/or a specific date. 
+ * The content review schedule can be automatic, e.g. every month, and/or a specific date.
 
 ## Wishlist features
 
