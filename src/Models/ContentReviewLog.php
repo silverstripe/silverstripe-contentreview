@@ -4,6 +4,7 @@ namespace SilverStripe\ContentReview\Models;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 
 class ContentReviewLog extends DataObject
