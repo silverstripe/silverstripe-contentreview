@@ -161,21 +161,36 @@ class PagesDueForReviewReport extends Report
 
         if (empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
             // If there's no review dates set, default to all pages due for review now
-            $nextReviewUnixSec = strtotime(' + 1 day', DBDatetime::now()->format('U'));
-            $records = $records->where(sprintf('"NextReviewDate" < \'%s\'', date('Y-m-d', $nextReviewUnixSec)));
+            $records = $records->where(
+                sprintf(
+                    '"NextReviewDate" < \'%s\'',
+                    DBDatetime::now()->Format('y-MM-dd')
+                )
+            );
         } else {
             // Review date before
             if (!empty($params['ReviewDateBefore'])) {
                 // TODO Get value from DateField->dataValue() once we have access to form elements here
-                $nextReviewUnixSec = strtotime(' + 1 day', strtotime($params['ReviewDateBefore']));
-                $records = $records->where(sprintf("\"NextReviewDate\" < '%s'", date('Y-m-d', $nextReviewUnixSec)));
+                $nextReviewUnixSec = strtotime(
+                    ' + 1 day',
+                    strtotime($params['ReviewDateBefore'])
+                );
+                $records = $records->where(
+                    sprintf(
+                        "\"NextReviewDate\" < '%s'",
+                        DBDatetime::create()->setValue($nextReviewUnixSec)->Format('y-MM-dd')
+                    )
+                );
             }
 
             // Review date after
             if (!empty($params['ReviewDateAfter'])) {
                 // TODO Get value from DateField->dataValue() once we have access to form elements here
                 $records = $records->where(
-                    sprintf("\"NextReviewDate\" >= '%s'", date('Y-m-d', strtotime($params['ReviewDateAfter'])))
+                    sprintf(
+                        "\"NextReviewDate\" >= '%s'",
+                        DBDatetime::create()->setValue(strtotime($params['ReviewDateAfter']))->Format('y-MM-dd')
+                    )
                 );
             }
         }

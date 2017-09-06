@@ -170,7 +170,7 @@ class ContentReviewSettingsTest extends SapphireTest
         $page = $this->objFromFixture(Page::class, "inherit");
 
         $this->assertEquals("Inherit", $page->ContentReviewType);
-        $this->assertEquals($this->objFromFixture(SiteConfig::class, "default"), $page->getOptions());
+        $this->assertEquals($this->objFromFixture(SiteConfig::class, "default")->ID, $page->getOptions()->ID);
     }
 
     public function testGetNextReviewDateFromCustomSettings()

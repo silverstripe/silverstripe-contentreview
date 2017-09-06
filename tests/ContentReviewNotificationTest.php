@@ -4,6 +4,7 @@ namespace SilverStripe\ContentReview\Tests;
 
 use Page;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
 use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
@@ -12,6 +13,8 @@ use SilverStripe\ContentReview\Tasks\ContentReviewEmails;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 
 /**
@@ -68,11 +71,11 @@ class ContentReviewNotificationTest extends SapphireTest
         $this->assertNotNull($email, "Email haven't been sent.");
         $this->assertContains(
             "<h1>$Subject</h1><p>There are $PagesCount pages that are due for review today by you, $ToFirstName.</p><p>This email was sent to $ToEmail</p>",
-            $email['htmlContent']
+            $email['HtmlContent']
         );
-        $this->assertContains('Staff', $email['htmlContent']);
-        $this->assertContains('Contact Us', $email['htmlContent']);
-        $this->assertContains('Contact Us Child', $email['htmlContent']);
+        $this->assertContains('Staff', $email['HtmlContent']);
+        $this->assertContains('Contact Us', $email['HtmlContent']);
+        $this->assertContains('Contact Us Child', $email['HtmlContent']);
 
         DBDatetime::clear_mock_now();
     }

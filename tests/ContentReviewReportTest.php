@@ -48,8 +48,8 @@ class ContentReviewReportTest extends FunctionalTest
         $report->title();
 
         $results = $report->sourceRecords(array(
-            "ReviewDateAfter"  => "01/01/2010",
-            "ReviewDateBefore" => "12/12/2010",
+            "ReviewDateAfter"  => "2010-01-01",
+            "ReviewDateBefore" => "2010-12-12",
         ));
 
         $this->assertEquals(array(

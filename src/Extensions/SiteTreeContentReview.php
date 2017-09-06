@@ -211,7 +211,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         }
 
         // Failover to check on ReviewPeriodDays + LastEdited
-        $nextReviewUnixSec = strtotime('now + ' . $options->ReviewPeriodDays . ' days');
+        $nextReviewUnixSec = strtotime(' + ' . $options->ReviewPeriodDays . ' days', DBDatetime::now()->getTimestamp());
         $date = DBDate::create('NextReviewDate');
         $date->setValue($nextReviewUnixSec);
 
@@ -457,17 +457,20 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function advanceReviewDate()
     {
-        $nextDate = false;
+        $nextDateTimestamp = false;
         $options = $this->getOptions();
 
         if ($options && $options->ReviewPeriodDays) {
-            $nextDateTimestamp = strtotime('now + ' . $options->ReviewPeriodDays . ' days');
+            $nextDateTimestamp = strtotime(
+                ' + ' . $options->ReviewPeriodDays . ' days',
+                DBDatetime::now()->getTimestamp()
+            );
 
             $this->owner->NextReviewDate = DBDate::create()->setValue($nextDateTimestamp)->Format('y-MM-dd');
             $this->owner->write();
         }
 
-        return (bool) $nextDate;
+        return (bool) $nextDateTimestamp;
     }
 
     /**
@@ -554,7 +557,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         // parent page change its review period
         // && !$this->owner->isChanged('ContentReviewType', 2)
         if ($this->owner->isChanged('ReviewPeriodDays', 2)) {
-            $nextReviewUnixSec = strtotime('now + ' . $this->owner->ReviewPeriodDays . ' days');
+            $nextReviewUnixSec = strtotime(
+                ' + ' . $this->owner->ReviewPeriodDays . ' days',
+                DBDatetime::now()->getTimestamp()
+            );
             $this->owner->NextReviewDate = DBDate::create()->setValue($nextReviewUnixSec)->Format('y-MM-dd');
         }
     }

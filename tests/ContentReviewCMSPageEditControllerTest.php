@@ -9,6 +9,7 @@ use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
 use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
+use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
@@ -72,7 +73,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         /** @var Member $author */
         $author = $this->objFromFixture(Member::class, "author");
 
-        $this->loginAs($author);
+        $this->logInAs($author);
 
         /** @var Page|SiteTreeContentReview $page */
         $page = $this->objFromFixture(Page::class, "home");
@@ -83,7 +84,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         );
 
         $this->get('admin/pages/edit/show/' . $page->ID);
-        $response = $this->post(singleton(CMSPageEditController::class)->getEditForm($page->ID)->FormAction(), $data);
+        $response = $this->post($this->getFormAction($page), $data);
 
         $this->assertEquals("OK", $response->getStatusDescription());
         $this->assertEquals(200, $response->getStatusCode());
@@ -106,7 +107,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         );
 
         $this->get('admin/pages/edit/show/' . $page->ID);
-        $response = $this->post(singleton(CMSPageEditController::class)->getEditForm($page->ID)->FormAction(), $data);
+        $response = $this->post($this->getFormAction($page), $data);
 
         $this->assertEquals("OK", $response->getStatusDescription());
         $this->assertEquals(200, $response->getStatusCode());
@@ -115,5 +116,20 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         $reviewLog = $page->ReviewLogs()->first();
 
         $this->assertEquals($data["ReviewNotes"], $reviewLog->Note);
+    }
+
+    /**
+     * Return a CMS page edit form action via using a dummy request and session
+     *
+     * @param Page $page
+     * @return string
+     */
+    protected function getFormAction(Page $page)
+    {
+        $controller = singleton(CMSPageEditController::class);
+        $controller->setRequest(new HTTPRequest('GET', '/'));
+        $controller->getRequest()->setSession($this->session());
+
+        return $controller->getEditForm($page->ID)->FormAction();
     }
 }
