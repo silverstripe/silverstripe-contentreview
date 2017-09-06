@@ -1,0 +1,18 @@
+mappings:
+  ContentReviewCompatability: SilverStripe\ContentReview\Compatibility\ContentReviewCompatability
+  ContentReviewCMSExtension: SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension
+  ContentReviewDefaultSettings: SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings
+  ContentReviewOwner: SilverStripe\ContentReview\Extensions\ContentReviewOwner
+  SiteTreeContentReview: SilverStripe\ContentReview\Extensions\SiteTreeContentReview
+  ContentReviewNotificationJob: SilverStripe\ContentReview\Jobs\ContentReviewNotificationJob
+  ContentReviewLog: SilverStripe\ContentReview\Models\ContentReviewLog
+  PagesDueForReviewReport: SilverStripe\ContentReview\Reports\PagesDueForReviewReport
+  PagesWithoutReviewScheduleReport: SilverStripe\ContentReview\Reports\PagesWithoutReviewScheduleReport
+  ContentReviewEmails: SilverStripe\ContentReview\Tasks\ContentReviewEmails
+  ContentReviewOwnerMigrationTask: SilverStripe\ContentReview\Tasks\ContentReviewOwnerMigrationTask
+  ContentReviewBaseTest: SilverStripe\ContentReview\Tests\ContentReviewBaseTest
+  ContentReviewCMSPageEditControllerTest: SilverStripe\ContentReview\Tests\ContentReviewCMSPageEditControllerTest
+  ContentReviewNotificationTest: SilverStripe\ContentReview\Tests\ContentReviewNotificationTest
+  ContentReviewReportTest: SilverStripe\ContentReview\Tests\ContentReviewReportTest
+  ContentReviewSettingsTest: SilverStripe\ContentReview\Tests\ContentReviewSettingsTest
+  SiteTreeContentReviewTest: SilverStripe\ContentReview\Tests\SiteTreeContentReviewTest

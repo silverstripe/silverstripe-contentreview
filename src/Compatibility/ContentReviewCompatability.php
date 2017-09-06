@@ -1,5 +1,12 @@
 <?php
 
+namespace SilverStripe\ContentReview\Compatibility;
+
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Subsites\Model\Subsite;
+// @todo add translatable namespace
+use Translatable;
+
 /**
  * This is a helper class which lets us do things with content review data without subsites
  * and translatable messing our SQL queries up.
@@ -25,12 +32,12 @@ class ContentReviewCompatability
             self::TRANSLATABLE => null,
         );
 
-        if (ClassInfo::exists("Subsite")) {
+        if (ClassInfo::exists(Subsite::class)) {
             $compatibility[self::SUBSITES] = Subsite::$disable_subsite_filter;
             Subsite::disable_subsite_filter(true);
         }
 
-        if (ClassInfo::exists("Translatable")) {
+        if (ClassInfo::exists(Translatable::class)) {
             $compatibility[self::TRANSLATABLE] = Translatable::locale_filter_enabled();
             Translatable::disable_locale_filter();
         }
@@ -43,11 +50,11 @@ class ContentReviewCompatability
      */
     public static function done(array $compatibility)
     {
-        if (class_exists("Subsite")) {
+        if (class_exists(Subsite::class)) {
             Subsite::$disable_subsite_filter = $compatibility[self::SUBSITES];
         }
 
-        if (class_exists("Translatable")) {
+        if (class_exists(Translatable::class)) {
             Translatable::enable_locale_filter($compatibility[self::TRANSLATABLE]);
         }
     }

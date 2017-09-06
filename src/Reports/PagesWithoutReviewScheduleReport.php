@@ -1,11 +1,24 @@
 <?php
 
-require_once "Zend/Date.php";
+namespace SilverStripe\ContentReview\Reports;
+
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\CMS\Controllers\CMSPageEditController;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\CMS\Model\VirtualPage;
+use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Reports\Report;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Show all pages that need to be reviewed.
  */
-class PagesWithoutReviewScheduleReport extends SS_Report
+class PagesWithoutReviewScheduleReport extends Report
 {
     /**
      * @return string
@@ -20,8 +33,8 @@ class PagesWithoutReviewScheduleReport extends SS_Report
      */
     public function parameterFields()
     {
-        $params = new FieldList();
-        $params->push(new CheckboxField("ShowVirtualPages", "Show Virtual Pages"));
+        $params = FieldList::create();
+        $params->push(CheckboxField::create("ShowVirtualPages", "Show Virtual Pages"));
 
         return $params;
     }
@@ -31,7 +44,7 @@ class PagesWithoutReviewScheduleReport extends SS_Report
      */
     public function columns()
     {
-        $linkBase = singleton("CMSPageEditController")->Link("show");
+        $linkBase = singleton(CMSPageEditController::class)->Link("show");
         $linkPath = parse_url($linkBase, PHP_URL_PATH);
         $linkQuery = parse_url($linkBase, PHP_URL_QUERY);
 
@@ -54,7 +67,8 @@ class PagesWithoutReviewScheduleReport extends SS_Report
                     $liveLink = $item->AbsoluteLiveLink;
                     $stageLink = $item->AbsoluteLink();
 
-                    return sprintf("%s <a href='%s'>%s</a>",
+                    return sprintf(
+                        "%s <a href='%s'>%s</a>",
                         $stageLink,
                         $liveLink ? $liveLink : $stageLink . "?stage=Stage",
                         $liveLink ? "(live)" : "(draft)"
@@ -94,7 +108,7 @@ class PagesWithoutReviewScheduleReport extends SS_Report
      */
     public function sourceRecords($params = array())
     {
-        Versioned::reading_stage("Stage");
+        Versioned::set_stage(Versioned::DRAFT);
 
         $records = SiteTree::get();
         $compatibility = ContentReviewCompatability::start();
@@ -103,7 +117,7 @@ class PagesWithoutReviewScheduleReport extends SS_Report
 
         // Show virtual pages?
         if (empty($params["ShowVirtualPages"])) {
-            $virtualPageClasses = ClassInfo::subclassesFor("VirtualPage");
+            $virtualPageClasses = ClassInfo::subclassesFor(VirtualPage::class);
             $records = $records->where(sprintf(
                 "\"SiteTree\".\"ClassName\" NOT IN ('%s')",
                 implode("','", array_values($virtualPageClasses))
@@ -114,7 +128,7 @@ class PagesWithoutReviewScheduleReport extends SS_Report
         $records = $records->toArray();
 
         // Trim out calculated values
-        $list = new ArrayList();
+        $list = ArrayList::create();
         foreach ($records as $record) {
             if (!$this->hasReviewSchedule($record)) {
                 $list->push($record);

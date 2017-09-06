@@ -1,5 +1,45 @@
 <?php
 
+namespace SilverStripe\ContentReview\Extensions;
+
+use Exception;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ContentReview\Jobs\ContentReviewNotificationJob;
+use SilverStripe\ContentReview\Models\ContentReviewLog;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\CompositeField;
+use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridFieldSortableHeader;
+use SilverStripe\Forms\ListboxField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\HeaderField;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\FieldType\DBDate;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionProvider;
+use SilverStripe\Security\Security;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\Requirements;
+use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
+
 /**
  * Set dates at which content needs to be reviewed and provide a report and emails to alert
  * to content needing review.
@@ -38,15 +78,15 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      * @var array
      */
     private static $has_many = array(
-        "ReviewLogs" => "ContentReviewLog",
+        "ReviewLogs" => ContentReviewLog::class,
     );
 
     /**
      * @var array
      */
     private static $belongs_many_many = array(
-        "ContentReviewGroups" => "Group",
-        "ContentReviewUsers"  => "Member",
+        "ContentReviewGroups" => Group::class,
+        "ContentReviewUsers"  => Member::class,
     );
 
     /**
@@ -70,7 +110,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public static function get_schedule()
     {
-        return self::$schedule;
+        return Config::inst()->get(static::class, 'schedule');
     }
 
     /**
@@ -99,9 +139,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             array_unique($groupIDs);
 
             if (count($groupIDs)) {
-                $groupMembers = DataObject::get("Member")->where("\"Group\".\"ID\" IN (" . implode(",", $groupIDs) . ")")
+                $groupMembers = DataObject::get(Member::class)->where("\"Group\".\"ID\" IN (" . implode(",", $groupIDs) . ")")
                     ->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
-                    ->leftJoin("Group", "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
+                    /** @skipUpgrade */
+                    ->leftJoin('Group', "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
 
                 $contentReviewOwners->merge($groupMembers);
             }
@@ -118,8 +159,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function updateCMSActions(FieldList $actions)
     {
-        if ($this->canBeReviewedBy(Member::currentUser())) {
-            Requirements::css("contentreview/css/contentreview.css");
+        if ($this->canBeReviewedBy(Security::getCurrentUser())) {
+            Requirements::css("silverstripe/contentreview:css/contentreview.css");
 
             $reviewTitle = LiteralField::create(
                 "ReviewContentNotesLabel",
@@ -155,8 +196,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $page = $this->owner;
         }
 
-        if ($page->obj("NextReviewDate")->exists()) {
-            return $page->obj("NextReviewDate");
+        if ($page->obj('NextReviewDate')->exists()) {
+            return $page->obj('NextReviewDate');
         }
 
         $options = $this->owner->getOptions();
@@ -170,9 +211,9 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         }
 
         // Failover to check on ReviewPeriodDays + LastEdited
-        $nextReviewUnixSec = strtotime(" + " . $options->ReviewPeriodDays . " days", SS_Datetime::now()->format("U"));
-        $date = Date::create("NextReviewDate");
-        $date->setValue(date("Y-m-d H:i:s", $nextReviewUnixSec));
+        $nextReviewUnixSec = strtotime('now + ' . $options->ReviewPeriodDays . ' days');
+        $date = DBDate::create('NextReviewDate');
+        $date->setValue($nextReviewUnixSec);
 
         return $date;
     }
@@ -205,7 +246,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         // $page is inheriting it's settings from it's parent, find
         // the first valid parent with a valid setting
         while ($parent = $page->Parent()) {
-
             // Root page, use site config
             if (!$parent->exists()) {
                 return SiteConfig::current_site_config();
@@ -254,7 +294,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function getEditorName()
     {
-        $member = Member::currentUser();
+        $member = Security::getCurrentUser();
 
         if ($member) {
             return $member->getTitle();
@@ -298,7 +338,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function updateSettingsFields(FieldList $fields)
     {
-        Requirements::javascript("contentreview/javascript/contentreview.js");
+        Requirements::javascript("silverstripe/contentreview:javascript/contentreview.js");
 
         // Display read-only version only
         if (!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
@@ -313,8 +353,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             }
 
             $logConfig = GridFieldConfig::create()
-                ->addComponent(new GridFieldSortableHeader())
-                ->addComponent($logColumns = new GridFieldDataColumns());
+                ->addComponent(Injector::inst()->create(GridFieldSortableHeader::class))
+                ->addComponent($logColumns = Injector::inst()->create(GridFieldDataColumns::class));
 
             // Cast the value to the users preferred date format
             $logColumns->setFieldCasting(array(
@@ -351,7 +391,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         asort($usersMap);
 
         $userField = ListboxField::create("OwnerUsers", _t("ContentReview.PAGEOWNERUSERS", "Users"), $usersMap)
-            ->setMultiple(true)
             ->addExtraClass('custom-setting')
             ->setAttribute("data-placeholder", _t("ContentReview.ADDUSERS", "Add users"))
             ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
@@ -364,15 +403,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         asort($groupsMap);
 
         $groupField = ListboxField::create("OwnerGroups", _t("ContentReview.PAGEOWNERGROUPS", "Groups"), $groupsMap)
-            ->setMultiple(true)
             ->addExtraClass('custom-setting')
             ->setAttribute("data-placeholder", _t("ContentReview.ADDGROUP", "Add groups"))
             ->setDescription(_t("ContentReview.OWNERGROUPSDESCRIPTION", "Page owners that are responsible for reviews"));
 
         $reviewDate = DateField::create("NextReviewDate", _t("ContentReview.NEXTREVIEWDATE", "Next review date"))
-            ->setConfig("showcalendar", true)
-            ->setConfig("dateformat", "yyyy-MM-dd")
-            ->setConfig("datavalueformat", "yyyy-MM-dd")
             ->setDescription(_t("ContentReview.NEXTREVIEWDATADESCRIPTION", "Leave blank for no review"));
 
         $reviewFrequency = DropdownField::create(
@@ -386,7 +421,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         $notesField = GridField::create("ReviewNotes", "Review Notes", $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
 
         $fields->addFieldsToTab("Root.ContentReview", array(
-            new HeaderField(_t("ContentReview.REVIEWHEADER", "Content review"), 2),
+            HeaderField::create('ContentReviewHeader', _t("ContentReview.REVIEWHEADER", "Content review"), 2),
             $viewersOptionsField,
             CompositeField::create(
                 $userField,
@@ -426,9 +461,9 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         $options = $this->getOptions();
 
         if ($options && $options->ReviewPeriodDays) {
-            $nextDate = date('Y-m-d', strtotime('+ ' . $options->ReviewPeriodDays . ' days', SS_Datetime::now()->format('U')));
+            $nextDateTimestamp = strtotime('now + ' . $options->ReviewPeriodDays . ' days');
 
-            $this->owner->NextReviewDate = $nextDate;
+            $this->owner->NextReviewDate = DBDate::create()->setValue($nextDateTimestamp)->Format('y-MM-dd');
             $this->owner->write();
         }
 
@@ -453,12 +488,12 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         }
 
         $options = $this->getOptions();
-        
+
         if (!$options) {
             return false;
         }
 
-        if (!$options || !$options->hasExtension($this->class)) {
+        if (!$options || !$options->hasExtension(__CLASS__)) {
             return false;
         }
 
@@ -488,7 +523,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     {
         // Only update if DB fields have been changed
         $changedFields = $this->owner->getChangedFields(true, 2);
-        if($changedFields) {
+        if ($changedFields) {
             $this->owner->LastEditedByName = $this->owner->getEditorName();
             $this->owner->OwnerNames = $this->owner->getOwnerNames();
         }
@@ -518,9 +553,9 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         // parent page change its review period
         // && !$this->owner->isChanged('ContentReviewType', 2)
-        if ($this->owner->isChanged("ReviewPeriodDays", 2)) {
-            $nextReviewUnixSec = strtotime(" + " . $this->owner->ReviewPeriodDays . " days", SS_Datetime::now()->format("U"));
-            $this->owner->NextReviewDate = date("Y-m-d", $nextReviewUnixSec);
+        if ($this->owner->isChanged('ReviewPeriodDays', 2)) {
+            $nextReviewUnixSec = strtotime('now + ' . $this->owner->ReviewPeriodDays . ' days');
+            $this->owner->NextReviewDate = DBDate::create()->setValue($nextReviewUnixSec)->Format('y-MM-dd');
         }
     }
 
@@ -591,14 +626,14 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function requireDefaultRecords()
     {
-        if (class_exists("ContentReviewNotificationJob")) {
+        if (class_exists(ContentReviewNotificationJob::class)) {
             // Ensure there is not already a job queued
-            if (QueuedJobDescriptor::get()->filter("Implementation", "ContentReviewNotificationJob")->first()) {
+            if (QueuedJobDescriptor::get()->filter("Implementation", ContentReviewNotificationJob::class)->first()) {
                 return;
             }
 
-            $nextRun = new ContentReviewNotificationJob();
-            $runHour = Config::inst()->get("ContentReviewNotificationJob", "first_run_hour");
+            $nextRun = Injector::inst()->create(ContentReviewNotificationJob::class);
+            $runHour = Config::inst()->get(ContentReviewNotificationJob::class, "first_run_hour");
             $firstRunTime = date("Y-m-d H:i:s", mktime($runHour, 0, 0, date("m"), date("d") + 1, date("y")));
 
             singleton("QueuedJobService")->queueJob(

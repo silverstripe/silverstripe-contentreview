@@ -12,8 +12,8 @@
 				<% loop Pages %>
 				<tr>
 					<td valign="top">$Title</td>
-					<td><a href="{$BaseURL}admin/pages/edit/show/$ID"><% _t('ContentReviewEmails.REVIEWPAGELINK','Review the page in the CMS') %></a><br />
-						<a href="$AbsoluteLink"><% _t('ContentReviewEmails.VIEWPUBLISHEDLINK','View this page on the website') %></a>
+					<td><a href="{$BaseURL}admin/pages/edit/show/$ID"><%t ContentReviewEmails.REVIEWPAGELINK 'Review the page in the CMS' %></a><br />
+						<a href="$AbsoluteLink"><%t ContentReviewEmails.VIEWPUBLISHEDLINK View this page on the website' %></a>
 					</td>
 				</tr>
 				<% end_loop %>

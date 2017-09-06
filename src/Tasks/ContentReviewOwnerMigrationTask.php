@@ -1,12 +1,18 @@
 <?php
 
+namespace SilverStripe\ContentReview\Tasks;
+
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\DB;
+
 /**
  * Task which migrates the ContentReview Module's SiteTree->OwnerID column to a new column name.
  */
 class ContentReviewOwnerMigrationTask extends BuildTask
 {
     /**
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
      */
     public function run($request)
     {
@@ -20,7 +26,7 @@ class ContentReviewOwnerMigrationTask extends BuildTask
             DB::query("UPDATE \"SiteTree_versions\" SET \"ContentReviewOwnerID\" = \"OwnerID\"");
             DB::query("ALTER TABLE \"SiteTree\" DROP COLUMN \"OwnerID\"");
             DB::query("ALTER TABLE \"SiteTree_Live\" DROP COLUMN \"OwnerID\"");
-            DB::query("ALTER TABLE \"SiteTree_versions\" DROP COLUMN \"OwnerID\"");
+            DB::query("ALTER TABLE \"SiteTree_Versions\" DROP COLUMN \"OwnerID\"");
             echo "<h1>Migrated 3 tables. Dropped obsolete OwnerID column</h1>";
         }
     }

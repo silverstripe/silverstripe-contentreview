@@ -1,5 +1,19 @@
 <?php
 
+namespace SilverStripe\ContentReview\Tests;
+
+use Page;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
+use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
+use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
+use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
+use SilverStripe\ContentReview\Tasks\ContentReviewEmails;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\SiteConfig\SiteConfig;
+
 /**
  * @mixin PHPUnit_Framework_TestCase
  */
@@ -8,14 +22,14 @@ class ContentReviewNotificationTest extends SapphireTest
     /**
      * @var string
      */
-    public static $fixture_file = 'contentreview/tests/ContentReviewTest.yml';
+    protected static $fixture_file = 'ContentReviewTest.yml';
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         // Hack to ensure only desired siteconfig is scaffolded
-        $desiredID = $this->idFromFixture('SiteConfig', 'mysiteconfig');
+        $desiredID = $this->idFromFixture(SiteConfig::class, 'mysiteconfig');
         foreach (SiteConfig::get()->exclude('ID', $desiredID) as $config) {
             $config->delete();
         }
@@ -24,25 +38,25 @@ class ContentReviewNotificationTest extends SapphireTest
     /**
      * @var array
      */
-    protected $requiredExtensions = array(
-        'SiteTree' => array('SiteTreeContentReview'),
-        'Group' => array('ContentReviewOwner'),
-        'Member' => array('ContentReviewOwner'),
-        'CMSPageEditController' => array('ContentReviewCMSExtension'),
-        'SiteConfig' => array('ContentReviewDefaultSettings'),
-    );
+    protected static $required_extensions = [
+        SiteTree::class => [SiteTreeContentReview::class],
+        Group::class => [ContentReviewOwner::class],
+        Member::class => [ContentReviewOwner::class],
+        CMSPageEditController::class => [ContentReviewCMSExtension::class],
+        SiteConfig::class => [ContentReviewDefaultSettings::class],
+    ];
 
     public function testContentReviewEmails()
     {
-        SS_Datetime::set_mock_now('2010-02-24 12:00:00');
+        DBDatetime::set_mock_now('2010-02-24 12:00:00');
 
         /** @var Page|SiteTreeContentReview $childParentPage */
-        $childParentPage = $this->objFromFixture('Page', 'contact');
+        $childParentPage = $this->objFromFixture(Page::class, 'contact');
         $childParentPage->NextReviewDate = '2010-02-23';
         $childParentPage->write();
 
         $task = new ContentReviewEmails();
-        $task->run(new SS_HTTPRequest('GET', '/dev/tasks/ContentReviewEmails'));
+        $task->run(new HTTPRequest('GET', '/dev/tasks/ContentReviewEmails'));
 
         // Set template variables (as per variable case)
         $ToEmail = 'author@example.com';
@@ -60,6 +74,6 @@ class ContentReviewNotificationTest extends SapphireTest
         $this->assertContains('Contact Us', $email['htmlContent']);
         $this->assertContains('Contact Us Child', $email['htmlContent']);
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 }

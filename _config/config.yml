@@ -1,18 +1,21 @@
-SiteTree:
+---
+Name: contentreviewextensions
+---
+SilverStripe\CMS\Model\SiteTree:
   extensions:
-    - SiteTreeContentReview
-Group:
+    - SilverStripe\ContentReview\Extensions\SiteTreeContentReview
+SilverStripe\Security\Group:
   extensions:
-    - ContentReviewOwner
-Member:
+    - SilverStripe\ContentReview\Extensions\ContentReviewOwner
+SilverStripe\Security\Member:
   extensions:
-    - ContentReviewOwner
-CMSPageEditController:
+    - SilverStripe\ContentReview\Extensions\ContentReviewOwner
+SilverStripe\CMS\Controllers\CMSPageEditController:
   extensions:
-    - ContentReviewCMSExtension
-CMSPageSettingsController:
+    - SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension
+SilverStripe\CMS\Controllers\CMSPageSettingsController:
   extensions:
-    - ContentReviewCMSExtension
-SiteConfig:
+    - SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension
+SilverStripe\SiteConfig\SiteConfig:
   extensions:
-    - ContentReviewDefaultSettings
+    - SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings

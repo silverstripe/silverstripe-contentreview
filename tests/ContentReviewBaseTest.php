@@ -1,5 +1,12 @@
 <?php
 
+namespace SilverStripe\ContentReview\Tests;
+
+use SilverStripe\Dev\FunctionalTest;
+use SilverStripe\CMS\Model\SiteTree;
+// @todo add translatable namespace
+use Translatable;
+
 /**
  * Extend this class when writing unit tests which are compatible with other modules.
  * All compatibility code goes here.
@@ -11,7 +18,7 @@ abstract class ContentReviewBaseTest extends FunctionalTest
      */
     protected $translatableEnabledBefore;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -21,21 +28,21 @@ abstract class ContentReviewBaseTest extends FunctionalTest
          *  (e.g. $this->post()) do not seem to get passed the tester's locale, but instead fallback to the default locale.
          *
          *  So we set the pages locale to be the default locale, which will then match any subsequent requests.
-         *  
+         *
          *  If creating pages in your unit tests (rather than reading from the fixtures file), you must explicitly call
          *  self::compat() on the page, for the same reasons as above.
          */
-        if (class_exists("Translatable")) {
-            $this->translatableEnabledBefore = SiteTree::has_extension("Translatable");
-            SiteTree::remove_extension("Translatable");
+        if (class_exists(Translatable::class)) {
+            $this->translatableEnabledBefore = SiteTree::has_extension(Translatable::class);
+            SiteTree::remove_extension(Translatable::class);
         }
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
-        if (class_exists("Translatable")) {
+        if (class_exists(Translatable::class)) {
             if ($this->translatableEnabledBefore) {
-                SiteTree::add_extension("Translatable");
+                SiteTree::add_extension(Translatable::class);
             }
         }
 
