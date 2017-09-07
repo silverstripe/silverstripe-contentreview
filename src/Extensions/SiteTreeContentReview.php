@@ -39,6 +39,7 @@ use SilverStripe\Security\Security;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\Requirements;
 use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
+use Symbiote\QueuedJobs\Services\QueuedJobService;
 
 /**
  * Set dates at which content needs to be reviewed and provide a report and emails to alert
@@ -642,7 +643,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $runHour = Config::inst()->get(ContentReviewNotificationJob::class, "first_run_hour");
             $firstRunTime = date("Y-m-d H:i:s", mktime($runHour, 0, 0, date("m"), date("d") + 1, date("y")));
 
-            singleton("QueuedJobService")->queueJob(
+            singleton(QueuedJobService::class)->queueJob(
                 $nextRun,
                 $firstRunTime
             );

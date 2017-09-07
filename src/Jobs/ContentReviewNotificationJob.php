@@ -7,6 +7,7 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Config\Config;
 use Symbiote\QueuedJobs\Services\AbstractQueuedJob;
 use Symbiote\QueuedJobs\Services\QueuedJob;
+use Symbiote\QueuedJobs\Services\QueuedJobService;
 
 if (!class_exists(AbstractQueuedJob::class)) {
     return;
@@ -106,7 +107,7 @@ class ContentReviewNotificationJob extends AbstractQueuedJob implements QueuedJo
             date("Y")
         );
 
-        singleton("QueuedJobService")->queueJob(
+        singleton(QueuedJobService::class)->queueJob(
             $nextRun,
             date("Y-m-d H:i:s", $nextRunTime)
         );
