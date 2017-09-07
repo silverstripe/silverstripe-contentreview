@@ -161,7 +161,7 @@ class ContentReviewDefaultSettings extends DataExtension
             'Root.ContentReview',
             array(
                 TextField::create('ReviewFrom', _t('ContentReview.EMAILFROM', 'From email address'))
-                    ->setRightTitle(_t('Review.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
+                    ->setDescription(_t('Review.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
                 TextField::create('ReviewSubject', _t('ContentReview.EMAILSUBJECT', 'Subject line')),
                 TextAreaField::create('ReviewBody', _t('ContentReview.EMAILTEMPLATE', 'Email template')),
                 LiteralField::create(
