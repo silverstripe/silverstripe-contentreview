@@ -1,0 +1,6 @@
+---
+Name: contentreviewlegacy
+---
+SilverStripe\ORM\DatabaseAdmin:
+  classname_value_remapping:
+    ContentReviewLog: SilverStripe\ContentReview\Models\ContentReviewLog

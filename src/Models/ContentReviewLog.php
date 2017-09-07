@@ -1,5 +1,12 @@
 <?php
 
+namespace SilverStripe\ContentReview\Models;
+
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
+
 class ContentReviewLog extends DataObject
 {
     /**
@@ -13,8 +20,8 @@ class ContentReviewLog extends DataObject
      * @var array
      */
     private static $has_one = array(
-        "Reviewer" => "Member",
-        "SiteTree" => "SiteTree",
+        "Reviewer" => Member::class,
+        "SiteTree" => SiteTree::class,
     );
 
     /**
@@ -31,6 +38,8 @@ class ContentReviewLog extends DataObject
      */
     private static $default_sort = "Created DESC";
 
+    private static $table_name = 'ContentReviewLog';
+
     /**
      * @param mixed $member
      *
@@ -38,6 +47,6 @@ class ContentReviewLog extends DataObject
      */
     public function canView($member = null)
     {
-        return (bool) Member::currentUser();
+        return (bool) Security::getCurrentUser();
     }
 }

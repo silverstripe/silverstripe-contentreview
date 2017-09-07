@@ -1,11 +1,29 @@
 <?php
 
-require_once "Zend/Date.php";
+namespace SilverStripe\ContentReview\Reports;
+
+use SilverStripe\CMS\Controllers\CMSPageEditController;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\CMS\Model\VirtualPage;
+use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
+use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Convert;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\i18n\i18n;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Reports\Report;
+use SilverStripe\Security\Security;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Show all pages that need to be reviewed.
  */
-class PagesDueForReviewReport extends SS_Report
+class PagesDueForReviewReport extends Report
 {
     /**
      * @return string
@@ -20,21 +38,36 @@ class PagesDueForReviewReport extends SS_Report
      */
     public function parameterFields()
     {
-        $filtersList = new FieldList();
+        $filtersList = FieldList::create();
 
         $filtersList->push(
-            DateField::create("ReviewDateAfter", _t("PagesDueForReviewReport.REVIEWDATEAFTER", "Review date after or on"))
-                ->setConfig("showcalendar", true)
+            DateField::create(
+                "ReviewDateAfter",
+                _t("PagesDueForReviewReport.REVIEWDATEAFTER", "Review date after or on")
+            )
         );
 
         $filtersList->push(
-            DateField::create("ReviewDateBefore", _t("PagesDueForReviewReport.REVIEWDATEBEFORE", "Review date before or on"), date("d/m/Y", strtotime("midnight")))
-                ->setConfig("showcalendar", true)
+            DateField::create(
+                "ReviewDateBefore",
+                _t("PagesDueForReviewReport.REVIEWDATEBEFORE", "Review date before or on"),
+                date("d/m/Y", strtotime("midnight"))
+            )
         );
 
-        $filtersList->push(new CheckboxField("ShowVirtualPages", _t("PagesDueForReviewReport.SHOWVIRTUALPAGES", "Show Virtual Pages")));
+        $filtersList->push(
+            CheckboxField::create(
+                "ShowVirtualPages",
+                _t("PagesDueForReviewReport.SHOWVIRTUALPAGES", "Show Virtual Pages")
+            )
+        );
 
-        $filtersList->push(new CheckboxField("OnlyMyPages", _t("PagesDueForReviewReport.ONLYMYPAGES", "Only Show pages assigned to me")));
+        $filtersList->push(
+            CheckboxField::create(
+                "OnlyMyPages",
+                _t("PagesDueForReviewReport.ONLYMYPAGES", "Only Show pages assigned to me")
+            )
+        );
 
         return $filtersList;
     }
@@ -44,7 +77,7 @@ class PagesDueForReviewReport extends SS_Report
      */
     public function columns()
     {
-        $linkBase = singleton("CMSPageEditController")->Link("show");
+        $linkBase = singleton(CMSPageEditController::class)->Link("show");
         $linkPath = parse_url($linkBase, PHP_URL_PATH);
         $linkQuery = parse_url($linkBase, PHP_URL_QUERY);
 
@@ -80,7 +113,8 @@ class PagesDueForReviewReport extends SS_Report
                     $liveLink = $item->AbsoluteLiveLink;
                     $stageLink = $item->AbsoluteLink();
 
-                    return sprintf("%s <a href='%s'>%s</a>",
+                    return sprintf(
+                        "%s <a href='%s'>%s</a>",
                         $stageLink,
                         $liveLink ? $liveLink : $stageLink . "?stage=Stage",
                         $liveLink ? "(live)" : "(draft)"
@@ -120,36 +154,50 @@ class PagesDueForReviewReport extends SS_Report
      */
     public function sourceRecords($params = array())
     {
-        Versioned::reading_stage("Stage");
+        Versioned::set_stage(Versioned::DRAFT);
 
         $records = SiteTree::get();
         $compatibility = ContentReviewCompatability::start();
 
-        if (empty($params["ReviewDateBefore"]) && empty($params["ReviewDateAfter"])) {
+        if (empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
             // If there's no review dates set, default to all pages due for review now
-            $reviewDate = new Zend_Date(SS_Datetime::now()->Format("U"));
-            $reviewDate->add(1, Zend_Date::DAY);
-            $records = $records->where(sprintf('"NextReviewDate" < \'%s\'', $reviewDate->toString("YYYY-MM-dd")));
+            $records = $records->where(
+                sprintf(
+                    '"NextReviewDate" < \'%s\'',
+                    DBDatetime::now()->Format('y-MM-dd')
+                )
+            );
         } else {
             // Review date before
             if (!empty($params['ReviewDateBefore'])) {
                 // TODO Get value from DateField->dataValue() once we have access to form elements here
-                $reviewDate = new Zend_Date($params["ReviewDateBefore"], Config::inst()->get("i18n", "date_format"));
-                $reviewDate->add(1, Zend_Date::DAY);
-                $records = $records->where(sprintf("\"NextReviewDate\" < '%s'", $reviewDate->toString("YYYY-MM-dd")));
+                $nextReviewUnixSec = strtotime(
+                    ' + 1 day',
+                    strtotime($params['ReviewDateBefore'])
+                );
+                $records = $records->where(
+                    sprintf(
+                        "\"NextReviewDate\" < '%s'",
+                        DBDatetime::create()->setValue($nextReviewUnixSec)->Format('y-MM-dd')
+                    )
+                );
             }
 
             // Review date after
-            if (!empty($params["ReviewDateAfter"])) {
+            if (!empty($params['ReviewDateAfter'])) {
                 // TODO Get value from DateField->dataValue() once we have access to form elements here
-                $reviewDate = new Zend_Date($params["ReviewDateAfter"], Config::inst()->get("i18n", "date_format"));
-                $records = $records->where(sprintf("\"NextReviewDate\" >= '%s'", $reviewDate->toString("YYYY-MM-dd")));
+                $records = $records->where(
+                    sprintf(
+                        "\"NextReviewDate\" >= '%s'",
+                        DBDatetime::create()->setValue(strtotime($params['ReviewDateAfter']))->Format('y-MM-dd')
+                    )
+                );
             }
         }
 
         // Show virtual pages?
         if (empty($params["ShowVirtualPages"])) {
-            $virtualPageClasses = ClassInfo::subclassesFor("VirtualPage");
+            $virtualPageClasses = ClassInfo::subclassesFor(VirtualPage::class);
             $records = $records->where(sprintf(
                 "\"SiteTree\".\"ClassName\" NOT IN ('%s')",
                 implode("','", array_values($virtualPageClasses))
@@ -157,15 +205,15 @@ class PagesDueForReviewReport extends SS_Report
         }
 
         // Owner dropdown
-        if (!empty($params["ContentReviewOwner"])) {
-            $ownerNames = Convert::raw2sql($params["ContentReviewOwner"]);
+        if (!empty($params[ContentReviewOwner::class])) {
+            $ownerNames = Convert::raw2sql($params[ContentReviewOwner::class]);
             $records = $records->filter("OwnerNames:PartialMatch", $ownerNames);
         }
 
         // Only show pages assigned to the current user?
         // This come last because it transforms $records to an ArrayList.
         if (!empty($params["OnlyMyPages"])) {
-            $currentUser = Member::currentUser();
+            $currentUser = Security::getCurrentUser();
 
             $records = $records->filterByCallback(function ($page) use ($currentUser) {
                 $options = $page->getOptions();

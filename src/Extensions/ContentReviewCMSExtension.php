@@ -1,5 +1,14 @@
 <?php
 
+namespace SilverStripe\ContentReview\Extensions;
+
+use SilverStripe\Admin\LeftAndMainExtension;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\HTTPResponse_Exception;
+use SilverStripe\Forms\Form;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
+
 /**
  * CMSPageEditController extension to receive the additional action button from
  * SiteTreeContentReview::updateCMSActions()
@@ -21,7 +30,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
      *
      * @return string
      *
-     * @throws SS_HTTPResponse_Exception
+     * @throws HTTPResponse_Exception
      */
     public function savereview($data, Form $form)
     {
@@ -30,14 +39,17 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
             return Security::permissionFailure($this->owner);
         }
 
-        $notes = (!empty($data["ReviewNotes"]) ? $data["ReviewNotes"] : _t("ContentReview.NOCOMMENTS", "(no comments)"));
+        $notes = (!empty($data["ReviewNotes"])
+            ? $data["ReviewNotes"]
+            : _t("ContentReview.NOCOMMENTS", "(no comments)"));
         $page->addReviewNote(Member::currentUser(), $notes);
         $page->advanceReviewDate();
-        
-        $this->owner->getResponse()->addHeader("X-Status", _t("ContentReview.REVIEWSUCCESSFUL", "Content reviewed successfully"));
+
+        $this->owner->getResponse()
+            ->addHeader("X-Status", _t("ContentReview.REVIEWSUCCESSFUL", "Content reviewed successfully"));
         return $this->owner->redirectBack();
     }
-    
+
     /**
      * Find the page this form is updating
      *
@@ -48,7 +60,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
     protected function findRecord($data)
     {
         if (empty($data["ID"])) {
-            throw new SS_HTTPResponse_Exception("No record ID", 404);
+            throw new HTTPResponse_Exception("No record ID", 404);
         }
 
         $page = null;
@@ -58,7 +70,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
         }
 
         if (!$page || !$page->ID) {
-            throw new SS_HTTPResponse_Exception("Bad record ID #{$id}", 404);
+            throw new HTTPResponse_Exception("Bad record ID #{$id}", 404);
         }
 
         return $page;

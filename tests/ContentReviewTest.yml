@@ -1,10 +1,10 @@
-SiteConfig:
+SilverStripe\SiteConfig\SiteConfig:
   mysiteconfig:
     ReviewFrom: sender@silverstripe.com
     ReviewSubject: 'Please log in to review some content!'
     ReviewBody: '<h1>$Subject</h1><p>There are $PagesCount pages that are due for review today by you, $ToFirstName.</p><p>This email was sent to $ToEmail</p>'
 
-Permission:
+SilverStripe\Security\Permission:
   cmsmain1:
     Code: CMS_ACCESS_CMSMain
   cmsmain2:
@@ -16,39 +16,44 @@ Permission:
   workflowadmin2:
     Code: IS_WORKFLOW_ADMIN
 
-Group:
+SilverStripe\Security\Group:
   editorgroup:
     Title: Edit existing pages
     Code: editorgroup
-    Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
+    Permissions:
+      - =>SilverStripe\Security\Permission.cmsmain1
+      - =>SilverStripe\Security\Permission.workflowadmin1
+      - =>SilverStripe\Security\Permission.setreviewdates
   authorgroup:
     Title: Author existing pages
     Code: authorgroup
-    Permissions: =>Permission.cmsmain2,=>Permission.workflowadmin2
+    Permissions:
+      - =>SilverStripe\Security\Permission.cmsmain2
+      - =>SilverStripe\Security\Permission.workflowadmin2
 
-Member:
+SilverStripe\Security\Member:
   author:
     FirstName: Test
     Surname: Author
     Email: author@example.com
-    Groups: =>Group.authorgroup
+    Groups: =>SilverStripe\Security\Group.authorgroup
   editor:
     FirstName: Test
     Surname: Editor
-    Groups: =>Group.editorgroup
+    Groups: =>SilverStripe\Security\Group.editorgroup
   visitor:
     FirstName: Kari
     Surname: Visitor
     Email: visitor@example.com
-  
+
 Page:
-# Cant be reviewed, no owners
+  # Cant be reviewed, no owners
   home:
     Title: Home
     ContentReviewType: Custom
     NextReviewDate: 2010-02-01
     ReviewPeriodDays: 10
-# Cant be reviewed, no owners
+  # Cant be reviewed, no owners
   about:
     Title: About Us
     ContentReviewType: Custom
@@ -59,24 +64,24 @@ Page:
     ContentReviewType: Custom
     NextReviewDate: 2010-02-14
     ReviewPeriodDays: 10
-    ContentReviewUsers: =>Member.author
+    ContentReviewUsers: =>SilverStripe\Security\Member.author
   contact:
     Title: Contact Us
     ContentReviewType: Custom
     ReviewPeriodDays: 10
     NextReviewDate: 2010-02-21
-    ContentReviewGroups: =>Group.authorgroup
+    ContentReviewGroups: =>SilverStripe\Security\Group.authorgroup
   contact-child:
     Title: Contact Us Child
     ContentReviewType: Inherit
     ParentID: =>Page.contact
-# Cant be reviewed, no NextReviewDate
+  # Cant be reviewed, no NextReviewDate
   no-review:
     Title: Page without review date
     ContentReviewType: Custom
-    ContentReviewUsers: =>Member.author
-# Cant be reviewed, no NextReviewDate
+    ContentReviewUsers: =>SilverStripe\Security\Member.author
+  # Cant be reviewed, no NextReviewDate
   group-owned:
     Title: Page owned by group
     ContentReviewType: Custom
-    ContentReviewGroups: =>Group.authorgroup
+    ContentReviewGroups: =>SilverStripe\Security\Group.authorgroup

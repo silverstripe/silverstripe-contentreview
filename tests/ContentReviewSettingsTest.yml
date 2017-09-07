@@ -1,4 +1,4 @@
-Permission:
+SilverStripe\Security\Permission:
   cmsmain1:
     Code: CMS_ACCESS_CMSMain
   cmsmain2:
@@ -10,46 +10,56 @@ Permission:
   workflowadmin2:
     Code: IS_WORKFLOW_ADMIN
 
-Group:
+SilverStripe\Security\Group:
   webmastergroup:
     Title: Edit existing pages
     Code: editorgroup
-    Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
+    Permissions:
+      - =>SilverStripe\Security\Permission.cmsmain1
+      - =>SilverStripe\Security\Permission.workflowadmin1
+      - =>SilverStripe\Security\Permission.setreviewdates
   editorgroup:
     Title: Edit existing pages
     Code: editorgroup
-    Permissions: =>Permission.cmsmain1,=>Permission.workflowadmin1,=>Permission.setreviewdates
+    Permissions:
+      - =>SilverStripe\Security\Permission.cmsmain1
+      - =>SilverStripe\Security\Permission.workflowadmin1
+      - =>SilverStripe\Security\Permission.setreviewdates
   authorgroup:
     Title: Author existing pages
     Code: authorgroup
-    Permissions: =>Permission.cmsmain2,=>Permission.workflowadmin2
+    Permissions:
+      - =>SilverStripe\Security\Permission.cmsmain2
+      - =>SilverStripe\Security\Permission.workflowadmin2
 
-Member:
+SilverStripe\Security\Member:
   webmaster:
     FirstName: Web
     Surname: Master
     Email: webmaster@example.com
-    Groups: =>Group.webmastergroup
+    Groups: =>SilverStripe\Security\Group.webmastergroup
   author:
     FirstName: Test
     Surname: Author
     Email: author@example.com
-    Groups: =>Group.authorgroup
+    Groups: =>SilverStripe\Security\Group.authorgroup
   editor:
     FirstName: Test
     Surname: Editor
-    Groups: =>Group.editorgroup
-SiteConfig:
+    Groups: =>SilverStripe\Security\Group.editorgroup
+
+SilverStripe\SiteConfig\SiteConfig:
   default:
-    ContentReviewUsers: =>Member.webmaster
-    ContentReviewGroups: =>Group.webmastergroup
+    ContentReviewUsers: =>SilverStripe\Security\Member.webmaster
+    ContentReviewGroups: =>SilverStripe\Security\Group.webmastergroup
     ReviewPeriodDays: 30
+
 Page:
   custom:
     Title: custom
     ContentReviewType: Custom
     NextReviewDate: 2010-02-01
-    ContentReviewUsers: =>Member.editor
+    ContentReviewUsers: =>SilverStripe\Security\Member.editor
     ReviewPeriodDays: 10
   disabled:
     Title: disabled
@@ -89,7 +99,7 @@ Page:
   page-3-1-1:
     Title: page 3 1 1
     ContentReviewType: Inherit
-    ParentID: =>Page.page-3-1 
+    ParentID: =>Page.page-3-1
   page-3-1-1-1:
     Title: page 3 1 1 1
     ContentReviewType: Inherit

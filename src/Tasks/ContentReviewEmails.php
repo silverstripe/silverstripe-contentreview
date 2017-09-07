@@ -1,12 +1,28 @@
 <?php
 
+namespace SilverStripe\ContentReview\Tasks;
+
+use Page;
+use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\Security\Member;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\View\ArrayData;
+use SilverStripe\View\SSViewer;
+
 /**
  * Daily task to send emails to the owners of content items when the review date rolls around.
  */
 class ContentReviewEmails extends BuildTask
 {
     /**
-     * @param SS_HTTPRequest $request
+     * @param HTTPRequest $request
      */
     public function run($request)
     {
@@ -14,7 +30,7 @@ class ContentReviewEmails extends BuildTask
 
         // First grab all the pages with a custom setting
         $pages = Page::get()
-            ->filter('NextReviewDate:LessThanOrEqual', SS_Datetime::now()->URLDate());
+            ->filter('NextReviewDate:LessThanOrEqual', DBDatetime::now()->URLDate());
 
         $overduePages = $this->getOverduePagesForOwners($pages);
 
@@ -28,11 +44,11 @@ class ContentReviewEmails extends BuildTask
     }
 
     /**
-     * @param SS_list $pages
+     * @param SS_List $pages
      *
      * @return array
      */
-    protected function getOverduePagesForOwners(SS_list $pages)
+    protected function getOverduePagesForOwners(SS_List $pages)
     {
         $overduePages = array();
 
@@ -45,7 +61,7 @@ class ContentReviewEmails extends BuildTask
 
             foreach ($option->ContentReviewOwners() as $owner) {
                 if (!isset($overduePages[$owner->ID])) {
-                    $overduePages[$owner->ID] = new ArrayList();
+                    $overduePages[$owner->ID] = ArrayList::create();
                 }
 
                 $overduePages[$owner->ID]->push($page);
@@ -67,7 +83,7 @@ class ContentReviewEmails extends BuildTask
         $templateVariables = $this->getTemplateVariables($owner, $siteConfig, $pages);
 
         // Build email
-        $email = new Email();
+        $email = Email::create();
         $email->setTo($owner->Email);
         $email->setFrom($siteConfig->ReviewFrom);
         $email->setSubject($siteConfig->ReviewSubject);
@@ -76,13 +92,17 @@ class ContentReviewEmails extends BuildTask
         $body = $this->getEmailBody($siteConfig, $templateVariables);
 
         // Populate mail body with fixed template
-        $email->setTemplate($siteConfig->config()->content_review_template);
-        $email->populateTemplate($templateVariables);
-        $email->populateTemplate(array(
-            'EmailBody' => $body,
-            'Recipient' => $owner,
-            'Pages' => $pages,
-        ));
+        $email->setHTMLTemplate($siteConfig->config()->get('content_review_template'));
+        $email->setData(
+            array_merge(
+                $templateVariables,
+                [
+                    'EmailBody' => $body,
+                    'Recipient' => $owner,
+                    'Pages' => $pages,
+                ]
+            )
+        );
         $email->send();
     }
 
@@ -97,7 +117,7 @@ class ContentReviewEmails extends BuildTask
     protected function getEmailBody($config, $variables)
     {
         $template = SSViewer::fromString($config->ReviewBody);
-        $value = $template->process(new ArrayData($variables));
+        $value = $template->process(ArrayData::create($variables));
 
         // Cast to HTML
         return DBField::create_field('HTMLText', (string) $value);
@@ -117,13 +137,13 @@ class ContentReviewEmails extends BuildTask
      */
     protected function getTemplateVariables($recipient, $config, $pages)
     {
-        return array(
+        return [
             'Subject' => $config->ReviewSubject,
             'PagesCount' => $pages->count(),
             'FromEmail' => $config->ReviewFrom,
             'ToFirstName' => $recipient->FirstName,
             'ToSurname' => $recipient->Surname,
             'ToEmail' => $recipient->Email,
-        );
+        ];
     }
 }

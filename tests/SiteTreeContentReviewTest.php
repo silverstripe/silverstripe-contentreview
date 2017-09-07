@@ -1,5 +1,20 @@
 <?php
 
+namespace SilverStripe\ContentReview\Tests;
+
+use Page;
+use SilverStripe\CMS\Controllers\CMSPageEditController;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
+use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
+use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
+use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
+use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * @mixin PHPUnit_Framework_TestCase
  */
@@ -8,23 +23,23 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
     /**
      * @var string
      */
-    public static $fixture_file = "contentreview/tests/ContentReviewTest.yml";
+    protected static $fixture_file = 'ContentReviewTest.yml';
 
     /**
      * @var array
      */
-    protected $requiredExtensions = array(
-        "SiteTree"              => array("SiteTreeContentReview"),
-        "Group"                 => array("ContentReviewOwner"),
-        "Member"                => array("ContentReviewOwner"),
-        "CMSPageEditController" => array("ContentReviewCMSExtension"),
-        "SiteConfig"            => array("ContentReviewDefaultSettings"),
-    );
+    protected static $required_extensions = [
+        SiteTree::class              => [SiteTreeContentReview::class],
+        Group::class                 => [ContentReviewOwner::class],
+        Member::class                => [ContentReviewOwner::class],
+        CMSPageEditController::class => [ContentReviewCMSExtension::class],
+        SiteConfig::class            => [ContentReviewDefaultSettings::class],
+    ];
 
     public function testOwnerNames()
     {
         /** @var Member $editor */
-        $editor = $this->objFromFixture("Member", "editor");
+        $editor = $this->objFromFixture(Member::class, "editor");
 
         $this->logInAs($editor);
 
@@ -41,7 +56,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $this->assertEquals($page->OwnerNames, "Test Editor", "Test Editor should be the owner");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "about");
+        $page = $this->objFromFixture(Page::class, "about");
 
         $page->OwnerUsers()->removeAll();
         $page->write();
@@ -53,7 +68,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
     public function testPermissionsExists()
     {
-        $perms = singleton("SiteTreeContentReview")->providePermissions();
+        $perms = singleton(SiteTreeContentReview::class)->providePermissions();
 
         $this->assertTrue(isset($perms["EDIT_CONTENT_REVIEW_FIELDS"]));
     }
@@ -61,7 +76,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
     public function testUserWithPermissionCanEdit()
     {
         /** @var Member $editor */
-        $editor = $this->objFromFixture("Member", "editor");
+        $editor = $this->objFromFixture(Member::class, "editor");
 
         $this->logInAs($editor);
 
@@ -76,7 +91,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
     public function testUserWithoutPermissionCannotEdit()
     {
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         $this->logInAs($author);
 
@@ -91,7 +106,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
     public function testAutomaticallyToNotSetReviewDate()
     {
         /** @var Member $editor */
-        $editor = $this->objFromFixture("Member", "editor");
+        $editor = $this->objFromFixture(Member::class, "editor");
 
         $this->logInAs($editor);
 
@@ -108,15 +123,15 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
     public function testAddReviewNote()
     {
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "home");
+        $page = $this->objFromFixture(Page::class, "home");
 
         $page->addReviewNote($author, "This is a message");
 
         /** @var Page|SiteTreeContentReview $page */
-        $homepage = $this->objFromFixture("Page", "home");
+        $homepage = $this->objFromFixture(Page::class, "home");
 
         $this->assertEquals(1, $homepage->ReviewLogs()->count());
         $this->assertEquals("This is a message", $homepage->ReviewLogs()->first()->Note);
@@ -125,7 +140,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
     public function testGetContentReviewOwners()
     {
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "group-owned");
+        $page = $this->objFromFixture(Page::class, "group-owned");
 
         $owners = $page->ContentReviewOwners();
 
@@ -135,134 +150,135 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
     public function testCanNotBeReviewBecauseNoReviewDate()
     {
-        SS_Datetime::set_mock_now("2010-01-01 12:00:00");
+        DBDatetime::set_mock_now("2010-01-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "no-review");
+        $page = $this->objFromFixture(Page::class, "no-review");
 
         $this->assertFalse($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testCanNotBeReviewedBecauseInFuture()
     {
-        SS_Datetime::set_mock_now("2010-01-01 12:00:00");
+        DBDatetime::set_mock_now("2010-01-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "staff");
+        $page = $this->objFromFixture(Page::class, "staff");
 
         $this->assertFalse($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testCanNotBeReviewedByUser()
     {
-        SS_Datetime::set_mock_now("2010-03-01 12:00:00");
+        DBDatetime::set_mock_now("2010-03-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "home");
+        $page = $this->objFromFixture(Page::class, "home");
 
         $this->assertFalse($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testCanBeReviewedByUser()
     {
-        SS_Datetime::set_mock_now("2010-03-01 12:00:00");
+        DBDatetime::set_mock_now("2010-03-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "staff");
+        $page = $this->objFromFixture(Page::class, "staff");
 
         $this->assertTrue($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testCanNotBeReviewedByGroup()
     {
-        SS_Datetime::set_mock_now("2010-03-01 12:00:00");
+        DBDatetime::set_mock_now("2010-03-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "editor");
+        $author = $this->objFromFixture(Member::class, "editor");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "contact");
+        $page = $this->objFromFixture(Page::class, "contact");
 
         $this->assertFalse($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testCanBeReviewedByGroup()
     {
-        SS_Datetime::set_mock_now("2010-03-01 12:00:00");
+        DBDatetime::set_mock_now("2010-03-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "contact");
+        $page = $this->objFromFixture(Page::class, "contact");
 
         $this->assertTrue($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testCanBeReviewedFromInheritedSetting()
     {
-        SS_Datetime::set_mock_now("2013-03-01 12:00:00");
+        DBDatetime::set_mock_now("2013-03-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         /** @var Page|SiteTreeContentReview $parentPage */
-        $parentPage = $this->objFromFixture("Page", "contact");
+        $parentPage = $this->objFromFixture(Page::class, "contact");
 
         $parentPage->NextReviewDate = "2013-01-01";
         $parentPage->write();
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "contact-child");
+        $page = $this->objFromFixture(Page::class, "contact-child");
 
         $this->assertTrue($page->canBeReviewedBy($author));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
-    public function testUnModifiedPagesDontChangeEditor() {
-        SS_Datetime::set_mock_now("2013-03-01 12:00:00");
+    public function testUnModifiedPagesDontChangeEditor()
+    {
+        DBDatetime::set_mock_now("2013-03-01 12:00:00");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
         $this->logInAs($author);
 
         // Page which is un-modified doesn't advance version of have an editor assigned
-        $contactPage = $this->objFromFixture("Page", "contact");
+        $contactPage = $this->objFromFixture(Page::class, "contact");
         $contactPageVersion = $contactPage->Version;
         $contactPage->write();
         $this->assertEmpty($contactPage->LastEditedByName);
         $this->assertEquals(
             $contactPageVersion,
-            Versioned::get_versionnumber_by_stage('SiteTree', 'Stage', $contactPage->ID, false)
+            Versioned::get_versionnumber_by_stage(SiteTree::class, 'Stage', $contactPage->ID, false)
         );
 
         // Page with modifications gets marked
-        $homePage = $this->objFromFixture("Page", "home");
+        $homePage = $this->objFromFixture(Page::class, "home");
         $homePageVersion = $homePage->Version;
         $homePage->Content = '<p>Welcome!</p>';
         $homePage->write();
@@ -270,21 +286,21 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $this->assertEquals($author->getTitle(), $homePage->LastEditedByName);
         $this->assertGreaterThan(
             $homePageVersion,
-            Versioned::get_versionnumber_by_stage('SiteTree', 'Stage', $homePage->ID, false)
+            Versioned::get_versionnumber_by_stage(SiteTree::class, 'Stage', $homePage->ID, false)
         );
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testReviewActionVisibleForAuthor()
     {
-        SS_Datetime::set_mock_now("2020-03-01 12:00:00");
+        DBDatetime::set_mock_now("2020-03-01 12:00:00");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "contact");
+        $page = $this->objFromFixture(Page::class, "contact");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "author");
+        $author = $this->objFromFixture(Member::class, "author");
 
         $this->logInAs($author);
 
@@ -292,18 +308,18 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         $this->assertNotNull($fields->fieldByName("ActionMenus.ReviewContent"));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 
     public function testReviewActionNotVisibleForEditor()
     {
-        SS_Datetime::set_mock_now("2020-03-01 12:00:00");
+        DBDatetime::set_mock_now("2020-03-01 12:00:00");
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture("Page", "contact");
+        $page = $this->objFromFixture(Page::class, "contact");
 
         /** @var Member $author */
-        $author = $this->objFromFixture("Member", "editor");
+        $author = $this->objFromFixture(Member::class, "editor");
 
         $this->logInAs($author);
 
@@ -311,6 +327,6 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         $this->assertNull($fields->fieldByName("ActionMenus.ReviewContent"));
 
-        SS_Datetime::clear_mock_now();
+        DBDatetime::clear_mock_now();
     }
 }

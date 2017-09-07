@@ -1,5 +1,20 @@
 <?php
 
+namespace SilverStripe\ContentReview\Extensions;
+
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\ListboxField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+
 /**
  * This extensions add a default schema for new pages and pages without a content
  * review setting.
@@ -36,8 +51,8 @@ class ContentReviewDefaultSettings extends DataExtension
      * @var array
      */
     private static $many_many = array(
-        'ContentReviewGroups' => 'Group',
-        'ContentReviewUsers' => 'Member',
+        'ContentReviewGroups' => Group::class,
+        'ContentReviewUsers' => Member::class,
     );
 
     /**
@@ -49,7 +64,7 @@ class ContentReviewDefaultSettings extends DataExtension
      *
      * @var string
      */
-    private static $content_review_template = 'ContentReviewEmail';
+    private static $content_review_template = 'SilverStripe\\ContentReview\\ContentReviewEmail';
 
     /**
      * @return string
@@ -121,7 +136,6 @@ class ContentReviewDefaultSettings extends DataExtension
         asort($usersMap);
 
         $userField = ListboxField::create('OwnerUsers', _t('ContentReview.PAGEOWNERUSERS', 'Users'), $usersMap)
-            ->setMultiple(true)
             ->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
             ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
@@ -137,7 +151,6 @@ class ContentReviewDefaultSettings extends DataExtension
         asort($groupsMap);
 
         $groupField = ListboxField::create('OwnerGroups', _t('ContentReview.PAGEOWNERGROUPS', 'Groups'), $groupsMap)
-            ->setMultiple(true)
             ->setAttribute('data-placeholder', _t('ContentReview.ADDGROUP', 'Add groups'))
             ->setDescription(_t('ContentReview.OWNERGROUPSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
@@ -151,7 +164,10 @@ class ContentReviewDefaultSettings extends DataExtension
                     ->setRightTitle(_t('Review.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
                 TextField::create('ReviewSubject', _t('ContentReview.EMAILSUBJECT', 'Subject line')),
                 TextAreaField::create('ReviewBody', _t('ContentReview.EMAILTEMPLATE', 'Email template')),
-                LiteralField::create('TemplateHelp', $this->owner->renderWith('ContentReviewAdminHelp')),
+                LiteralField::create(
+                    'TemplateHelp',
+                    $this->owner->renderWith('SilverStripe\\ContentReview\\ContentReviewAdminHelp')
+                ),
             )
         );
     }
@@ -200,7 +216,7 @@ class ContentReviewDefaultSettings extends DataExtension
         }
 
         // Fall back to admin email
-        return Config::inst()->get('Email', 'admin_email');
+        return Config::inst()->get(Email::class, 'admin_email');
     }
 
     /**
@@ -217,7 +233,7 @@ class ContentReviewDefaultSettings extends DataExtension
             return $value;
         }
         // fallback to default value
-        $defaults = $this->owner->config()->defaults;
+        $defaults = $this->owner->config()->get('defaults');
         if (isset($defaults[$field])) {
             return $defaults[$field];
         }
