@@ -161,7 +161,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     public function updateCMSActions(FieldList $actions)
     {
         if ($this->canBeReviewedBy(Security::getCurrentUser())) {
-            Requirements::css("silverstripe/contentreview:css/contentreview.css");
+            Requirements::css('silverstripe/contentreview:client/dist/styles/contentreview.css');
+            Requirements::javascript('silverstripe/contentreview:client/dist/js/contentreview.js');
 
             $reviewTitle = LiteralField::create(
                 "ReviewContentNotesLabel",
@@ -171,8 +172,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $ReviewNotes = LiteralField::create("ReviewNotes", "<textarea class=\"no-change-track\" id=\"Form_EditForm_ReviewNotes\" name=\"ReviewNotes\" placeholder=\"" . _t("ContentReview.COMMENTS", "(optional) Add comments...") . "\" class=\"text\"></textarea>");
 
             $quickReviewAction = FormAction::create("savereview", _t("ContentReview.MARKREVIEWED", "Mark as reviewed"))
-                ->setAttribute("data-icon", "pencil")
-                ->setAttribute("data-text-alternate", _t("ContentReview.MARKREVIEWED", "Mark as reviewed"));
+                ->addExtraClass('btn btn-primary');
 
             $allFields = CompositeField::create($reviewTitle, $ReviewNotes, $quickReviewAction)
                 ->addExtraClass('review-notes field');
@@ -339,7 +339,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function updateSettingsFields(FieldList $fields)
     {
-        Requirements::javascript("silverstripe/contentreview:javascript/contentreview.js");
+        Requirements::javascript("silverstripe/contentreview:client/dist/js/contentreview.js");
 
         // Display read-only version only
         if (!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
@@ -483,6 +483,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function canBeReviewedBy(Member $member = null)
     {
+        return true;
         if (!$this->owner->obj("NextReviewDate")->exists()) {
             return false;
         }
