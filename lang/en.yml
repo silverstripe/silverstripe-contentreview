@@ -49,8 +49,7 @@ en:
 
   SilverStripe\ContentReview\Forms\ReviewContentHandler:
     ContentDueForReview: Content due for review
-    ErrorReviewPermissionDenied: It seems you don't have the necessary permissions to submit a content review
     MarkAsReviewedAction: Mark as reviewed
     NoComments: (no comments)
-    ObjectDoesntExist: That object doesn't exist
+    Placeholder: Add comments (optional)
     Success: Review successfully added

@@ -7,6 +7,7 @@ use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
+use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\ORM\DataObject;
@@ -25,13 +26,6 @@ class ReviewContentHandler
     protected $controller;
 
     /**
-     * The submitted form data
-     *
-     * @var array
-     */
-    protected $data;
-
-    /**
      * Form name to use
      *
      * @var string
@@ -40,16 +34,11 @@ class ReviewContentHandler
 
     /**
      * @param Controller       $controller
-     * @param array|DataObject $data
      * @param string           $name
      */
-    public function __construct($controller = null, $data = [], $name = 'ReviewContentForm')
+    public function __construct($controller = null, $name = 'ReviewContentForm')
     {
         $this->controller = $controller;
-        if ($data instanceof DataObject) {
-            $data = $data->toMap();
-        }
-        $this->data = $data;
         $this->name = $name;
     }
 
@@ -61,7 +50,8 @@ class ReviewContentHandler
      */
     public function Form($object)
     {
-        $placeholder = 'Add comments (optional)';
+        $placeholder = _t(__CLASS__ . '.Placeholder', 'Add comments (optional)');
+        $title = _t(__CLASS__ . '.MarkAsReviewedAction', 'Mark as reviewed');
 
         $fields = FieldList::create([
             HiddenField::create('ID', null, $object->ID),
@@ -71,16 +61,15 @@ class ReviewContentHandler
                 ->setSchemaData(['attributes' => ['placeholder' => $placeholder]])
         ]);
 
-        $actions = FieldList::create([
-            ReviewContentHandlerFormAction::create()
-                ->setTitle(_t(__CLASS__ . '.MarkAsReviewedAction', 'Mark as reviewed'))
-                ->addExtraClass('review-content__action')
-        ]);
+        $action = FormAction::create('savereview', $title)
+            ->setTitle($title)
+            ->setUseButtonTag(false)
+            ->addExtraClass('review-content__action btn btn-primary');
+        $actions = FieldList::create([$action]);
 
-        $form = Form::create($this->controller, $this->name, $fields, $actions);
-
-        $form->setHTMLID('Form_EditForm_ReviewContent');
-        $form->addExtraClass('form--no-dividers review-content__form');
+        $form = Form::create($this->controller, $this->name, $fields, $actions)
+            ->setHTMLID('Form_EditForm_ReviewContent')
+            ->addExtraClass('form--no-dividers review-content__form');
 
         return $form;
     }
@@ -91,24 +80,20 @@ class ReviewContentHandler
      * @param  DataObject $record
      * @param  array $data
      * @return HTTPResponse|string
+     * @throws ValidationException If the user cannot submit the review
      */
     public function submitReview($record, $data)
     {
-        if (!$record || !$record->exists()) {
-            throw new ValidationException(_t(__CLASS__ . '.ObjectDoesntExist', 'That object doesn\'t exist'));
-        }
-
-        if (!$record->canEdit()
-            || !$record->hasMethod('canBeReviewedBy')
-            || !$record->canBeReviewedBy(Security::getCurrentUser())
-        ) {
+        if (!$this->canSubmitReview($record)) {
             throw new ValidationException(_t(
                 __CLASS__ . '.ErrorReviewPermissionDenied',
                 'It seems you don\'t have the necessary permissions to submit a content review'
             ));
         }
 
-        $this->saveRecord($record, $data);
+        $notes = (!empty($data['Review']) ? $data['Review'] : _t(__CLASS__ . '.NoComments', '(no comments)'));
+        $record->addReviewNote(Security::getCurrentUser(), $notes);
+        $record->advanceReviewDate();
 
         $request = $this->controller->getRequest();
         $message = _t(__CLASS__ . '.Success', 'Review successfully added');
@@ -119,21 +104,25 @@ class ReviewContentHandler
             $response = HTTPResponse::create($message, 200);
             $response->addHeader('Content-Type', 'text/html; charset=utf-8');
             return $response;
-        } else {
-            return $this->controller->redirectBack();
         }
+
+        return $this->controller->redirectBack();
     }
 
     /**
-     * Save the review provided in $data to the $record
+     * Determine whether the user can submit a review
      *
      * @param DataObject $record
-     * @param array $data
+     * @return bool
      */
-    protected function saveRecord($record, $data)
+    public function canSubmitReview($record)
     {
-        $notes = (!empty($data['Review']) ? $data['Review'] : _t(__CLASS__ . '.NoComments', '(no comments)'));
-        $record->addReviewNote(Security::getCurrentUser(), $notes);
-        $record->advanceReviewDate();
+        if (!$record->canEdit()
+            || !$record->hasMethod('canBeReviewedBy')
+            || !$record->canBeReviewedBy(Security::getCurrentUser())
+        ) {
+            return false;
+        }
+        return true;
     }
 }

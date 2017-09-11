@@ -8,6 +8,7 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Forms\ReviewContentHandler;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Core\Convert;
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\ValidationResult;
@@ -21,7 +22,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
 {
     private static $allowed_actions = [
         'ReviewContentForm',
-        'submitReview',
+        'savereview',
     ];
 
     /**
@@ -45,15 +46,9 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
      */
     public function getReviewContentForm($id)
     {
-        $record = SiteTree::get()->byID($id);
-
-        if (!$record) {
-            $this->owner->httpError(404, _t(__CLASS__ . '.ErrorNotFound', 'That object couldn\'t be found'));
-            return null;
-        }
-
+        $page = $this->findRecord(['ID' => $id]);
         $user = Security::getCurrentUser();
-        if (!$record->canEdit() || ($record->hasMethod('canBeReviewedBy') && !$record->canBeReviewedBy($user))) {
+        if (!$page->canEdit() || ($page->hasMethod('canBeReviewedBy') && !$page->canBeReviewedBy($user))) {
             $this->owner->httpError(403, _t(
                 __CLASS__.'.ErrorItemPermissionDenied',
                 'It seems you don\'t have the necessary permissions to review this content'
@@ -61,12 +56,10 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
             return null;
         }
 
-        $handler = ReviewContentHandler::create($this->owner, $record);
-        $form = $handler->Form($record);
-
+        $form = $this->getReviewContentHandler()->Form($page);
         $form->setValidationResponseCallback(function (ValidationResult $errors) use ($form, $id) {
             $schemaId = $this->owner->join_links($this->owner->Link('schema/ReviewContentForm'), $id);
-            return $this->owner->getSchemaResponse($schemaId, $form, $errors);
+            return $this->getSchemaResponse($schemaId, $form, $errors);
         });
 
         return $form;
@@ -77,28 +70,57 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
      *
      * @param array $data
      * @param Form $form
-     * @return DBHTMLText|HTTPResponse
+     * @return DBHTMLText|HTTPResponse|null
      */
-    public function submitReview($data = '', $form = '')
+    public function savereview($data, Form $form)
     {
-        $id = $data['ID'];
-        $record = SiteTree::get()->byID($id);
+        $page = $this->findRecord($data);
 
-        $handler = ReviewContentHandler::create($this->owner, $record);
-        $form = $handler->Form($record);
-        $results = $handler->submitReview($record, $data);
+        $results = $this->getReviewContentHandler()->submitReview($page, $data);
         if (is_null($results)) {
             return null;
         }
-
         if ($this->getSchemaRequested()) {
             // Send extra "message" data with schema response
             $extraData = ['message' => $results];
-            $schemaId = $this->owner->join_links($this->owner->Link('schema/ReviewContentForm'), $id);
+            $schemaId = $this->owner->join_links($this->owner->Link('schema/ReviewContentForm'), $page->ID);
             return $this->getSchemaResponse($schemaId, $form, null, $extraData);
         }
 
         return $results;
+    }
+
+    /**
+     * Return a handler or reviewing content
+     *
+     * @return ReviewContentHandler
+     */
+    protected function getReviewContentHandler()
+    {
+        return ReviewContentHandler::create($this->owner);
+    }
+
+    /**
+     * Find the page this form is updating
+     *
+     * @param array $data Form data
+     * @return SiteTree Record
+     * @throws HTTPResponse_Exception
+     */
+    protected function findRecord($data)
+    {
+        if (empty($data["ID"])) {
+            throw new HTTPResponse_Exception("No record ID", 404);
+        }
+        $page = null;
+        $id = $data["ID"];
+        if (is_numeric($id)) {
+            $page = SiteTree::get()->byID($id);
+        }
+        if (!$page || !$page->ID) {
+            throw new HTTPResponse_Exception("Bad record ID #{$id}", 404);
+        }
+        return $page;
     }
 
     /**

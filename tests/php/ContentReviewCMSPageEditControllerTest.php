@@ -90,34 +90,6 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testSaveReview()
-    {
-        /** @var Member $author */
-        $author = $this->objFromFixture(Member::class, "author");
-
-        $this->logInAs($author);
-
-        /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture(Page::class, "home");
-
-        $data = array(
-            "action_savereview" => 1,
-            "ID"                => $page->ID,
-            "ReviewNotes"       => "This is the best page ever",
-        );
-
-        $this->get('admin/pages/edit/show/' . $page->ID);
-        $response = $this->post($this->getFormAction($page), $data);
-
-        $this->assertEquals("OK", $response->getStatusDescription());
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(1, $page->ReviewLogs()->count());
-
-        $reviewLog = $page->ReviewLogs()->first();
-
-        $this->assertEquals($data["ReviewNotes"], $reviewLog->Note);
-    }
-
     /**
      * Return a CMS page edit form action via using a dummy request and session
      *
