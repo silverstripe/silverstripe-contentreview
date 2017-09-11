@@ -1,0 +1,17 @@
+// The bell button, shows up next to the major actions (save, publish, etc) when
+// viewing a page in the CMS
+.content-review__button {
+  background: url("images/icon-bell.png") center center no-repeat;
+  background-position: 0 0;
+  display: inline-block;
+  height: 20px;
+  margin: 6px 4px 0 12px;
+  padding: 0;
+  text-indent: -9999px;
+  width: 20px;
+
+  &:hover,
+  &:focus {
+    background-position: 0 -20px;
+  }
+}

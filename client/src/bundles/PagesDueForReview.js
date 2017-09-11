@@ -1,7 +1,9 @@
+import jQuery from 'jquery';
+
 /**
  * @todo Re-validate this with Subsites
  */
-window.jQuery.entwine('ss', ($) => {
+jQuery.entwine('ss', ($) => {
   // Hide all owner dropdowns except the one for the current subsite
   function showCorrectSubsiteIDDropdown(value) {
     const domid = `ContentReviewOwnerID${value}`;

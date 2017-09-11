@@ -1,21 +1,30 @@
 ---
 Name: contentreviewextensions
 ---
-SilverStripe\CMS\Model\SiteTree:
+SilverStripe\Admin\LeftAndMain:
   extensions:
-    - SilverStripe\ContentReview\Extensions\SiteTreeContentReview
-SilverStripe\Security\Group:
-  extensions:
-    - SilverStripe\ContentReview\Extensions\ContentReviewOwner
-SilverStripe\Security\Member:
-  extensions:
-    - SilverStripe\ContentReview\Extensions\ContentReviewOwner
+    - SilverStripe\ContentReview\Extensions\ContentReviewLeftAndMainExtension
+
 SilverStripe\CMS\Controllers\CMSPageEditController:
   extensions:
     - SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension
+
 SilverStripe\CMS\Controllers\CMSPageSettingsController:
   extensions:
     - SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension
+
+SilverStripe\CMS\Model\SiteTree:
+  extensions:
+    - SilverStripe\ContentReview\Extensions\SiteTreeContentReview
+
+SilverStripe\Security\Group:
+  extensions:
+    - SilverStripe\ContentReview\Extensions\ContentReviewOwner
+
+SilverStripe\Security\Member:
+  extensions:
+    - SilverStripe\ContentReview\Extensions\ContentReviewOwner
+
 SilverStripe\SiteConfig\SiteConfig:
   extensions:
     - SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings
