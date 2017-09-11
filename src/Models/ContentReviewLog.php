@@ -12,26 +12,26 @@ class ContentReviewLog extends DataObject
     /**
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         "Note" => "Text",
-    );
+    ];
 
     /**
      * @var array
      */
-    private static $has_one = array(
+    private static $has_one = [
         "Reviewer" => Member::class,
         "SiteTree" => SiteTree::class,
-    );
+    ];
 
     /**
      * @var array
      */
-    private static $summary_fields = array(
-        "Note"           => array("title" => "Note"),
-        "Created"        => array("title" => "Reviewed at"),
-        "Reviewer.Title" => array("title" => "Reviewed by"),
-    );
+    private static $summary_fields = [
+        "Note"           => ["title" => "Note"],
+        "Created"        => ["title" => "Reviewed at"],
+        "Reviewer.Title" => ["title" => "Reviewed by"]
+    ];
 
     /**
      * @var string
