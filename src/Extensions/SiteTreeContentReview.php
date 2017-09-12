@@ -14,6 +14,7 @@ use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\DateField;
+use SilverStripe\Forms\DateTimeField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig;
@@ -359,7 +360,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
             // Cast the value to the users preferred date format
             $logColumns->setFieldCasting(array(
-                "Created" => "DateTimeField->value",
+                'Created' => DateTimeField::class . '->value',
             ));
 
             $logs = GridField::create("ROReviewNotes", "Review Notes", $this->owner->ReviewLogs(), $logConfig);
