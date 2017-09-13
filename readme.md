@@ -42,13 +42,8 @@ $ composer require silverstripe/contentreview
 
 You'll also need to run `dev/build`.
 
-### Manual installation
-
-Download or clone the source code into the SilverStripe root folder. Rename the module folder
-to `contentreview`.
-
-Run dev/build either via the webserver by opening the url `http://<your-host>/dev/build` or
-by running the dev/build via a CLI.
+Run dev/build either via the web server by opening the URL `http://<your-host>/dev/build?flush` or
+by running the dev/build via a CLI: `sake dev/build flush=1`
 
 ## Documentation
 
