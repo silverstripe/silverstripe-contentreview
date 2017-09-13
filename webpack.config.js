@@ -13,11 +13,11 @@ const {
 const ENV = process.env.NODE_ENV;
 const PATHS = {
   MODULES: 'node_modules',
-  THIRDPARTY: 'thirdparty',
   FILES_PATH: '../',
   ROOT: Path.resolve(),
   SRC: Path.resolve('client/src'),
   DIST: Path.resolve('client/dist'),
+  THIRDPARTY: Path.resolve('thirdparty'),
 };
 
 const config = [

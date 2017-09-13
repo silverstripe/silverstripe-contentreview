@@ -8,6 +8,7 @@ use SilverStripe\ContentReview\Jobs\ContentReviewNotificationJob;
 use SilverStripe\ContentReview\Models\ContentReviewLog;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Core\Manifest\ModuleLoader;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\FormAction;
@@ -165,8 +166,9 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             return;
         }
 
-        Requirements::css('silverstripe/contentreview:client/dist/styles/contentreview.css');
-        Requirements::javascript('silverstripe/contentreview:client/dist/js/contentreview.js');
+        $module = ModuleLoader::getModule('silverstripe/contentreview');
+        Requirements::css($module->getRelativeResourcePath('client/dist/styles/contentreview.css'));
+        Requirements::javascript($module->getRelativeResourcePath('client/dist/js/contentreview.js'));
 
         $reviewTab = LiteralField::create('ContentReviewButton', $this->owner->renderWith(__CLASS__ . '_button'));
         $actions->insertAfter('MajorActions', $reviewTab);
@@ -327,7 +329,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function updateSettingsFields(FieldList $fields)
     {
-        Requirements::javascript("silverstripe/contentreview:client/dist/js/contentreview.js");
+        $module = ModuleLoader::getModule('silverstripe/contentreview');
+        Requirements::javascript($module->getRelativeResourcePath('client/dist/js/contentreview.js'));
 
         // Display read-only version only
         if (!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
