@@ -1,4 +1,6 @@
-window.jQuery.entwine('ss', ($) => {
+import jQuery from 'jquery';
+
+jQuery.entwine('ss', ($) => {
   /**
    * Class: .cms-edit-form #Form_EditForm_ContentReviewType_Holder
    *

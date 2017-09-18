@@ -1,0 +1,101 @@
+import i18n from 'i18n';
+import jQuery from 'jquery';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { provideInjector } from 'lib/Injector';
+import FormBuilderModal from 'components/FormBuilderModal/FormBuilderModal';
+
+const InjectableFormBuilderModal = provideInjector(FormBuilderModal);
+
+/**
+ * "Content due for review" modal popup. See AddToCampaignForm.js in
+ * silverstripe/admin for reference.
+ */
+jQuery.entwine('ss', ($) => {
+	/**
+   * Kick off a "content due for review" dialog from the CMS actions.
+   */
+  $('.cms-content-actions .content-review__button').entwine({
+    onclick(e) {
+      e.preventDefault();
+
+      let dialog = $('#content-review__dialog-wrapper');
+
+      if (!dialog.length) {
+        dialog = $('<div id="content-review__dialog-wrapper" />');
+        $('body').append(dialog);
+      }
+
+      dialog.open();
+
+      return false;
+    },
+  });
+
+  // This is required because the React version of e.preventDefault() doesn't work
+  // this is to prevent PJAX request to occur when clicking a link the modal
+  $('.content-review-modal .content-review-modal__nav-link').entwine({
+    onclick: (e) => {
+      e.preventDefault();
+      const $link = $(e.target);
+      window.location = $link.attr('href');
+    },
+  });
+
+	/**
+   * Uses React-Bootstrap in order to replicate the bootstrap styling and JavaScript behaviour.
+   */
+  $('#content-review__dialog-wrapper').entwine({
+    onunmatch() {
+      // solves errors given by ReactDOM "no matched root found" error.
+      this._clearModal();
+    },
+
+    open() {
+      this._renderModal(true);
+    },
+
+    close() {
+      this._renderModal(false);
+    },
+
+    _renderModal(show) {
+      const handleHide = () => this.close();
+      const handleSubmit = (...args) => this._handleSubmitModal(...args);
+      const id = $('form.cms-edit-form :input[name=ID]').val();
+      const store = window.ss.store;
+      const sectionConfigKey = 'SilverStripe\\CMS\\Controllers\\CMSPageEditController';
+      const sectionConfig = store.getState().config.sections
+        .find((section) => section.name === sectionConfigKey);
+      const modalSchemaUrl = `${sectionConfig.form.ReviewContentForm.schemaUrl}/${id}`;
+      const title = i18n._t('ContentReview.CONTENT_DUE_FOR_REVIEW', 'Content due for review');
+
+      ReactDOM.render(
+        <Provider store={store}>
+          <InjectableFormBuilderModal
+            title={title}
+            show={show}
+            handleSubmit={handleSubmit}
+            handleHide={handleHide}
+            schemaUrl={modalSchemaUrl}
+            bodyClassName="modal__dialog"
+            className="content-review-modal"
+            responseClassBad="modal__response modal__response--error"
+            responseClassGood="modal__response modal__response--good"
+            identifier="ContentReview.CONTENT_DUE_FOR_REVIEW"
+          />
+        </Provider>,
+        this[0]
+      );
+    },
+
+    _clearModal() {
+      ReactDOM.unmountComponentAtNode(this[0]);
+    },
+
+    _handleSubmitModal(data, action, submitFn) {
+      return submitFn();
+    },
+  });
+});

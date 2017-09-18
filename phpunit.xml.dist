@@ -1,6 +1,6 @@
 <phpunit bootstrap="cms/tests/bootstrap.php" colors="true">
     <testsuite name="Default">
-        <directory>tests/</directory>
+        <directory>tests/php/</directory>
     </testsuite>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">

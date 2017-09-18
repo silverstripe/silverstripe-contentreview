@@ -9,6 +9,7 @@ use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
 use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
@@ -294,19 +295,19 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
     public function testReviewActionVisibleForAuthor()
     {
-        DBDatetime::set_mock_now("2020-03-01 12:00:00");
+        DBDatetime::set_mock_now('2020-03-01 12:00:00');
 
         /** @var Page|SiteTreeContentReview $page */
-        $page = $this->objFromFixture(Page::class, "contact");
+        $page = $this->objFromFixture(Page::class, 'contact');
 
         /** @var Member $author */
-        $author = $this->objFromFixture(Member::class, "author");
+        $author = $this->objFromFixture(Member::class, 'author');
 
         $this->logInAs($author);
 
         $fields = $page->getCMSActions();
 
-        $this->assertNotNull($fields->fieldByName("ActionMenus.ReviewContent"));
+        $this->assertInstanceOf(LiteralField::class, $fields->fieldByName('ContentReviewButton'));
 
         DBDatetime::clear_mock_now();
     }

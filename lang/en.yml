@@ -46,3 +46,10 @@ en:
     TITLE: 'Pages without a scheduled review.'
   Review:
     EMAILFROM_RIGHTTITLE: 'e.g: do-not-reply@site.com'
+
+  SilverStripe\ContentReview\Forms\ReviewContentHandler:
+    ContentDueForReview: Content due for review
+    MarkAsReviewedAction: Mark as reviewed
+    NoComments: (no comments)
+    Placeholder: Add comments (optional)
+    Success: Review successfully added
