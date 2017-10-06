@@ -313,4 +313,25 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         SS_Datetime::clear_mock_now();
     }
+
+    public function testSiteConfigSettingsAreUsedAsDefaults()
+    {
+        SS_Datetime::set_mock_now("2020-03-01 12:00:00");
+
+        /** @var Member $author */
+        $author = $this->objFromFixture('Member', 'editor');
+
+        /** @var SiteConfig $siteConfig */
+        $siteConfig = SiteConfig::current_site_config();
+
+        // Set the author to a default user for reviewing
+        $siteConfig->OwnerUsers()->add($author);
+
+        $emptyPage = new Page;
+        $emptyPage->NextReviewDate = '2020-02-20 12:00:00';
+
+        $this->assertTrue($emptyPage->canBeReviewedBy($author));
+
+        SS_Datetime::clear_mock_now();
+    }
 }
