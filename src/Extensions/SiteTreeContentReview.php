@@ -166,9 +166,8 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             return;
         }
 
-        $module = ModuleLoader::getModule('silverstripe/contentreview');
-        Requirements::css($module->getRelativeResourcePath('client/dist/styles/contentreview.css'));
-        Requirements::javascript($module->getRelativeResourcePath('client/dist/js/contentreview.js'));
+        Requirements::css('silverstripe/contentreview:client/dist/styles/contentreview.css');
+        Requirements::javascript('silverstripe/contentreview:client/dist/js/contentreview.js');
 
         $reviewTab = LiteralField::create('ContentReviewButton', $this->owner->renderWith(__CLASS__ . '_button'));
         $actions->insertAfter('MajorActions', $reviewTab);
