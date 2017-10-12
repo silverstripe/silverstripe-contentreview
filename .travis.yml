@@ -28,10 +28,10 @@ before_script:
   - phpenv config-rm xdebug.ini
 
   # Install composer dependencies
-  - composer install --prefer-dist
-  - composer require --prefer-dist --no-update silverstripe/recipe-cms:1.0.x-dev
-  - if [[ $DB == PGSQL ]]; then composer require --prefer-dist --no-update silverstripe/postgresql:2.0.x-dev; fi
-  - composer update
+  - composer validate
+  - composer require --no-update silverstripe/recipe-cms:1.0.x-dev
+  - if [[ $DB == PGSQL ]]; then composer require --no-update silverstripe/postgresql:2.0.x-dev; fi
+  - composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader --verbose --profile
 
   # Start behat services
   - if [[ $BEHAT_TEST ]]; then echo 'SS_BASE_URL=http://localhost:8080/' >> .env; fi
