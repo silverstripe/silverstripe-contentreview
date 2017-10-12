@@ -1,6 +1,6 @@
 {
     "name": "silverstripe/contentreview",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "description": "Flags pages for periodical author review (incl. reporting)",
     "homepage": "http://silverstripe.org",
     "license": "BSD-3-Clause",
@@ -20,6 +20,7 @@
         }
     ],
     "require": {
+        "silverstripe/vendor-plugin": "^1.0",
         "silverstripe/framework": "^4@dev",
         "silverstripe/cms": "^4@dev",
         "silverstripe/reports": "^4@dev",
@@ -38,7 +39,10 @@
     "extra": {
         "branch-alias": {
             "dev-master": "4.0.x-dev"
-        }
+        },
+        "expose": [
+            "client/dist"
+        ]
     },
     "autoload": {
         "psr-4": {
