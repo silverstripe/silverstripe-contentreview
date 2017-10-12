@@ -454,7 +454,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         $options = $this->getOptions();
 
-        if (!$options || !$options->hasExtension($this->class)) {
+        if (!$options
+            // Options can be a SiteConfig with different extension applied
+            || (!$options->hasExtension($this->class) && !$options->hasExtension('ContentReviewDefaultSettings'))
+        ) {
             return false;
         }
 
