@@ -488,7 +488,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             return false;
         }
 
-        if (!$options || !$options->hasExtension(__CLASS__)) {
+        if (!$options
+            // Options can be a SiteConfig with different extension applied
+            || (!$options->hasExtension(__CLASS__) && !$options->hasExtension(ContentReviewDefaultSettings::class))
+        ) {
             return false;
         }
 
