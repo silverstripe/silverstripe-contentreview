@@ -328,6 +328,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function updateSettingsFields(FieldList $fields)
     {
+        if ($this->owner->hasMethod('displayContentReview') && !$this->owner->displayContentReview()) {
+            return;
+        }
+
         $module = ModuleLoader::getModule('silverstripe/contentreview');
         Requirements::javascript($module->getRelativeResourcePath('client/dist/js/contentreview.js'));
 
