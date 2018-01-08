@@ -8,30 +8,27 @@ use SilverStripe\ContentReview\Jobs\ContentReviewNotificationJob;
 use SilverStripe\ContentReview\Models\ContentReviewLog;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Core\Manifest\ModuleLoader;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\LiteralField;
-use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\CompositeField;
-use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DateTimeField;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldSortableHeader;
+use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\ListboxField;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\Forms\HeaderField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBDate;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\SS_List;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
@@ -332,9 +329,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             return;
         }
 
-        $module = ModuleLoader::getModule('silverstripe/contentreview');
-        Requirements::javascript($module->getResource('client/dist/js/contentreview.js')->getRelativePath());
-
+        Requirements::javascript('silverstripe/contentreview:client/dist/js/contentreview.js');
         // Display read-only version only
         if (!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
             $schedule = self::get_schedule();
