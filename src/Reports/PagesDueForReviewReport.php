@@ -30,7 +30,7 @@ class PagesDueForReviewReport extends Report
      */
     public function title()
     {
-        return _t("PagesDueForReviewReport.TITLE", "Pages due for review");
+        return _t(__CLASS__ . ".TITLE", "Pages due for review");
     }
 
     /**
@@ -43,14 +43,14 @@ class PagesDueForReviewReport extends Report
         $filtersList->push(
             DateField::create(
                 "ReviewDateAfter",
-                _t("PagesDueForReviewReport.REVIEWDATEAFTER", "Review date after or on")
+                _t(__CLASS__ . ".REVIEWDATEAFTER", "Review date after or on")
             )
         );
 
         $filtersList->push(
             DateField::create(
                 "ReviewDateBefore",
-                _t("PagesDueForReviewReport.REVIEWDATEBEFORE", "Review date before or on"),
+                _t(__CLASS__ . ".REVIEWDATEBEFORE", "Review date before or on"),
                 date("d/m/Y", strtotime("midnight"))
             )
         );
@@ -58,14 +58,14 @@ class PagesDueForReviewReport extends Report
         $filtersList->push(
             CheckboxField::create(
                 "ShowVirtualPages",
-                _t("PagesDueForReviewReport.SHOWVIRTUALPAGES", "Show Virtual Pages")
+                _t(__CLASS__ . ".SHOWVIRTUALPAGES", "Show Virtual Pages")
             )
         );
 
         $filtersList->push(
             CheckboxField::create(
                 "OnlyMyPages",
-                _t("PagesDueForReviewReport.ONLYMYPAGES", "Only Show pages assigned to me")
+                _t(__CLASS__ . ".ONLYMYPAGES", "Only Show pages assigned to me")
             )
         );
 

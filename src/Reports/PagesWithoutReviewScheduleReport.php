@@ -25,7 +25,7 @@ class PagesWithoutReviewScheduleReport extends Report
      */
     public function title()
     {
-        return _t("PagesWithoutReviewScheduleReport.TITLE", "Pages without a scheduled review.");
+        return _t(__CLASS__ . ".TITLE", "Pages without a scheduled review.");
     }
 
     /**

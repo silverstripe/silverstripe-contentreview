@@ -108,7 +108,7 @@ class ContentReviewDefaultSettings extends DataExtension
         $helpText = LiteralField::create(
             'ContentReviewHelp',
             _t(
-                'ContentReview.DEFAULTSETTINGSHELP',
+                __CLASS__ . '.DEFAULTSETTINGSHELP',
                 'These settings will apply to all pages that do not have a specific Content Review schedule.'
             )
         );
@@ -117,11 +117,11 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $reviewFrequency = DropdownField::create(
             'ReviewPeriodDays',
-            _t('ContentReview.REVIEWFREQUENCY', 'Review frequency'),
+            _t(__CLASS__ . '.REVIEWFREQUENCY', 'Review frequency'),
             SiteTreeContentReview::get_schedule()
         )
             ->setDescription(_t(
-                'ContentReview.REVIEWFREQUENCYDESCRIPTION',
+                __CLASS__ . '.REVIEWFREQUENCYDESCRIPTION',
                 'The review date will be set to this far in the future, whenever the page is published.'
             ));
 
@@ -135,9 +135,9 @@ class ContentReviewDefaultSettings extends DataExtension
         $usersMap = $users->map('ID', 'Title')->toArray();
         asort($usersMap);
 
-        $userField = ListboxField::create('OwnerUsers', _t('ContentReview.PAGEOWNERUSERS', 'Users'), $usersMap)
-            ->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
-            ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        $userField = ListboxField::create('OwnerUsers', _t(__CLASS__ . '.PAGEOWNERUSERS', 'Users'), $usersMap)
+            ->setAttribute('data-placeholder', _t(__CLASS__ . '.ADDUSERS', 'Add users'))
+            ->setDescription(_t(__CLASS__ . '.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
         $fields->addFieldToTab('Root.ContentReview', $userField);
 
@@ -150,9 +150,9 @@ class ContentReviewDefaultSettings extends DataExtension
 
         asort($groupsMap);
 
-        $groupField = ListboxField::create('OwnerGroups', _t('ContentReview.PAGEOWNERGROUPS', 'Groups'), $groupsMap)
-            ->setAttribute('data-placeholder', _t('ContentReview.ADDGROUP', 'Add groups'))
-            ->setDescription(_t('ContentReview.OWNERGROUPSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        $groupField = ListboxField::create('OwnerGroups', _t(__CLASS__ . '.PAGEOWNERGROUPS', 'Groups'), $groupsMap)
+            ->setAttribute('data-placeholder', _t(__CLASS__ . '.ADDGROUP', 'Add groups'))
+            ->setDescription(_t(__CLASS__ . '.OWNERGROUPSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
         $fields->addFieldToTab('Root.ContentReview', $groupField);
 
@@ -160,10 +160,10 @@ class ContentReviewDefaultSettings extends DataExtension
         $fields->addFieldsToTab(
             'Root.ContentReview',
             array(
-                TextField::create('ReviewFrom', _t('ContentReview.EMAILFROM', 'From email address'))
-                    ->setDescription(_t('Review.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
-                TextField::create('ReviewSubject', _t('ContentReview.EMAILSUBJECT', 'Subject line')),
-                TextAreaField::create('ReviewBody', _t('ContentReview.EMAILTEMPLATE', 'Email template')),
+                TextField::create('ReviewFrom', _t(__CLASS__ . '.EMAILFROM', 'From email address'))
+                    ->setDescription(_t(__CLASS__ . '.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
+                TextField::create('ReviewSubject', _t(__CLASS__ . '.EMAILSUBJECT', 'Subject line')),
+                TextAreaField::create('ReviewBody', _t(__CLASS__ . '.EMAILTEMPLATE', 'Email template')),
                 LiteralField::create(
                     'TemplateHelp',
                     $this->owner->renderWith('SilverStripe\\ContentReview\\ContentReviewAdminHelp')
