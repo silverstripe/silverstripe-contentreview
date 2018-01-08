@@ -338,13 +338,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         // Display read-only version only
         if (!Permission::check("EDIT_CONTENT_REVIEW_FIELDS")) {
             $schedule = self::get_schedule();
-            $contentOwners = ReadonlyField::create("ROContentOwners", _t("ContentReview.CONTENTOWNERS", "Content Owners"), $this->getOwnerNames());
-            $nextReviewAt = DateField::create('RONextReviewDate', _t("ContentReview.NEXTREVIEWDATE", "Next review date"), $this->owner->NextReviewDate);
+            $contentOwners = ReadonlyField::create("ROContentOwners", _t(__CLASS__ . ".CONTENTOWNERS", "Content Owners"), $this->getOwnerNames());
+            $nextReviewAt = DateField::create('RONextReviewDate', _t(__CLASS__ . ".NEXTREVIEWDATE", "Next review date"), $this->owner->NextReviewDate);
 
             if (!isset($schedule[$this->owner->ReviewPeriodDays])) {
-                $reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $schedule[0]);
+                $reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t(__CLASS__ . ".REVIEWFREQUENCY", "Review frequency"), $schedule[0]);
             } else {
-                $reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t("ContentReview.REVIEWFREQUENCY", "Review frequency"), $schedule[$this->owner->ReviewPeriodDays]);
+                $reviewFreq = ReadonlyField::create("ROReviewPeriodDays", _t(__CLASS__ . ".REVIEWFREQUENCY", "Review frequency"), $schedule[$this->owner->ReviewPeriodDays]);
             }
 
             $logConfig = GridFieldConfig::create()
@@ -359,7 +359,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $logs = GridField::create("ROReviewNotes", "Review Notes", $this->owner->ReviewLogs(), $logConfig);
 
 
-            $optionsFrom = ReadonlyField::create("ROType", _t("ContentReview.SETTINGSFROM", "Options are"), $this->owner->ContentReviewType);
+            $optionsFrom = ReadonlyField::create("ROType", _t(__CLASS__ . ".SETTINGSFROM", "Options are"), $this->owner->ContentReviewType);
 
             $fields->addFieldsToTab("Root.ContentReview", array(
                 $contentOwners,
@@ -373,11 +373,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         }
 
         $options = array();
-        $options["Disabled"] = _t("ContentReview.DISABLE", "Disable content review");
-        $options["Inherit"] = _t("ContentReview.INHERIT", "Inherit from parent page");
-        $options["Custom"] = _t("ContentReview.CUSTOM", "Custom settings");
+        $options["Disabled"] = _t(__CLASS__ . ".DISABLE", "Disable content review");
+        $options["Inherit"] = _t(__CLASS__ . ".INHERIT", "Inherit from parent page");
+        $options["Custom"] = _t(__CLASS__ . ".CUSTOM", "Custom settings");
 
-        $viewersOptionsField = OptionsetField::create("ContentReviewType", _t("ContentReview.OPTIONS", "Options"), $options);
+        $viewersOptionsField = OptionsetField::create("ContentReviewType", _t(__CLASS__ . ".OPTIONS", "Options"), $options);
 
         $users = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
 
@@ -385,10 +385,10 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         asort($usersMap);
 
-        $userField = ListboxField::create("OwnerUsers", _t("ContentReview.PAGEOWNERUSERS", "Users"), $usersMap)
+        $userField = ListboxField::create("OwnerUsers", _t(__CLASS__ . ".PAGEOWNERUSERS", "Users"), $usersMap)
             ->addExtraClass('custom-setting')
-            ->setAttribute("data-placeholder", _t("ContentReview.ADDUSERS", "Add users"))
-            ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+            ->setAttribute("data-placeholder", _t(__CLASS__ . ".ADDUSERS", "Add users"))
+            ->setDescription(_t(__CLASS__ . '.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
 
         $groupsMap = array();
 
@@ -397,26 +397,26 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         }
         asort($groupsMap);
 
-        $groupField = ListboxField::create("OwnerGroups", _t("ContentReview.PAGEOWNERGROUPS", "Groups"), $groupsMap)
+        $groupField = ListboxField::create("OwnerGroups", _t(__CLASS__ . ".PAGEOWNERGROUPS", "Groups"), $groupsMap)
             ->addExtraClass('custom-setting')
-            ->setAttribute("data-placeholder", _t("ContentReview.ADDGROUP", "Add groups"))
-            ->setDescription(_t("ContentReview.OWNERGROUPSDESCRIPTION", "Page owners that are responsible for reviews"));
+            ->setAttribute("data-placeholder", _t(__CLASS__ . ".ADDGROUP", "Add groups"))
+            ->setDescription(_t(__CLASS__ . ".OWNERGROUPSDESCRIPTION", "Page owners that are responsible for reviews"));
 
-        $reviewDate = DateField::create("NextReviewDate", _t("ContentReview.NEXTREVIEWDATE", "Next review date"))
-            ->setDescription(_t("ContentReview.NEXTREVIEWDATADESCRIPTION", "Leave blank for no review"));
+        $reviewDate = DateField::create("NextReviewDate", _t(__CLASS__ . ".NEXTREVIEWDATE", "Next review date"))
+            ->setDescription(_t(__CLASS__ . ".NEXTREVIEWDATADESCRIPTION", "Leave blank for no review"));
 
         $reviewFrequency = DropdownField::create(
             "ReviewPeriodDays",
-            _t("ContentReview.REVIEWFREQUENCY", "Review frequency"),
+            _t(__CLASS__ . ".REVIEWFREQUENCY", "Review frequency"),
             self::get_schedule()
         )
             ->addExtraClass('custom-setting')
-            ->setDescription(_t("ContentReview.REVIEWFREQUENCYDESCRIPTION", "The review date will be set to this far in the future whenever the page is published"));
+            ->setDescription(_t(__CLASS__ . ".REVIEWFREQUENCYDESCRIPTION", "The review date will be set to this far in the future whenever the page is published"));
 
         $notesField = GridField::create("ReviewNotes", "Review Notes", $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
 
         $fields->addFieldsToTab("Root.ContentReview", array(
-            HeaderField::create('ContentReviewHeader', _t("ContentReview.REVIEWHEADER", "Content review"), 2),
+            HeaderField::create('ContentReviewHeader', _t(__CLASS__ . ".REVIEWHEADER", "Content review"), 2),
             $viewersOptionsField,
             CompositeField::create(
                 $userField,
@@ -424,7 +424,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
                 $reviewDate,
                 $reviewFrequency
             )->addExtraClass("review-settings"),
-            ReadonlyField::create("ROContentOwners", _t("ContentReview.CONTENTOWNERS", "Content Owners"), $this->getOwnerNames()),
+            ReadonlyField::create("ROContentOwners", _t(__CLASS__ . ".CONTENTOWNERS", "Content Owners"), $this->getOwnerNames()),
             $notesField,
         ));
     }
@@ -618,7 +618,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         return array(
             "EDIT_CONTENT_REVIEW_FIELDS" => array(
                 "name"     => "Set content owners and review dates",
-                "category" => _t("Permissions.CONTENT_CATEGORY", "Content permissions"),
+                "category" => _t("SilverStripe\\Security\\Permission.CONTENT_CATEGORY", "Content permissions"),
                 "sort"     => 50,
             ),
         );

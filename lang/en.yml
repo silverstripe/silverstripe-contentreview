@@ -1,22 +1,30 @@
 en:
-  ContentReview:
+  SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension:
+    ErrorItemPermissionDenied: 'It seems you don''t have the necessary permissions to review this content'
+  SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings:
     ADDGROUP: 'Add groups'
     ADDUSERS: 'Add users'
-    BUTTONREVIEWED: 'Review content'
-    COMMENTS: '(optional) Add comments...'
+    DEFAULTSETTINGSHELP: 'These settings will apply to all pages that do not have a specific Content Review schedule.'
+    EMAILFROM: 'From email address'
+    EMAILFROM_RIGHTTITLE: 'e.g: do-not-reply@site.com'
+    EMAILSUBJECT: 'Subject line'
+    EMAILTEMPLATE: 'Email template'
+    OWNERGROUPSDESCRIPTION: 'Page owners that are responsible for reviews'
+    OWNERUSERSDESCRIPTION: 'Page owners that are responsible for reviews'
+    PAGEOWNERGROUPS: Groups
+    PAGEOWNERUSERS: Users
+    REVIEWFREQUENCY: 'Review frequency'
+    REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future, whenever the page is published.'
+  SilverStripe\ContentReview\Extensions\SiteTreeContentReview:
+    ADDGROUP: 'Add groups'
+    ADDUSERS: 'Add users'
     CONTENTOWNERS: 'Content Owners'
     CONTENTREVIEW: 'Content due for review'
     CUSTOM: 'Custom settings'
-    DEFAULTSETTINGSHELP: 'These settings will apply to all pages that do not have a specific Content Review schedule.'
     DISABLE: 'Disable content review'
-    EMAILFROM: 'From email address'
-    EMAILSUBJECT: 'Subject line'
-    EMAILTEMPLATE: 'Email template'
     INHERIT: 'Inherit from parent page'
-    MARKREVIEWED: 'Mark as reviewed'
     NEXTREVIEWDATADESCRIPTION: 'Leave blank for no review'
     NEXTREVIEWDATE: 'Next review date'
-    NOCOMMENTS: '(no comments)'
     OPTIONS: Options
     OWNERGROUPSDESCRIPTION: 'Page owners that are responsible for reviews'
     OWNERUSERSDESCRIPTION: 'Page owners that are responsible for reviews'
@@ -25,31 +33,27 @@ en:
     REVIEWFREQUENCY: 'Review frequency'
     REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future whenever the page is published'
     REVIEWHEADER: 'Content review'
-    REVIEWNOTES: 'Review notes'
-    REVIEWSUCCESSFUL: 'Content reviewed successfully'
-    SAVE: Save
     SETTINGSFROM: 'Options are'
-  ContentReviewEmails:
-    REVIEWPAGELINK: 'Review the page in the CMS'
-    SUBJECT: 'Page(s) are due for content review'
-    VIEWPUBLISHEDLINK: 'View this page on the website'
-  ContentReviewLog:
+  SilverStripe\ContentReview\Forms\ReviewContentHandler:
+    ErrorReviewPermissionDenied: 'It seems you don''t have the necessary permissions to submit a content review'
+    MarkAsReviewedAction: 'Mark as reviewed'
+    NoComments: '(no comments)'
+    Placeholder: 'Add comments (optional)'
+    Success: 'Review successfully added'
+  SilverStripe\ContentReview\Models\ContentReviewLog:
     PLURALNAME: 'Content Review Logs'
+    PLURALS:
+      one: 'A Content Review Log'
+      other: '{count} Content Review Logs'
     SINGULARNAME: 'Content Review Log'
-  PagesDueForReviewReport:
+  SilverStripe\ContentReview\Reports\PagesDueForReviewReport:
     ONLYMYPAGES: 'Only Show pages assigned to me'
     REVIEWDATEAFTER: 'Review date after or on'
     REVIEWDATEBEFORE: 'Review date before or on'
     SHOWVIRTUALPAGES: 'Show Virtual Pages'
     TITLE: 'Pages due for review'
-  PagesWithoutReviewScheduleReport:
+  SilverStripe\ContentReview\Reports\PagesWithoutReviewScheduleReport:
     TITLE: 'Pages without a scheduled review.'
-  Review:
-    EMAILFROM_RIGHTTITLE: 'e.g: do-not-reply@site.com'
-
-  SilverStripe\ContentReview\Forms\ReviewContentHandler:
-    ContentDueForReview: Content due for review
-    MarkAsReviewedAction: Mark as reviewed
-    NoComments: (no comments)
-    Placeholder: Add comments (optional)
-    Success: Review successfully added
+  SilverStripe\ContentReview\Tasks\ContentReviewEmails:
+    REVIEWPAGELINK: 'Review the page in the CMS'
+    VIEWPUBLISHEDLINK: 'View this page on the website'
