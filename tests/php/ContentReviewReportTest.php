@@ -47,27 +47,27 @@ class ContentReviewReportTest extends FunctionalTest
         $report->columns();
         $report->title();
 
-        $results = $report->sourceRecords(array(
+        $results = $report->sourceRecords([
             "ReviewDateAfter"  => "2010-01-01",
             "ReviewDateBefore" => "2010-12-12",
-        ));
+        ]);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             "Contact Us Child",
             "Home",
             "About Us",
             "Staff",
             "Contact Us",
-        ), $results->column("Title"));
+        ], $results->column("Title"));
 
         DBDatetime::set_mock_now("2010-02-13 00:00:00");
 
-        $results = $report->sourceRecords(array());
+        $results = $report->sourceRecords([]);
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             "Home",
             "About Us",
-        ), $results->column("Title"));
+        ], $results->column("Title"));
 
         DBDatetime::clear_mock_now();
     }
@@ -87,11 +87,11 @@ class ContentReviewReportTest extends FunctionalTest
 
         $results = $report->sourceRecords();
 
-        $this->assertEquals(array(
+        $this->assertEquals([
             "Home",
             "About Us",
             "Page without review date",
             "Page owned by group",
-        ), $results->column("Title"));
+        ], $results->column("Title"));
     }
 }

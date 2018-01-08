@@ -50,7 +50,7 @@ class ContentReviewEmails extends BuildTask
      */
     protected function getOverduePagesForOwners(SS_List $pages)
     {
-        $overduePages = array();
+        $overduePages = [];
 
         foreach ($pages as $page) {
             if (!$page->canBeReviewedBy()) {

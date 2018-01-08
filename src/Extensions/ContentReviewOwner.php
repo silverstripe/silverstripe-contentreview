@@ -13,7 +13,7 @@ class ContentReviewOwner extends DataExtension
     /**
      * @var array
      */
-    private static $many_many = array(
+    private static $many_many = [
         "SiteTreeContentReview" => SiteTree::class,
-    );
+    ];
 }

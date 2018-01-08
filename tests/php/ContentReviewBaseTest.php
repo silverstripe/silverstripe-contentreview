@@ -25,7 +25,8 @@ abstract class ContentReviewBaseTest extends FunctionalTest
         /*
          *  We set the locale for pages explicitly, because if we don't, then we get into a situation
          *  where the page takes on the tester's (your) locale, and any calls to simulate subsequent requests
-         *  (e.g. $this->post()) do not seem to get passed the tester's locale, but instead fallback to the default locale.
+         *  (e.g. $this->post()) do not seem to get passed the tester's locale,
+         *  but instead fallback to the default locale.
          *
          *  So we set the pages locale to be the default locale, which will then match any subsequent requests.
          *

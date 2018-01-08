@@ -2,15 +2,16 @@
 
 namespace SilverStripe\ContentReview\Reports;
 
-use SilverStripe\Forms\CheckboxField;
-use SilverStripe\Forms\FieldList;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Model\VirtualPage;
 use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\SS_List;
 use SilverStripe\Reports\Report;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
@@ -48,20 +49,20 @@ class PagesWithoutReviewScheduleReport extends Report
         $linkPath = parse_url($linkBase, PHP_URL_PATH);
         $linkQuery = parse_url($linkBase, PHP_URL_QUERY);
 
-        $fields = array(
-            "Title"             => array(
+        $fields = [
+            "Title"             => [
                 "title"      => "Page name",
                 "formatting" => "<a href='{$linkPath}/\$ID?{$linkQuery}' title='Edit page'>\$value</a>",
-            ),
-            "NextReviewDate"    => array(
+            ],
+            "NextReviewDate"    => [
                 "title"   => "Review Date",
                 "casting" => "Date->Full",
-            ),
-            "OwnerNames"        => array(
+            ],
+            "OwnerNames"        => [
                 "title" => "Owner",
-            ),
+            ],
             "LastEditedByName"  => "Last edited by",
-            "AbsoluteLink"      => array(
+            "AbsoluteLink"      => [
                 "title"      => "URL",
                 "formatting" => function ($value, $item) {
                     $liveLink = $item->AbsoluteLiveLink;
@@ -74,8 +75,8 @@ class PagesWithoutReviewScheduleReport extends Report
                         $liveLink ? "(live)" : "(draft)"
                     );
                 },
-            ),
-            "ContentReviewType" => array(
+            ],
+            "ContentReviewType" => [
                 "title"      => "Settings are",
                 "formatting" => function ($value, $item) use ($linkPath, $linkQuery) {
                     if ($item->ContentReviewType == "Inherit") {
@@ -95,8 +96,8 @@ class PagesWithoutReviewScheduleReport extends Report
 
                     return $value;
                 },
-            ),
-        );
+            ],
+        ];
 
         return $fields;
     }
@@ -106,7 +107,7 @@ class PagesWithoutReviewScheduleReport extends Report
      *
      * @return SS_List
      */
-    public function sourceRecords($params = array())
+    public function sourceRecords($params = [])
     {
         Versioned::set_stage(Versioned::DRAFT);
 

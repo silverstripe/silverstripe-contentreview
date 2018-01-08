@@ -70,7 +70,8 @@ class ContentReviewNotificationTest extends SapphireTest
         $email = $this->findEmail($ToEmail, null, $Subject);
         $this->assertNotNull($email, "Email haven't been sent.");
         $this->assertContains(
-            "<h1>$Subject</h1><p>There are $PagesCount pages that are due for review today by you, $ToFirstName.</p><p>This email was sent to $ToEmail</p>",
+            "<h1>$Subject</h1><p>There are $PagesCount pages that are due for review today by you, "
+            . "$ToFirstName.</p><p>This email was sent to $ToEmail</p>",
             $email['HtmlContent']
         );
         $this->assertContains('Staff', $email['HtmlContent']);

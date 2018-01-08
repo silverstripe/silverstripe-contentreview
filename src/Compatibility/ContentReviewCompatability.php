@@ -4,8 +4,9 @@ namespace SilverStripe\ContentReview\Compatibility;
 
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Subsites\Model\Subsite;
-// @todo add translatable namespace
 use Translatable;
+
+// @todo add translatable namespace
 
 /**
  * This is a helper class which lets us do things with content review data without subsites
@@ -27,10 +28,10 @@ class ContentReviewCompatability
      */
     public static function start()
     {
-        $compatibility = array(
+        $compatibility = [
             self::SUBSITES     => null,
             self::TRANSLATABLE => null,
-        );
+        ];
 
         if (ClassInfo::exists(Subsite::class)) {
             $compatibility[self::SUBSITES] = Subsite::$disable_subsite_filter;

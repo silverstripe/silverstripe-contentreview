@@ -5,15 +5,15 @@ namespace SilverStripe\ContentReview\Tests;
 use Page;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
-use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
+use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
+use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
-use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -63,7 +63,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $page->write();
 
         $this->assertTrue($page->canPublish());
-        $this->assertTrue($page->doPublish());
+        $this->assertTrue($page->publishRecursive());
         $this->assertEquals("", $page->OwnerNames);
     }
 

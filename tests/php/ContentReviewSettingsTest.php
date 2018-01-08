@@ -2,6 +2,7 @@
 
 namespace SilverStripe\ContentReview\Tests;
 
+use function date;
 use Page;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\SiteTree;
@@ -80,7 +81,10 @@ class ContentReviewSettingsTest extends SapphireTest
 
         $page->write();
 
-        $this->assertEquals(date('Y-m-d', strtotime("now + " . $page->ReviewPeriodDays . " days")), $page->NextReviewDate);
+        $this->assertEquals(
+            date('Y-m-d', strtotime("now + " . $page->ReviewPeriodDays . " days")),
+            $page->NextReviewDate
+        );
     }
 
     public function testAdvanceReviewFromInheritedSettings()
@@ -112,7 +116,10 @@ class ContentReviewSettingsTest extends SapphireTest
 
         $page->write();
 
-        $this->assertEquals(date('Y-m-d', strtotime("now + " . $siteConfig->ReviewPeriodDays . " days")), $page->NextReviewDate);
+        $this->assertEquals(
+            date('Y-m-d', strtotime("now + " . $siteConfig->ReviewPeriodDays . " days")),
+            $page->NextReviewDate
+        );
     }
 
     public function testGetSettingsObjectFromCustom()
