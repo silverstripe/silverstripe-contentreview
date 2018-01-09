@@ -3,8 +3,6 @@
 [![Build status](https://travis-ci.org/silverstripe/silverstripe-contentreview.png?branch=master)](https://travis-ci.org/silverstripe/silverstripe-contentreview)
 [![Code quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/?branch=master)
 [![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-contentreview/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-contentreview)
-[![Version](http://img.shields.io/packagist/v/silverstripe/contentreview.svg)](https://packagist.org/packages/silverstripe/contentreview)
-[![License](http://img.shields.io/packagist/l/silverstripe/contentreview.svg)](license.md)
 
 This module helps keep your website content accurate and up-to-date, which keeps your users happy.
 
@@ -19,6 +17,8 @@ There are two types of roles with this module.
 ## Requirements
 
  * SilverStripe ^4.0
+ 
+ **Note:** For SilverStripe 3.x, please use the [3.x release line](https://github.com/silverstripe/silverstripe-contentreview/tree/3).
 
 ## Features
 

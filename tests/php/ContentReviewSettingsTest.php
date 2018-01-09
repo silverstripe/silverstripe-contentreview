@@ -2,7 +2,9 @@
 
 namespace SilverStripe\ContentReview\Tests;
 
+use function date;
 use Page;
+use PHPUnit_Framework_TestCase;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
@@ -80,7 +82,10 @@ class ContentReviewSettingsTest extends SapphireTest
 
         $page->write();
 
-        $this->assertEquals(date('Y-m-d', strtotime("now + " . $page->ReviewPeriodDays . " days")), $page->NextReviewDate);
+        $this->assertEquals(
+            date('Y-m-d', strtotime("now + " . $page->ReviewPeriodDays . " days")),
+            $page->NextReviewDate
+        );
     }
 
     public function testAdvanceReviewFromInheritedSettings()
@@ -112,7 +117,13 @@ class ContentReviewSettingsTest extends SapphireTest
 
         $page->write();
 
-        $this->assertEquals(date('Y-m-d', strtotime("now + " . $siteConfig->ReviewPeriodDays . " days")), $page->NextReviewDate);
+        $this->assertEquals(
+            date(
+                'Y-m-d',
+                strtotime("now + " . $siteConfig->ReviewPeriodDays . " days")
+            ),
+            $page->NextReviewDate
+        );
     }
 
     public function testGetSettingsObjectFromCustom()
@@ -170,7 +181,13 @@ class ContentReviewSettingsTest extends SapphireTest
         $page = $this->objFromFixture(Page::class, "inherit");
 
         $this->assertEquals("Inherit", $page->ContentReviewType);
-        $this->assertEquals($this->objFromFixture(SiteConfig::class, "default")->ID, $page->getOptions()->ID);
+        $this->assertEquals(
+            $this->objFromFixture(
+                SiteConfig::class,
+                "default"
+            )->ID,
+            $page->getOptions()->ID
+        );
     }
 
     public function testGetNextReviewDateFromCustomSettings()

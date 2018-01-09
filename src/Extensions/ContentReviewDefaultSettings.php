@@ -42,7 +42,8 @@ class ContentReviewDefaultSettings extends DataExtension
      */
     private static $defaults = array(
         'ReviewSubject' => 'Page(s) are due for content review',
-        'ReviewBody' => '<h2>Page(s) due for review</h2><p>There are $PagesCount pages that are due for review today by you.</p>',
+        'ReviewBody' => '<h2>Page(s) due for review</h2>'
+            . '<p>There are $PagesCount pages that are due for review today by you.</p>',
     );
 
     /**
@@ -50,10 +51,10 @@ class ContentReviewDefaultSettings extends DataExtension
      *
      * @var array
      */
-    private static $many_many = array(
+    private static $many_many = [
         'ContentReviewGroups' => Group::class,
         'ContentReviewUsers' => Member::class,
-    );
+    ];
 
     /**
      * Template to use for content review emails.
@@ -71,7 +72,7 @@ class ContentReviewDefaultSettings extends DataExtension
      */
     public function getOwnerNames()
     {
-        $names = array();
+        $names = [];
 
         foreach ($this->OwnerGroups() as $group) {
             $names[] = $group->getBreadcrumbs(' > ');
@@ -127,10 +128,10 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $fields->addFieldToTab('Root.ContentReview', $reviewFrequency);
 
-        $users = Permission::get_members_by_permission(array(
+        $users = Permission::get_members_by_permission([
             'CMS_ACCESS_CMSMain',
             'ADMIN',
-        ));
+        ]);
 
         $usersMap = $users->map('ID', 'Title')->toArray();
         asort($usersMap);
@@ -141,7 +142,7 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $fields->addFieldToTab('Root.ContentReview', $userField);
 
-        $groupsMap = array();
+        $groupsMap = [];
 
         foreach (Group::get() as $group) {
             // Listboxfield values are escaped, use ASCII char instead of &raquo;
@@ -159,7 +160,7 @@ class ContentReviewDefaultSettings extends DataExtension
         // Email content
         $fields->addFieldsToTab(
             'Root.ContentReview',
-            array(
+            [
                 TextField::create('ReviewFrom', _t(__CLASS__ . '.EMAILFROM', 'From email address'))
                     ->setDescription(_t(__CLASS__ . '.EMAILFROM_RIGHTTITLE', 'e.g: do-not-reply@site.com')),
                 TextField::create('ReviewSubject', _t(__CLASS__ . '.EMAILSUBJECT', 'Subject line')),
@@ -168,7 +169,7 @@ class ContentReviewDefaultSettings extends DataExtension
                     'TemplateHelp',
                     $this->owner->renderWith('SilverStripe\\ContentReview\\ContentReviewAdminHelp')
                 ),
-            )
+            ]
         );
     }
 

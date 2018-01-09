@@ -40,7 +40,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
 
     public function testReviewedThrowsExceptionWithNoRecordID()
     {
-        $this->setExpectedException(HTTPResponse_Exception::class);
+        $this->expectException(HTTPResponse_Exception::class);
 
         /** @var CMSPageEditController|ContentReviewCMSExtension $controller */
         $controller = new CMSPageEditController();
@@ -55,7 +55,7 @@ class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
 
     public function testReviewedThrowsExceptionWithWrongRecordID()
     {
-        $this->setExpectedException(HTTPResponse_Exception::class);
+        $this->expectException(HTTPResponse_Exception::class);
 
         /** @var CMSPageEditController|ContentReviewCMSExtension $controller */
         $controller = new CMSPageEditController();
