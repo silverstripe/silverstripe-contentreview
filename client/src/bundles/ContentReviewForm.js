@@ -1,12 +1,11 @@
+/* global window */
 import i18n from 'i18n';
 import jQuery from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { provideInjector } from 'lib/Injector';
-import FormBuilderModal from 'components/FormBuilderModal/FormBuilderModal';
+import { loadComponent } from 'lib/Injector';
 
-const InjectableFormBuilderModal = provideInjector(FormBuilderModal);
+const FormBuilderModal = loadComponent('FormBuilderModal');
 
 /**
  * "Content due for review" modal popup. See AddToCampaignForm.js in
@@ -17,9 +16,7 @@ jQuery.entwine('ss', ($) => {
    * Kick off a "content due for review" dialog from the CMS actions.
    */
   $('.cms-content-actions .content-review__button').entwine({
-    onclick(e) {
-      e.preventDefault();
-
+    onclick() {
       let dialog = $('#content-review__dialog-wrapper');
 
       if (!dialog.length) {
@@ -64,28 +61,26 @@ jQuery.entwine('ss', ($) => {
       const handleHide = () => this.close();
       const handleSubmit = (...args) => this._handleSubmitModal(...args);
       const id = $('form.cms-edit-form :input[name=ID]').val();
-      const store = window.ss.store;
       const sectionConfigKey = 'SilverStripe\\CMS\\Controllers\\CMSPageEditController';
+      const store = window.ss.store;
       const sectionConfig = store.getState().config.sections
         .find((section) => section.name === sectionConfigKey);
       const modalSchemaUrl = `${sectionConfig.form.ReviewContentForm.schemaUrl}/${id}`;
       const title = i18n._t('ContentReview.CONTENT_DUE_FOR_REVIEW', 'Content due for review');
 
       ReactDOM.render(
-        <Provider store={store}>
-          <InjectableFormBuilderModal
-            title={title}
-            show={show}
-            handleSubmit={handleSubmit}
-            handleHide={handleHide}
-            schemaUrl={modalSchemaUrl}
-            bodyClassName="modal__dialog"
-            className="content-review-modal"
-            responseClassBad="modal__response modal__response--error"
-            responseClassGood="modal__response modal__response--good"
-            identifier="ContentReview.CONTENT_DUE_FOR_REVIEW"
-          />
-        </Provider>,
+        <FormBuilderModal
+          title={title}
+          show={show}
+          onSubmit={handleSubmit}
+          onHide={handleHide}
+          schemaUrl={modalSchemaUrl}
+          bodyClassName="modal__dialog"
+          className="content-review-modal"
+          responseClassBad="modal__response modal__response--error"
+          responseClassGood="modal__response modal__response--good"
+          identifier="ContentReview.CONTENT_DUE_FOR_REVIEW"
+        />,
         this[0]
       );
     },
@@ -95,6 +90,10 @@ jQuery.entwine('ss', ($) => {
     },
 
     _handleSubmitModal(data, action, submitFn) {
+      // Remove the "review content" bell button so users won't do it again
+      $('.content-review__button-holder').remove();
+
+      // Handle the review submission
       return submitFn();
     },
   });
