@@ -1,0 +1,16 @@
+de:
+  SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings:
+    ADDGROUP: 'Gruppen hinzufügen'
+    ADDUSERS: 'Benutzer hinzufügen'
+    EMAILSUBJECT: Betreff
+    PAGEOWNERGROUPS: Gruppen
+    PAGEOWNERUSERS: Benutzer
+  SilverStripe\ContentReview\Extensions\SiteTreeContentReview:
+    ADDGROUP: 'Gruppen hinzufügen'
+    ADDUSERS: 'Benutzer hinzufügen'
+    CUSTOM: 'Benutzerdefinierte Einstellungen'
+    OPTIONS: Optionen
+    PAGEOWNERGROUPS: Gruppen
+    PAGEOWNERUSERS: Benutzer
+  SilverStripe\ContentReview\Forms\ReviewContentHandler:
+    Placeholder: 'Kommentare hinzufügen (optional)'
