@@ -21,6 +21,8 @@ use SilverStripe\Versioned\Versioned;
  */
 class SiteTreeContentReviewTest extends ContentReviewBaseTest
 {
+    protected $usesTransactions = false;
+
     /**
      * @var string
      */
