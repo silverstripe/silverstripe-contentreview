@@ -71,6 +71,14 @@ class ContentReviewNotificationJob extends AbstractQueuedJob implements QueuedJo
         return QueuedJob::QUEUED;
     }
 
+    public function setup() {
+        parent::setup();
+
+        // Recommended for long running jobs that don't increment 'currentStep'
+        // https://github.com/silverstripe-australia/silverstripe-queuedjobs
+        $this->currentStep = -1;
+    }
+
     public function process()
     {
         $this->queueNextRun();
