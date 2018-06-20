@@ -80,7 +80,8 @@ class ContentReviewNotificationJob extends AbstractQueuedJob implements QueuedJo
         return QueuedJob::QUEUED;
     }
 
-    public function setup() {
+    public function setup()
+    {
         parent::setup();
 
         // Recommended for long running jobs that don't increment 'currentStep'
