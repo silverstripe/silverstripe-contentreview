@@ -2,6 +2,8 @@
 
 namespace SilverStripe\ContentReview\Forms;
 
+use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
+use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Injector\Injectable;
@@ -84,6 +86,7 @@ class ReviewContentHandler
      */
     public function submitReview($record, $data)
     {
+        /** @var DataObject|SiteTreeContentReview $record */
         if (!$this->canSubmitReview($record)) {
             throw new ValidationException(_t(
                 __CLASS__ . '.ErrorReviewPermissionDenied',
