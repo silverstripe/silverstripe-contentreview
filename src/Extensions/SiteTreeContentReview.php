@@ -491,7 +491,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
                 DBDatetime::now()->getTimestamp()
             );
 
-            $this->owner->NextReviewDate = DBDate::create()->setValue($nextDateTimestamp)->Format('y-MM-dd');
+            $this->owner->NextReviewDate = DBDate::create()->setValue($nextDateTimestamp)->Format(DBDate::ISO_DATE);
             $this->owner->write();
         }
 
