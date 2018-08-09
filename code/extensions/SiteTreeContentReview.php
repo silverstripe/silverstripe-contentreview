@@ -383,7 +383,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             ->addExtraClass('custom-setting')
             ->setDescription(_t("ContentReview.REVIEWFREQUENCYDESCRIPTION", "The review date will be set to this far in the future whenever the page is published"));
 
-        $notesField = GridField::create("ReviewNotes", "Review Notes", $this->owner->ReviewLogs(), GridFieldConfig_RecordEditor::create());
+		
+		$notesFieldConfig = GridFieldConfig_RecordEditor::create();
+		$notesFieldConfig->removeComponentsByType(new GridFieldAddNewButton());
+        $notesField = GridField::create("ReviewNotes", "Review Notes", $this->owner->ReviewLogs(), $notesFieldConfig)
+            ->setDescription(_t("ContentReview.REVIEWNOTESDESCRIPTION", "To create a new review note, use the bell icon below when the pages is due for a review"));
 
         $fields->addFieldsToTab("Root.ContentReview", array(
             new HeaderField(_t("ContentReview.REVIEWHEADER", "Content review"), 2),

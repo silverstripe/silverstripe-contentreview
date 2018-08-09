@@ -27,6 +27,7 @@ en:
     REVIEWHEADER: 'Content review'
     REVIEWNOTES: 'Review notes'
     REVIEWSUCCESSFUL: 'Content reviewed successfully'
+    REVIEWNOTESDESCRIPTION: 'To create a new review note, use the bell icon below when the pages is due for a review'
     SAVE: Save
     SETTINGSFROM: 'Options are'
   ContentReviewEmails:
