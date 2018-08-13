@@ -47,8 +47,9 @@ class ContentReviewLog extends DataObject
      * @return \FieldList
      */
     public function getCMSFields() {
-        $fields = FieldList::create();
-        $fields->push(TextareaField::create('Note'));
+        $fields = parent::getCMSFields();
+        $fields->removeByName('ReviewerID');
+        $fields->removeByName('SiteTreeID');
         $fields->push(HiddenField::create('ReviewerID', 'ReviewerID', Member::currentUserID()));
         return $fields;
     }
