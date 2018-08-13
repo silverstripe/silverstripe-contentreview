@@ -40,4 +40,16 @@ class ContentReviewLog extends DataObject
     {
         return (bool) Member::currentUser();
     }
+
+
+    /**
+     * allow the user to edit the fields
+     * @return \FieldList
+     */
+    public function getCMSFields() {
+        $fields = FieldList::create();
+        $fields->push(TextareaField::create('Note'));
+        $fields->push(HiddenField::create('ReviewerID', 'ReviewerID', Member::currentUserID()));
+        return $fields;
+    }
 }
