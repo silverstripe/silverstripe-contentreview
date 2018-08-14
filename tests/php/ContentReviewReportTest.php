@@ -52,13 +52,13 @@ class ContentReviewReportTest extends FunctionalTest
             "ReviewDateBefore" => "2010-12-12",
         ]);
 
-        $this->assertEquals([
-            "Contact Us Child",
-            "Home",
-            "About Us",
-            "Staff",
-            "Contact Us",
-        ], $results->column("Title"));
+        $this->assertListEquals([
+            ['Title' => 'Contact Us Child'],
+            ['Title' => 'Home'],
+            ['Title' => 'About Us'],
+            ['Title' => 'Staff'],
+            ['Title' => 'Contact Us'],
+        ], $results);
 
         DBDatetime::set_mock_now("2010-02-13 00:00:00");
 
