@@ -112,13 +112,29 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $fields->addFieldToTab('Root.ContentReview', $reviewFrequency);
 
-		$gridfieldconfig = GridFieldConfig_RelationEditor::create();
-		$gridfieldconfig->removeComponentsByType(new GridFieldAddNewButton());
-		$gridfield = GridField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"),
-				$this->OwnerUsers()->Sort('FirstName'), $gridfieldconfig)
-				->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        $users = Permission::get_members_by_permission(array(
+            'CMS_ACCESS_CMSMain',
+            'ADMIN',
+        ));
 
-		$fields->addFieldToTab('Root.ContentReview', $gridfield);
+        $usersMap = $users->map('ID', 'Title')->toArray();
+        asort($usersMap);
+
+        $userField = ListboxField::create('OwnerUsers', _t('ContentReview.PAGEOWNERUSERS', 'Users'), $usersMap)
+            ->setMultiple(true)
+            ->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
+					->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+
+		
+		if(Member::get()->count() > Config::inst()->get('SiteTree', 'content_review_gridfield_threshold')) {
+			$gridfieldconfig = GridFieldConfig_RelationEditor::create();
+			$gridfieldconfig->removeComponentsByType(new GridFieldAddNewButton());
+			$userField = GridField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"),
+					$this->OwnerUsers()->Sort('FirstName'), $gridfieldconfig)
+					->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+		}
+		
+        $fields->addFieldToTab('Root.ContentReview', $userField);
 
         $groupsMap = array();
 

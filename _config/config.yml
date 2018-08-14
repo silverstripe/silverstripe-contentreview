@@ -1,4 +1,5 @@
 SiteTree:
+  content_review_gridfield_threshold: 500
   extensions:
     - SiteTreeContentReview
 Group:

@@ -23,3 +23,14 @@ CMS users without the permission to change the content review schedule can still
 and previous reviews in the same view, but cannot change anything.
 
 ![](_images/content-review-settings-ro.png)
+
+## If your database contains a large number of members
+
+The page owners selector will change from a ListboxField to a Gridfield in order 
+to prevent your browser from crashing. By default this numbers is 500. You can
+customise this threshold by editing your .yml with the following settings:
+
+```
+SiteTree:
+  content_review_gridfield_threshold: 500
+```
