@@ -55,7 +55,6 @@ class ContentReviewEmails extends BuildTask
 
         foreach ($pages as $page) {
             if (!$page->canBeReviewedBy()) {
-                $page->advanceReviewDate();
                 continue;
             }
 
@@ -65,6 +64,7 @@ class ContentReviewEmails extends BuildTask
             // check log date vs NextReviewDate. If someone has left a content review
             // after the review date, then we don't need to notify anybody
             if ($contentReviewLog && $contentReviewLog->Created >= $page->NextReviewDate) {
+                $page->advanceReviewDate();
                 continue;
             }
 
