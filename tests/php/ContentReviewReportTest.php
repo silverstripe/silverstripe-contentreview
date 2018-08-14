@@ -52,22 +52,22 @@ class ContentReviewReportTest extends FunctionalTest
             "ReviewDateBefore" => "2010-12-12",
         ]);
 
-        $this->assertListEquals([
-            ['Title' => 'Contact Us Child'],
-            ['Title' => 'Home'],
-            ['Title' => 'About Us'],
-            ['Title' => 'Staff'],
-            ['Title' => 'Contact Us'],
-        ], $results);
+        $recordTitles = $results->column('Title');
+        $this->assertCount(5, $recordTitles, 'The right number of pages are returned');
+        $this->assertContains('Contact Us Child', $recordTitles);
+        $this->assertContains('Home', $recordTitles);
+        $this->assertContains('About Us', $recordTitles);
+        $this->assertContains('Staff', $recordTitles);
+        $this->assertContains('Contact Us', $recordTitles);
 
         DBDatetime::set_mock_now("2010-02-13 00:00:00");
 
         $results = $report->sourceRecords([]);
 
-        $this->assertEquals([
-            "Home",
-            "About Us",
-        ], $results->column("Title"));
+        $recordTitles = $results->column('Title');
+        $this->assertCount(2, $recordTitles, 'The right number of pages are returned');
+        $this->assertContains('Home', $recordTitles);
+        $this->assertContains('About Us', $recordTitles);
 
         DBDatetime::clear_mock_now();
     }
@@ -87,11 +87,11 @@ class ContentReviewReportTest extends FunctionalTest
 
         $results = $report->sourceRecords();
 
-        $this->assertEquals([
-            "Home",
-            "About Us",
-            "Page without review date",
-            "Page owned by group",
-        ], $results->column("Title"));
+        $recordTitles = $results->column('Title');
+        $this->assertCount(4, $recordTitles, 'The right number of pages are returned');
+        $this->assertContains('Home', $recordTitles);
+        $this->assertContains('About Us', $recordTitles);
+        $this->assertContains('Page without review date', $recordTitles);
+        $this->assertContains('Page owned by group', $recordTitles);
     }
 }
