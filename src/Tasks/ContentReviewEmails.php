@@ -15,6 +15,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
+use SilverStripe\ContentReview\Models\ContentReviewLog;
 
 /**
  * Daily task to send emails to the owners of content items when the review date rolls around.
@@ -54,6 +55,16 @@ class ContentReviewEmails extends BuildTask
 
         foreach ($pages as $page) {
             if (!$page->canBeReviewedBy()) {
+                continue;
+            }
+
+            // get most recent review log of current [age]
+            $contentReviewLog = $page->ReviewLogs()->sort('Created DESC')->first();
+
+            // check log date vs NextReviewDate. If someone has left a content review
+            // after the review date, then we don't need to notify anybody
+            if ($contentReviewLog && $contentReviewLog->Created >= $page->NextReviewDate) {
+                $page->advanceReviewDate();
                 continue;
             }
 
