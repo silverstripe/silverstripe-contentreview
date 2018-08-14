@@ -55,6 +55,7 @@ class ContentReviewEmails extends BuildTask
 
         foreach ($pages as $page) {
             if (!$page->canBeReviewedBy()) {
+                $page->advanceReviewDate();
                 continue;
             }
 
