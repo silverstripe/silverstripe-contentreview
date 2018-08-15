@@ -344,18 +344,26 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         $viewersOptionsField = OptionsetField::create("ContentReviewType", _t("ContentReview.OPTIONS", "Options"), $options);
 
-        $users = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
-
+		$users = Permission::get_members_by_permission(array("CMS_ACCESS_CMSMain", "ADMIN"));
         $usersMap = $users->map("ID", "Title")->toArray();
-
         asort($usersMap);
 
-        $userField = ListboxField::create("OwnerUsers", _t("ContentReview.PAGEOWNERUSERS", "Users"), $usersMap)
-            ->setMultiple(true)
-            ->addExtraClass('custom-setting')
-            ->setAttribute("data-placeholder", _t("ContentReview.ADDUSERS", "Add users"))
-            ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
-
+        if(Member::get()->count() > Config::inst()->get('SiteConfig', 'content_review_gridfield_threshold')) {
+            // grid field for large numbers of users
+            $gridfieldconfig = GridFieldConfig_RelationEditor::create();
+            $gridfieldconfig->removeComponentsByType(new GridFieldAddNewButton());
+            $userField = GridField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"),
+                    $this->OwnerUsers(), $gridfieldconfig)
+                ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        } else {
+            $userField = ListboxField::create("OwnerUsers", _t("ContentReview.PAGEOWNERUSERS", "Users"), $usersMap)
+                ->setMultiple(true)
+                ->addExtraClass('custom-setting')
+                ->setAttribute("data-placeholder", _t("ContentReview.ADDUSERS", "Add users"))
+                ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        }
+		
+		
         $groupsMap = array();
 
         foreach (Group::get() as $group) {

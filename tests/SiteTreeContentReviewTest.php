@@ -334,4 +334,34 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         SS_Datetime::clear_mock_now();
     }
+    public function testSiteSettingsFieldsListBox()
+    {
+        $author = $this->objFromFixture("Member", "editor");
+
+        $this->logInAs($author);
+		
+        /** @var Page|SiteTreeContentReview $page */
+        $page = $this->objFromFixture("Page", "contact");
+
+        $fields = $page->getSettingsFields();
+		
+        $this->assertInstanceOf('ListboxField', $fields->dataFieldByName('OwnerUsers'));
+    }
+	
+    public function testSiteSettingsFieldsGridfield()
+    {
+        $author = $this->objFromFixture("Member", "editor");
+
+        $this->logInAs($author);
+
+        /** @var Page|SiteTreeContentReview $page */
+        $page = $this->objFromFixture("Page", "contact");
+
+        // update the minimum threshhold to change to gridfield
+        Config::inst()->update('SiteConfig', 'content_review_gridfield_threshold', 1);
+
+        $fields = $page->getSettingsFields();
+
+        $this->assertInstanceOf('GridField', $fields->dataFieldByName('OwnerUsers'));
+	}
 }
