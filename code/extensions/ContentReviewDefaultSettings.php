@@ -52,6 +52,15 @@ class ContentReviewDefaultSettings extends DataExtension
     private static $content_review_template = 'ContentReviewEmail';
 
     /**
+     * The number of members in which the dropdown will morph into a gridfield
+     *
+     * @config
+     *
+     * @var int
+     */
+    private static $content_review_gridfield_threshold = 500;
+
+    /**
      * @return string
      */
     public function getOwnerNames()
@@ -120,19 +129,18 @@ class ContentReviewDefaultSettings extends DataExtension
         $usersMap = $users->map('ID', 'Title')->toArray();
         asort($usersMap);
 
-        $userField = ListboxField::create('OwnerUsers', _t('ContentReview.PAGEOWNERUSERS', 'Users'), $usersMap)
-            ->setMultiple(true)
-            ->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
-					->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
-
-		
-		if(Member::get()->count() > Config::inst()->get('SiteTree', 'content_review_gridfield_threshold')) {
-			$gridfieldconfig = GridFieldConfig_RelationEditor::create();
-			$gridfieldconfig->removeComponentsByType(new GridFieldAddNewButton());
-			$userField = GridField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"),
-					$this->OwnerUsers()->Sort('FirstName'), $gridfieldconfig)
-					->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
-		}
+        if(Member::get()->count() > Config::inst()->get('SiteConfig', 'content_review_gridfield_threshold')) {
+            $gridfieldconfig = GridFieldConfig_RelationEditor::create();
+            $gridfieldconfig->removeComponentsByType(new GridFieldAddNewButton());
+            $userField = GridField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"),
+                    $this->OwnerUsers()->Sort('FirstName'), $gridfieldconfig)
+                    ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        } else {
+            $userField = ListboxField::create('OwnerUsers', _t('ContentReview.PAGEOWNERUSERS', 'Users'), $usersMap)
+                ->setMultiple(true)
+                ->setAttribute('data-placeholder', _t('ContentReview.ADDUSERS', 'Add users'))
+                            ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
+        }
 		
         $fields->addFieldToTab('Root.ContentReview', $userField);
 

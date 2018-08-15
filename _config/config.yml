@@ -1,5 +1,4 @@
 SiteTree:
-  content_review_gridfield_threshold: 500
   extensions:
     - SiteTreeContentReview
 Group:
@@ -15,5 +14,6 @@ CMSPageSettingsController:
   extensions:
     - ContentReviewCMSExtension
 SiteConfig:
+  content_review_gridfield_threshold: 2000
   extensions:
     - ContentReviewDefaultSettings
