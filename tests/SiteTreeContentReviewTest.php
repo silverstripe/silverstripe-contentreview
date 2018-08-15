@@ -345,7 +345,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         $fields = $page->getSettingsFields();
 		
-        $this->assertTrue($fields->dataFieldByName('OwnerUsers') instanceof ListboxField);
+        $this->assertInstanceOf('ListboxField', $fields->dataFieldByName('OwnerUsers'));
     }
 	
     public function testSiteSettingsFieldsGridfield()
@@ -362,6 +362,6 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         $fields = $page->getSettingsFields();
 
-        $this->assertTrue($fields->dataFieldByName('OwnerUsers') instanceof GridField);
+        $this->assertInstanceOf('GridField', $fields->dataFieldByName('OwnerUsers'));
 	}
 }

@@ -133,7 +133,7 @@ class ContentReviewDefaultSettings extends DataExtension
             $gridfieldconfig = GridFieldConfig_RelationEditor::create();
             $gridfieldconfig->removeComponentsByType(new GridFieldAddNewButton());
             $userField = GridField::create('OwnerUsers', _t("ContentReview.PAGEOWNERUSERS", "Users"),
-                    $this->OwnerUsers()->Sort('FirstName'), $gridfieldconfig)
+                    $this->OwnerUsers(), $gridfieldconfig)
                     ->setDescription(_t('ContentReview.OWNERUSERSDESCRIPTION', 'Page owners that are responsible for reviews'));
         } else {
             $userField = ListboxField::create('OwnerUsers', _t('ContentReview.PAGEOWNERUSERS', 'Users'), $usersMap)
