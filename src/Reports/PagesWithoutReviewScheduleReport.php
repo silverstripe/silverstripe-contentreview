@@ -154,7 +154,7 @@ class PagesWithoutReviewScheduleReport extends Report
 
         $options = $record->getOptions();
 
-        if ($options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
+        if ($options && $options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
             return false;
         }
 
