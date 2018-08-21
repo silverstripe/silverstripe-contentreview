@@ -68,14 +68,16 @@ class ContentReviewEmails extends BuildTask
                 continue;
             }
 
-            $option = $page->getOptions();
+            $options = $page->getOptions();
 
-            foreach ($option->ContentReviewOwners() as $owner) {
-                if (!isset($overduePages[$owner->ID])) {
-                    $overduePages[$owner->ID] = ArrayList::create();
+            if ($options) {
+                foreach ($options->ContentReviewOwners() as $owner) {
+                    if (!isset($overduePages[$owner->ID])) {
+                        $overduePages[$owner->ID] = ArrayList::create();
+                    }
+
+                    $overduePages[$owner->ID]->push($page);
                 }
-
-                $overduePages[$owner->ID]->push($page);
             }
         }
 
