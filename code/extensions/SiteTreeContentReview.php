@@ -453,7 +453,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         return (bool) $nextDate;
     }
-    
+
     public function canRemind(Member $member = null) {
         if (!$this->owner->obj("NextReviewDate")->exists()) {
             return false;
@@ -469,7 +469,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
         if (!$notifyDate1 == $now->URLDate()) {
             return false;
         }
-        
+
         $options = $this->getOptions();
 
         if (!$options) {
@@ -492,7 +492,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         return false;
     }
-    
+
     /**
      * Check if a review is due by a member for this owner.
      *
@@ -503,10 +503,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     public function canBeReviewedBy(Member $member = null)
     {
         if (!$this->owner->obj("NextReviewDate")->exists()) {
-            return false;
-        }
-
-        if ($this->owner->obj("NextReviewDate")->InFuture()) {
             return false;
         }
 
