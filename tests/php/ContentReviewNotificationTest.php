@@ -16,6 +16,7 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\ContentReview\Models\ContentReviewLog;
 
 /**
  * @mixin PHPUnit_Framework_TestCase
@@ -80,5 +81,71 @@ class ContentReviewNotificationTest extends SapphireTest
         $this->assertContains('Contact Us Child', $email['HtmlContent']);
 
         DBDatetime::clear_mock_now();
+    }
+
+    /**
+     * When a content review is left after a review date, we want to ensure that
+     * overdue notifications aren't sent.
+     */
+    public function testContentReviewNeeded()
+    {
+        DBDatetime::set_mock_now('2018-08-10 12:00:00');
+
+        /** @var Page|SiteTreeContentReview $childParentPage */
+        $childParentPage = $this->objFromFixture(Page::class, 'no-review');
+        $childParentPage->NextReviewDate = '2018-08-10';
+        $childParentPage->write();
+
+        // we need to ensure only our test page is being ran. If we don't do this
+        // then it may notify for other pages which fails our test
+        $this->deleteAllPagesExcept([$childParentPage->ID]);
+
+        // Grabbing the 'author' from member class
+        $member = $this->objFromFixture(Member::class, 'author');
+
+        // Assigning member as contentreviewer to page
+        $childParentPage->ContentReviewUsers()->add($member);
+
+        // Assert that only one reviewer is assigned to page
+        $this->assertCount(1, $childParentPage->ContentReviewUsers());
+
+        // Create new log
+        $log = new ContentReviewLog();
+
+        // Assign log reviewer as current member
+        $log->ReviewerID = $member->ID;
+
+        // Assign log ID to page ID
+        $log->SiteTreeID = $childParentPage->ID;
+
+        // Write to DB
+        $log->write();
+
+        // assert that log was created day of review
+        $this->assertEquals('2018-08-10 12:00:00', $log->Created);
+        $this->assertCount(1, $childParentPage->ReviewLogs());
+
+        $task = new ContentReviewEmails();
+        $task->run(new HTTPRequest('GET', '/dev/tasks/ContentReviewEmails'));
+
+        // Expecting to not send the email as content review for page is done
+        $email = $this->findEmail($member->Email);
+        $this->assertNull($email);
+
+        DBDatetime::clear_mock_now();
+    }
+
+    /**
+     * Deletes all pages except those passes in to the $ids parameter
+     *
+     * @param  array  $ids Page IDs which will NOT be deleted
+     */
+    private function deleteAllPagesExcept(array $ids)
+    {
+        $pages = SiteTree::get()->exclude('ID', $ids);
+
+        foreach ($pages as $page) {
+            $page->delete();
+        }
     }
 }

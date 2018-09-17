@@ -217,9 +217,11 @@ class PagesDueForReviewReport extends Report
             $records = $records->filterByCallback(function ($page) use ($currentUser) {
                 $options = $page->getOptions();
 
-                foreach ($options->ContentReviewOwners() as $owner) {
-                    if ($currentUser->ID == $owner->ID) {
-                        return true;
+                if ($options) {
+                    foreach ($options->ContentReviewOwners() as $owner) {
+                        if ($currentUser->ID == $owner->ID) {
+                            return true;
+                        }
                     }
                 }
 
