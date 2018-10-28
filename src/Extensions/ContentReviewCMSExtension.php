@@ -159,7 +159,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
             $data = array_merge($data, $extraData);
         }
 
-        $response = HTTPResponse::create(Convert::raw2json($data));
+        $response = HTTPResponse::create(json_encode($data));
         $response->addHeader('Content-Type', 'application/json');
 
         return $response;
