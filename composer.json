@@ -27,9 +27,5 @@
     "suggest": {
         "silverstripe/queuedjobs": "Automatically schedules content review emails to be sent, only requiring one crontask to be created"
     },
-    "extra": {
-        "branch-alias": {
-            "3.x-dev": "3.1.x-dev"
-        }
-    }
+    "extra": []
 }
