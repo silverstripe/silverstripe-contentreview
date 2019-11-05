@@ -12,7 +12,7 @@ const FormBuilderModal = loadComponent('FormBuilderModal');
  * silverstripe/admin for reference.
  */
 jQuery.entwine('ss', ($) => {
-	/**
+  /**
    * Kick off a "content due for review" dialog from the CMS actions.
    */
   $('.cms-content-actions .content-review__button').entwine({
@@ -42,7 +42,7 @@ jQuery.entwine('ss', ($) => {
     },
   });
 
-	/**
+  /**
    * Uses reactstrap in order to replicate the bootstrap styling and JavaScript behaviour.
    */
   $('#content-review__dialog-wrapper').entwine({
