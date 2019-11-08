@@ -1,3 +1,3 @@
-import 'bundles/ContentReviewForm.js';
-import 'bundles/ContentReviewSettings.js';
-import 'bundles/PagesDueForReview.js';
+import 'bundles/ContentReviewForm';
+import 'bundles/ContentReviewSettings';
+import 'bundles/PagesDueForReview';

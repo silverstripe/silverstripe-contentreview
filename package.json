@@ -3,10 +3,12 @@
   "version": "4.0.0",
   "description": "Flags pages for periodical author review (incl. reporting)",
   "scripts": {
-    "build": "yarn && NODE_ENV=production webpack -p --bail --progress",
-    "watch": "yarn && NODE_ENV=development webpack --watch --progress",
+    "build": "yarn && yarn lint && NODE_ENV=production webpack -p --bail --progress",
+    "dev": "NODE_ENV=development webpack --progress",
+    "watch": "NODE_ENV=development webpack --watch --progress",
     "css": "WEBPACK_CHILD=css npm run build",
-    "lint": "eslint client/src; sass-lint -v"
+    "lint": "eslint client/src && sass-lint -v",
+    "js-fix": "eslint client/src --fix"
   },
   "repository": {
     "type": "git",
@@ -31,14 +33,25 @@
     "redux": "https://registry.npmjs.org/redux/-/redux-3.0.5.tgz"
   },
   "devDependencies": {
-    "@silverstripe/webpack-config": "^0.2.5",
+    "@silverstripe/webpack-config": "^1.3.0",
+    "@silverstripe/eslint-config": "^0.0.5",
     "babel-core": "^6.24.1",
     "babel-preset-es2015": "^6.24.1",
-    "babel-preset-es2016": "^6.24.1",
-    "eslint": "^2.7.0",
-    "eslint-config-airbnb": "^6.2.0"
+    "babel-preset-es2016": "^6.24.1"
   },
   "engines": {
-    "node": "^6.x"
+    "node": "^10.x"
+  },
+  "resolutions": {
+    "eslint": "^4.6.1"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
   }
 }
