@@ -495,6 +495,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $this->owner->write();
         }
 
+        if ($options && $options->ReviewPeriodDays == 0) {
+            $this->owner->NextReviewDate = null;
+            $this->owner->write();
+        }
+
         return (bool)$nextDateTimestamp;
     }
 
