@@ -13,9 +13,9 @@ Feature: Set up reviews
   Scenario: I can set content review options
     When I click on "Home" in the tree
     And I click the "Settings" CMS tab
-    Then I should see a "Content Review" button
+    Then I should see a "Content review" button
 
-    When I click the "Content Review" CMS tab
+    When I click the "Content review" CMS tab
     And I select "Custom settings" from "Options" input group
     And I wait for 1 second
     And I select "ADMIN group" from "Groups"
@@ -26,7 +26,7 @@ Feature: Set up reviews
   Scenario: I can enter a review in the modal
     When I click on "Home" in the tree
     And I click the "Settings" CMS tab
-    And I click the "Content Review" CMS tab
+    And I click the "Content review" CMS tab
     And I select "Custom settings" from "Options" input group
     And I wait for 1 seconds
     And I select "ADMIN group" from "Groups"
