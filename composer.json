@@ -37,9 +37,6 @@
         "symbiote/silverstripe-queuedjobs": "Automatically schedules content review emails to be sent, only requiring one crontask to be created"
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "4.x-dev"
-        },
         "expose": [
             "client/dist"
         ]
