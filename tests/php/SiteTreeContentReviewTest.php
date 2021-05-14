@@ -10,6 +10,7 @@ use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
 use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
 use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
 use SilverStripe\Forms\LiteralField;
+use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
@@ -122,6 +123,20 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $this->assertTrue($page->doPublish());
         $this->assertEquals(null, $page->NextReviewDate);
     }
+
+    public function testAdvanceReviewDate()
+    {
+        $page = new Page();
+        $page->Title = 'Test page';
+        $page->ReviewPeriodDays = 0;
+        // Set timestamp to a time in the past
+        $timestamp = DBDatetime::now()->getTimestamp() - 100000;
+        $page->NextReviewDate = DBDate::create()->setValue($timestamp)->Format(DBDate::ISO_DATE);
+        $page->write();
+        $page->advanceReviewDate();
+        $this->assertNull(Page::get()->find('Title', 'Test page')->NextReviewDate);
+    }
+
 
     public function testAddReviewNote()
     {
