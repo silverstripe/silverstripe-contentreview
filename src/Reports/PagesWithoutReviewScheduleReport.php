@@ -111,7 +111,7 @@ class PagesWithoutReviewScheduleReport extends Report
     {
         Versioned::set_stage(Versioned::DRAFT);
 
-        $records = SiteTree::get();
+        $records = SiteTree::get()->filter('NextReviewDate', null);
         $compatibility = ContentReviewCompatability::start();
 
         // If there's no review dates set, default to all pages due for review now.
@@ -148,10 +148,6 @@ class PagesWithoutReviewScheduleReport extends Report
      */
     protected function hasReviewSchedule(DataObject $record)
     {
-        if (!$record->obj("NextReviewDate")->exists()) {
-            return false;
-        }
-
         $options = $record->getOptions();
 
         if ($options && $options->OwnerGroups()->count() == 0 && $options->OwnerUsers()->count() == 0) {
