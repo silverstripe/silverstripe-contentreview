@@ -130,6 +130,7 @@ class ContentReviewDefaultSettings extends DataExtension
 
         $users = Permission::get_members_by_permission([
             'CMS_ACCESS_CMSMain',
+            'CMS_ACCESS_LeftAndMain',
             'ADMIN',
         ]);
 
