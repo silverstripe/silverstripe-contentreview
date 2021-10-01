@@ -29,7 +29,7 @@
     "require-dev": {
         "sminnee/phpunit": "^5.7",
         "squizlabs/php_codesniffer": "^3",
-        "silverstripe/behat-extension": "^3",
+        "silverstripe/behat-extension": "^4",
         "silverstripe/serve": "^2",
         "se/selenium-server-standalone": "2.41.0"
     },
@@ -44,7 +44,8 @@
     "autoload": {
         "psr-4": {
             "SilverStripe\\ContentReview\\": "src/",
-            "SilverStripe\\ContentReview\\Tests\\": "tests/php/"
+            "SilverStripe\\ContentReview\\Tests\\": "tests/php/",
+            "SilverStripe\\ContentReview\\Tests\\Behat\\Context\\": "tests/behat/src/"
         }
     },
     "minimum-stability": "dev",
