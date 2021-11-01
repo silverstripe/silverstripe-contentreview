@@ -4,7 +4,6 @@ namespace SilverStripe\ContentReview\Tests;
 
 use function date;
 use Page;
-use PHPUnit_Framework_TestCase;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
@@ -22,8 +21,6 @@ use SilverStripe\SiteConfig\SiteConfig;
 /**
  * This class tests that settings are inherited correctly based on the inherited,
  * custom or disabled settings.
- *
- * @mixin PHPUnit_Framework_TestCase
  */
 class ContentReviewSettingsTest extends SapphireTest
 {

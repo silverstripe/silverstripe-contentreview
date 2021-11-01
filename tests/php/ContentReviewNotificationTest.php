@@ -18,9 +18,6 @@ use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\ContentReview\Models\ContentReviewLog;
 
-/**
- * @mixin PHPUnit_Framework_TestCase
- */
 class ContentReviewNotificationTest extends SapphireTest
 {
     /**
@@ -28,7 +25,7 @@ class ContentReviewNotificationTest extends SapphireTest
      */
     protected static $fixture_file = 'ContentReviewTest.yml';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -70,15 +67,15 @@ class ContentReviewNotificationTest extends SapphireTest
 
         $email = $this->findEmail($ToEmail, null, $Subject);
         $this->assertNotNull($email, "Email haven't been sent.");
-        $this->assertContains(
+        $this->assertStringContainsString(
             "<h1>$Subject</h1>".
             "<p>There are $PagesCount pages that are due for review today by you, $ToFirstName.</p>".
             "<p>This email was sent to $ToEmail</p>",
             $email['HtmlContent']
         );
-        $this->assertContains('Staff', $email['HtmlContent']);
-        $this->assertContains('Contact Us', $email['HtmlContent']);
-        $this->assertContains('Contact Us Child', $email['HtmlContent']);
+        $this->assertStringContainsString('Staff', $email['HtmlContent']);
+        $this->assertStringContainsString('Contact Us', $email['HtmlContent']);
+        $this->assertStringContainsString('Contact Us Child', $email['HtmlContent']);
 
         DBDatetime::clear_mock_now();
     }

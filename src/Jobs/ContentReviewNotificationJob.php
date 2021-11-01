@@ -80,7 +80,7 @@ class ContentReviewNotificationJob extends AbstractQueuedJob implements QueuedJo
         return QueuedJob::QUEUED;
     }
 
-    public function setup()
+    public function setUp()
     {
         parent::setup();
 

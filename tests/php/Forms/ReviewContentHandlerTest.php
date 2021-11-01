@@ -14,6 +14,7 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Security\Member;
+use SilverStripe\ORM\ValidationException;
 
 class ReviewContentHandlerTest extends SapphireTest
 {
@@ -37,12 +38,10 @@ class ReviewContentHandlerTest extends SapphireTest
         $this->assertTrue($saveAction->hasClass('review-content__action'));
     }
 
-    /**
-     * @expectedException SilverStripe\ORM\ValidationException
-     * @expectedExceptionMessage It seems you don't have the necessary permissions to submit a content review
-     */
     public function testExceptionThrownWhenSubmittingReviewForInvalidObject()
     {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('It seems you don\'t have the necessary permissions to submit a content review');
         ReviewContentHandler::create()->submitReview(new Member, ['foo' => 'bar']);
     }
 
