@@ -17,9 +17,6 @@ use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 
-/**
- * @mixin PHPUnit_Framework_TestCase
- */
 class SiteTreeContentReviewTest extends ContentReviewBaseTest
 {
     protected $usesTransactions = false;

@@ -18,7 +18,7 @@ abstract class ContentReviewBaseTest extends FunctionalTest
      */
     protected $translatableEnabledBefore;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +39,7 @@ abstract class ContentReviewBaseTest extends FunctionalTest
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (class_exists(Translatable::class)) {
             if ($this->translatableEnabledBefore) {

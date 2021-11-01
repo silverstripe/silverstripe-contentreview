@@ -5,6 +5,7 @@ namespace SilverStripe\ContentReview\Tests\Extensions;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Forms\ReviewContentHandler;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\Form;
@@ -29,21 +30,17 @@ class ContentReviewCMSExtensionTest extends SapphireTest
         $this->assertTrue($result);
     }
 
-    /**
-     * @expectedException SilverStripe\Control\HTTPResponse_Exception
-     * @expectedExceptionMessage Bad record ID #1234
-     */
     public function testGetReviewContentFormThrowsExceptionWhenPageNotFound()
     {
+        $this->expectException(HTTPResponse_Exception::class);
+        $this->expectExceptionMessage('Bad record ID #1234');
         (new ContentReviewCMSExtension)->getReviewContentForm(1234);
     }
 
-    /**
-     * @expectedException SilverStripe\Control\HTTPResponse_Exception
-     * @expectedExceptionMessage It seems you don't have the necessary permissions to review this content
-     */
     public function testGetReviewContentFormThrowsExceptionWhenObjectCannotBeReviewed()
     {
+        $this->expectException(HTTPResponse_Exception::class);
+        $this->expectExceptionMessage('It seems you don\'t have the necessary permissions to review this content');
         $this->logOut();
 
         $mock = $this->getMockBuilder(ContentReviewCMSExtension::class)
