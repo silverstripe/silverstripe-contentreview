@@ -6,3 +6,4 @@ import:
 env:
   global:
     - BEHAT_SUITE="contentreview"
+    - REQUIRE_EXTRA="symbiote/silverstripe-queuedjobs:^4"
