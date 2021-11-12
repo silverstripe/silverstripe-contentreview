@@ -42,7 +42,8 @@
     "autoload": {
         "psr-4": {
             "SilverStripe\\ContentReview\\": "src/",
-            "SilverStripe\\ContentReview\\Tests\\": "tests/php/"
+            "SilverStripe\\ContentReview\\Tests\\": "tests/php/",
+            "SilverStripe\\ContentReview\\Tests\\Behat\\Context\\": "tests/behat/src/"
         }
     },
     "minimum-stability": "dev",
