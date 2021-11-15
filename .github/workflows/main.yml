@@ -1,11 +1,14 @@
-name: Module CI
-
+name: Build Docs
 on:
   push:
-  pull_request:
-
+    branches:
+      - 'master'
+    paths:
+      - 'docs/en/userguide/**'
 jobs:
-  ci:
-    uses: silverstripe/github-actions-ci-cd/.github/workflows/ci.yml@0.1.11
-    with:
-      run_endtoend: true
+  build:
+    name: build-docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run build hook
+        run: curl -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.NETLIFY_BUILD_HOOK }}
