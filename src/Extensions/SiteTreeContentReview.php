@@ -542,6 +542,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             return true;
         }
 
+        // Whether or not a user is allowed to review the content of the page.
+        if ($this->owner->hasMethod("canReviewContent") && !$this->owner->canReviewContent($member)) {
+            return false;
+        }
+
         if ($member->inGroups($options->OwnerGroups())) {
             return true;
         }

@@ -2,6 +2,7 @@
 
 namespace SilverStripe\ContentReview\Tests\Extensions;
 
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Forms\ReviewContentHandler;
 use SilverStripe\Control\Controller;
@@ -50,7 +51,7 @@ class ContentReviewCMSExtensionTest extends SapphireTest
         $mock->setOwner(new Controller);
 
         // Return a DataObject without the content review extension applied
-        $mock->expects($this->once())->method('findRecord')->with(['ID' => 123])->willReturn(new Member);
+        $mock->expects($this->once())->method('findRecord')->with(['ID' => 123])->willReturn(new SiteTree);
 
         $mock->getReviewContentForm(123);
     }
