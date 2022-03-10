@@ -87,11 +87,11 @@ class ContentReviewReportTest extends FunctionalTest
 
         $results = $report->sourceRecords();
 
-        $this->assertEquals([
-            "Home",
-            "About Us",
-            "Page without review date",
-            "Page owned by group",
-        ], $results->column("Title"));
+        $this->assertListEquals([
+            ['Title' => 'Home'],
+            ['Title' => 'About Us'],
+            ['Title' => 'Page without review date'],
+            ['Title' => 'Page owned by group'],
+        ], $results);
     }
 }
