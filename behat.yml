@@ -2,18 +2,19 @@ default:
   suites:
     contentreview:
       paths:
-        - '%paths.modules.contentreview%/tests/behat/features'
+        - "%paths.modules.contentreview%/tests/behat/features"
       contexts:
-        - SilverStripe\Framework\Tests\Behaviour\FeatureContext
-        - SilverStripe\Framework\Tests\Behaviour\CmsFormsContext
-        - SilverStripe\Framework\Tests\Behaviour\CmsUiContext
+        - SilverStripe\Admin\Tests\Behat\Context\AdminContext
         - SilverStripe\BehatExtension\Context\BasicContext
         - SilverStripe\BehatExtension\Context\EmailContext
-        - SilverStripe\CMS\Tests\Behaviour\LoginContext
-        - SilverStripe\CMS\Tests\Behaviour\ThemeContext
-        - SilverStripe\CMS\Tests\Behaviour\FixtureContext:
-        # Note: double indent for args is intentional
-            - '%paths.modules.contentreview%/tests/behat/features/files/'
+        - SilverStripe\BehatExtension\Context\LoginContext
+        - SilverStripe\Framework\Tests\Behaviour\CmsFormsContext
+        - SilverStripe\Framework\Tests\Behaviour\CmsUiContext
+        - SilverStripe\ContentReview\Tests\Behat\Context\FeatureContext
+        - SilverStripe\ContentReview\Tests\Behat\Context\FixtureContext
+        -
+          SilverStripe\ContentReview\Tests\Behat\Context\FixtureContext:
+            - "%paths.modules.contentreview%/tests/behat/files/"
 
   extensions:
     SilverStripe\BehatExtension\MinkExtension:
@@ -21,9 +22,8 @@ default:
       javascript_session: facebook_web_driver
       facebook_web_driver:
         browser: chrome
-        wd_host: "http://127.0.0.1:9515" #chromedriver port
-      browser_name: chrome
-      
+        wd_host: "http://127.0.0.1:9515"
+
     SilverStripe\BehatExtension\Extension:
-      screenshot_path: '%paths.base%/artifacts/screenshots'
-      bootstrap_file: "vendor/silverstripe/cms/tests/behat/serve-bootstrap.php"
+      screenshot_path: "%paths.base%/artifacts/screenshots"
+      bootstrap_file: vendor/silverstripe/framework/tests/behat/serve-bootstrap.php

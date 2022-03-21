@@ -104,10 +104,12 @@ class PagesWithoutReviewScheduleReport extends Report
 
     /**
      * @param array $params
+     * @param array|string|null $sort
+     * @param int|null $limit
      *
      * @return SS_List
      */
-    public function sourceRecords($params = [])
+    public function sourceRecords($params = [], $sort = null, $limit = null)
     {
         Versioned::set_stage(Versioned::DRAFT);
 
@@ -125,16 +127,18 @@ class PagesWithoutReviewScheduleReport extends Report
             ));
         }
 
-        $records->sort("ParentID");
-        $records = $records->toArray();
+        // Apply sort and limit if appropriate.
+        if ($sort !== null) {
+            $records = $records->sort($sort);
+        }
+        if ($limit !== null) {
+            $records = $records->limit($limit);
+        }
 
         // Trim out calculated values
-        $list = ArrayList::create();
-        foreach ($records as $record) {
-            if (!$this->hasReviewSchedule($record)) {
-                $list->push($record);
-            }
-        }
+        $list = $records->filterByCallback(function ($record) {
+            return !$this->hasReviewSchedule($record);
+        });
 
         ContentReviewCompatability::done($compatibility);
 

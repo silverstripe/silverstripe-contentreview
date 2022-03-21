@@ -148,15 +148,25 @@ class PagesDueForReviewReport extends Report
 
     /**
      * @param array $params
+     * @param array|string|null $sort
+     * @param int|null $limit
      *
      * @return SS_List
      */
-    public function sourceRecords($params = [])
+    public function sourceRecords($params = [], $sort = null, $limit = null)
     {
         Versioned::set_stage(Versioned::DRAFT);
 
         $records = SiteTree::get();
         $compatibility = ContentReviewCompatability::start();
+
+        // Apply sort and limit if appropriate.
+        if ($sort !== null) {
+            $records = $records->sort($sort);
+        }
+        if ($limit !== null) {
+            $records = $records->limit($limit);
+        }
 
         if (empty($params['ReviewDateBefore']) && empty($params['ReviewDateAfter'])) {
             // If there's no review dates set, default to all pages due for review now

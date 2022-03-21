@@ -17,9 +17,6 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 
-/**
- * @mixin PHPUnit_Framework_TestCase
- */
 class ContentReviewCMSPageEditControllerTest extends ContentReviewBaseTest
 {
     /**
