@@ -77,8 +77,8 @@ class PagesDueForReviewReport extends Report
     public function columns()
     {
         $linkBase = singleton(CMSPageEditController::class)->Link("show");
-        $linkPath = parse_url($linkBase, PHP_URL_PATH);
-        $linkQuery = parse_url($linkBase, PHP_URL_QUERY);
+        $linkPath = parse_url($linkBase ?? '', PHP_URL_PATH);
+        $linkQuery = parse_url($linkBase ?? '', PHP_URL_QUERY);
 
         $fields = [
             "Title" => [
@@ -182,7 +182,7 @@ class PagesDueForReviewReport extends Report
                 // TODO Get value from DateField->dataValue() once we have access to form elements here
                 $nextReviewUnixSec = strtotime(
                     ' + 1 day',
-                    strtotime($params['ReviewDateBefore'])
+                    strtotime($params['ReviewDateBefore'] ?? '')
                 );
                 $records = $records->where(
                     sprintf(
@@ -209,7 +209,7 @@ class PagesDueForReviewReport extends Report
             $virtualPageClasses = ClassInfo::subclassesFor(VirtualPage::class);
             $records = $records->where(sprintf(
                 "\"SiteTree\".\"ClassName\" NOT IN ('%s')",
-                implode("','", array_values($virtualPageClasses))
+                implode("','", array_values($virtualPageClasses ?? []))
             ));
         }
 
