@@ -132,13 +132,13 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
                 $familyIDs = $group->collateFamilyIDs();
 
                 if (is_array($familyIDs)) {
-                    $groupIDs = array_merge($groupIDs, array_values($familyIDs));
+                    $groupIDs = array_merge($groupIDs, array_values($familyIDs ?? []));
                 }
             }
 
-            array_unique($groupIDs);
+            array_unique($groupIDs ?? []);
 
-            if (count($groupIDs)) {
+            if (count($groupIDs ?? [])) {
                 $groupMembers = DataObject::get(Member::class)
                     ->where("\"Group\".\"ID\" IN (" . implode(",", $groupIDs) . ")")
                     ->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
@@ -676,7 +676,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $runHour = Config::inst()->get(ContentReviewNotificationJob::class, "first_run_hour");
             $firstRunTime = date(
                 "Y-m-d H:i:s",
-                mktime($runHour, 0, 0, date("m"), date("d") + 1, date("y"))
+                mktime($runHour ?? 0, 0, 0, date("m"), date("d") + 1, date("y"))
             );
 
             singleton(QueuedJobService::class)->queueJob(

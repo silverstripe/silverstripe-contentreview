@@ -108,7 +108,7 @@ class ContentReviewNotificationJob extends AbstractQueuedJob implements QueuedJo
         $nextRun = new ContentReviewNotificationJob();
 
         $nextRunTime = mktime(
-            Config::inst()->get(__CLASS__, 'next_run_hour'),
+            Config::inst()->get(__CLASS__, 'next_run_hour') ?? 0,
             Config::inst()->get(__CLASS__, 'next_run_minute'),
             0,
             date("m"),
