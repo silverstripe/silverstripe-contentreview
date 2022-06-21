@@ -3,7 +3,7 @@
 namespace SilverStripe\ContentReview\Forms;
 
 use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
-use SilverStripe\ContentReview\Traits\ReviewPermission;
+use SilverStripe\ContentReview\Traits\PermissionChecker;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse;
@@ -20,7 +20,7 @@ use SilverStripe\Security\Security;
 class ReviewContentHandler
 {
     use Injectable;
-    use ReviewPermission;
+    use PermissionChecker;
 
     /**
      * Parent controller for this form
@@ -127,6 +127,6 @@ class ReviewContentHandler
             return false;
         }
 
-        return $this->canUseReviewContent($record, Security::getCurrentUser());
+        return $this->isContentReviewable($record, Security::getCurrentUser());
     }
 }
