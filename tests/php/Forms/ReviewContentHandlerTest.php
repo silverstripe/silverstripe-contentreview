@@ -45,6 +45,13 @@ class ReviewContentHandlerTest extends SapphireTest
         ReviewContentHandler::create()->submitReview(new Member, ['foo' => 'bar']);
     }
 
+    public function testExceptionThrownWhenSubmittingReviewForInvalidDataObject()
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('It seems you don\'t have the necessary permissions to submit a content review');
+        ReviewContentHandler::create()->submitReview(new Controller, ['foo' => 'bar']);
+    }
+
     public function testAddReviewNoteCalledWhenSubmittingReview()
     {
         $this->logInWithPermission('ADMIN');

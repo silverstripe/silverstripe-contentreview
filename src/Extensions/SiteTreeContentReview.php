@@ -512,11 +512,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      */
     public function canBeReviewedBy(Member $member = null)
     {
-        if (!$this->owner->obj("NextReviewDate")->exists()) {
+        if (!$this->owner->obj('NextReviewDate')->exists()) {
             return false;
         }
 
-        if ($this->owner->obj("NextReviewDate")->InFuture()) {
+        if ($this->owner->obj('NextReviewDate')->InFuture()) {
             return false;
         }
 
@@ -540,6 +540,11 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
 
         if (!$member) {
             return true;
+        }
+
+        // Check whether this user is allowed to review the content of the page.
+        if ($this->owner->hasMethod("canReviewContent") && !$this->owner->canReviewContent($member)) {
+            return false;
         }
 
         if ($member->inGroups($options->OwnerGroups())) {

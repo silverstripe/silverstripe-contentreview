@@ -9,6 +9,7 @@ use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
 use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
 use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
 use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -16,6 +17,7 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\ORM\ArrayList;
 
 class SiteTreeContentReviewTest extends ContentReviewBaseTest
 {
@@ -362,6 +364,40 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $emptyPage->NextReviewDate = '2020-02-20 12:00:00';
 
         $this->assertTrue($emptyPage->canBeReviewedBy($author));
+
+        DBDatetime::clear_mock_now();
+    }
+
+    public function testPermissionCheckByOnDataObject()
+    {
+        $reviewer = $this->objFromFixture(Member::class, 'editor');
+
+        // Mock Page class with canReviewContent method to return true on first call and false on second call
+        $mock = $this->getMockBuilder(Page::class)
+            ->setMethods(['canReviewContent', 'NextReviewDate', 'OwnerUsers'])
+            ->getMock();
+        $mock->expects($this->exactly(2))->method('canReviewContent')->willReturnOnConsecutiveCalls(false, true);
+        $mock->method('NextReviewDate')->willReturn('2020-02-20 12:00:00');
+        $mock->method('OwnerUsers')->willReturn(ArrayList::create([$reviewer]));
+        $mock->ContentReviewType = 'Custom';
+
+        /** @var SiteTreeContentReview $extension */
+        $extension = Injector::inst()->get(SiteTreeContentReview::class);
+        $extension->setOwner($mock);
+
+        // Assert that the user is not allowed to review content
+        $author = $this->objFromFixture(Member::class, 'author');
+        $this->assertFalse($extension->canBeReviewedBy($author));
+
+        DBDatetime::set_mock_now("2020-03-01 12:00:00");
+
+        // Assert that the user is allowed to review content
+        $this->assertTrue($extension->canBeReviewedBy($reviewer));
+
+        // Assert tht canBeReviewedBy return true if no user logged in
+        // This is for CLI execution for ContentReviewEmails task
+        $this->logOut();
+        $this->assertTrue($extension->canBeReviewedBy());
 
         DBDatetime::clear_mock_now();
     }

@@ -3,6 +3,7 @@
 namespace SilverStripe\ContentReview\Forms;
 
 use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
+use SilverStripe\ContentReview\Traits\PermissionChecker;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPResponse;
@@ -19,6 +20,7 @@ use SilverStripe\Security\Security;
 class ReviewContentHandler
 {
     use Injectable;
+    use PermissionChecker;
 
     /**
      * Parent controller for this form
@@ -120,12 +122,11 @@ class ReviewContentHandler
      */
     public function canSubmitReview($record)
     {
-        if (!$record->canEdit()
-            || !$record->hasMethod('canBeReviewedBy')
-            || !$record->canBeReviewedBy(Security::getCurrentUser())
-        ) {
+        // Ensure the parameter of correct data type
+        if (!$record instanceof DataObject) {
             return false;
         }
-        return true;
+
+        return $this->isContentReviewable($record, Security::getCurrentUser());
     }
 }

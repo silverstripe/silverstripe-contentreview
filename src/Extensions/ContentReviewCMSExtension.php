@@ -6,10 +6,10 @@ use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Admin\LeftAndMainExtension;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Forms\ReviewContentHandler;
+use SilverStripe\ContentReview\Traits\PermissionChecker;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
-use SilverStripe\Core\Convert;
 use SilverStripe\Forms\Form;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Security\Security;
@@ -20,6 +20,8 @@ use SilverStripe\Security\Security;
  */
 class ContentReviewCMSExtension extends LeftAndMainExtension
 {
+    use PermissionChecker;
+
     private static $allowed_actions = [
         'ReviewContentForm',
         'savereview',
@@ -48,7 +50,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
     {
         $page = $this->findRecord(['ID' => $id]);
         $user = Security::getCurrentUser();
-        if (!$page->canEdit() || ($page->hasMethod('canBeReviewedBy') && !$page->canBeReviewedBy($user))) {
+        if (!$this->isContentReviewable($page, $user)) {
             $this->owner->httpError(403, _t(
                 __CLASS__.'.ErrorItemPermissionDenied',
                 'It seems you don\'t have the necessary permissions to review this content'
