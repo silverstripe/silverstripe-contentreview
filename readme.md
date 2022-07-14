@@ -1,6 +1,6 @@
 # Content Review module
 
-[![Build Status](https://api.travis-ci.com/silverstripe/silverstripe-contentreview.svg?branch=4)](https://travis-ci.com/silverstripe/silverstripe-contentreview)
+[![CI](https://github.com/silverstripe/silverstripe-contentreview/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-contentreview/actions/workflows/ci.yml)
 [![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 [![Code quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/?branch=master)
 [![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-contentreview/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-contentreview)
