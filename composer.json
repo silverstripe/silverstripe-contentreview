@@ -29,7 +29,8 @@
     },
     "require-dev": {
         "silverstripe/recipe-testing": "^2",
-        "squizlabs/php_codesniffer": "^3"
+        "squizlabs/php_codesniffer": "^3",
+        "symbiote/silverstripe-queuedjobs": "^4.9"
     },
     "suggest": {
         "symbiote/silverstripe-queuedjobs": "Automatically schedules content review emails to be sent, only requiring one crontask to be created"
