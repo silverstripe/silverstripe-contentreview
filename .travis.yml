@@ -1,9 +1,0 @@
-version: ~> 1.0
-
-import:
-  - silverstripe/silverstripe-travis-shared:config/provision/standard-jobs-range-behat.yml
-
-env:
-  global:
-    - BEHAT_SUITE="contentreview"
-    - REQUIRE_EXTRA="symbiote/silverstripe-queuedjobs:^4"
