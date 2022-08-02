@@ -1,9 +1,7 @@
 # Content Review module
 
 [![CI](https://github.com/silverstripe/silverstripe-contentreview/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-contentreview/actions/workflows/ci.yml)
-[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
-[![Code quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-contentreview/?branch=master)
-[![Code coverage](https://codecov.io/gh/silverstripe/silverstripe-contentreview/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-contentreview)
+[![Silverstripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
 This module helps keep your website content accurate and up-to-date, which keeps your users happy.
 
@@ -17,9 +15,9 @@ There are two types of roles with this module.
 
 ## Requirements
 
- * SilverStripe ^4.0
+ * Silverstripe ^4.0
  
- **Note:** For SilverStripe 3.x, please use the [3.x release line](https://github.com/silverstripe/silverstripe-contentreview/tree/3).
+ **Note:** For Silverstripe 3.x, please use the [3.x release line](https://github.com/silverstripe/silverstripe-contentreview/tree/3).
 
 ## Features
 
