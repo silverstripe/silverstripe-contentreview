@@ -1,5 +1,7 @@
+---
 title: Content review
 summary: Mark pages in the CMS with a date and an owner for future reviews.
+---
 
 ## Content review
 
