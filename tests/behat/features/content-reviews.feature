@@ -6,14 +6,17 @@ Feature: Set up reviews
   Background:
     # Note: the review date is deliberately in the past
     Given a "page" "My page" with "Content"="<p>Welcome</p>", "NextReviewDate"="01/01/2017", "ReviewPeriodDays"="1"
-    And the "group" "EDITOR group" has permissions "CMS_ACCESS_LeftAndMain" and "FILE_EDIT_ALL"
-    And the "group" "FILEONLY group" has permissions "FILE_EDIT_ALL"
-    And a "member" "Ed" belonging to "EDITOR group" with "Email"="ed@example.com"
-    And a "member" "Phil" belonging to "FILEONLY group" with "Email"="phil@example.com"
-    # Login in as EDITOR once https://github.com/silverstripe/silverstripe-contentreview/pull/155 is merged
-    # And I am logged in with "EDITOR" permissions
-    And I am logged in with "ADMIN" permissions
+    And the "group" "ADMIN group" has permissions "Full administrative rights"
+    And the "group" "EDITOR" has permissions "CMS_ACCESS_CMSMain" and "EDIT_CONTENT_REVIEW_FIELDS"
+    And the "group" "AUTHOR" has permissions and  "CMS_ACCESS_LeftAndMain"
+    And the "group" "FILEONLY" has permissions "FILE_EDIT_ALL"
+    And the "group" "CMS_MAIN" has permissions "CMS_ACCESS_CMSMain"
+    And a "member" "Ed" belonging to "AUTHOR" with "Email"="ed@example.com"
+    And a "member" "Phil" belonging to "FILEONLY" with "Email"="phil@example.com"
+    And a "member" "Anna" belonging to "CMS_MAIN" with "Email"="anna@example.com"
+    And I am logged in as a member of "EDITOR" group
     And I go to "admin/pages"
+    And I wait for 1 second
     And I click on "My page" in the tree
     And I click the "Settings" CMS tab
     And I click the "Content review" CMS tab
@@ -24,10 +27,11 @@ Feature: Set up reviews
 
     # Test adding individual member based on them having access to the Pages section fo the CMS
     Then the "#Form_EditForm_OwnerUsers" select element should have an option with an "Ed" label
+    And the "#Form_EditForm_OwnerUsers" select element should have an option with an "Anna" label
     And the "#Form_EditForm_OwnerUsers" select element should not have an option with a "Phil" label
 
     # Test adding groups
-    Then the "#Form_EditForm_OwnerGroups" select element should have an option with an "EDITOR group" label
+    Then the "#Form_EditForm_OwnerGroups" select element should have an option with an "EDITOR" label
 
     # Required to avoid "unsaved changed" browser dialog
     Then I press the "Save" button
@@ -37,7 +41,7 @@ Feature: Set up reviews
     And I wait for 1 second
     Then I should not see the ".content-review__button" element
     When I press the "Save" button
-    And I select "ADMIN group" from "Groups"
+    And I select "EDITOR" from "Groups"
     And I press the "Save" button
     Then I should see the ".content-review__button" element
     When I click on the ".content-review__button" element
