@@ -397,7 +397,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
             $options
         );
 
-        $users = Permission::get_members_by_permission(["CMS_ACCESS_CMSMain", "ADMIN"]);
+        $users = Permission::get_members_by_permission(['CMS_ACCESS_CMSMain', 'CMS_ACCESS_LeftAndMain', 'ADMIN']);
 
         $usersMap = $users->map("ID", "Title")->toArray();
 
