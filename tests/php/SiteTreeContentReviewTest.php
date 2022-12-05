@@ -55,7 +55,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $page->write();
 
         $this->assertTrue($page->canPublish());
-        $this->assertTrue($page->doPublish());
+        $this->assertTrue($page->publishRecursive());
         $this->assertEquals($page->OwnerNames, "Test Editor", "Test Editor should be the owner");
 
         /** @var Page|SiteTreeContentReview $page */
@@ -119,7 +119,7 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
         $page->ReviewPeriodDays = 10;
         $page->write();
 
-        $this->assertTrue($page->doPublish());
+        $this->assertTrue($page->publishRecursive());
         $this->assertEquals(null, $page->NextReviewDate);
     }
 
