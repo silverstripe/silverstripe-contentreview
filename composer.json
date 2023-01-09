@@ -20,17 +20,17 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "silverstripe/vendor-plugin": "^1",
-        "silverstripe/framework": "^4.10",
-        "silverstripe/cms": "^4.2",
-        "silverstripe/reports": "^4.2",
-        "silverstripe/siteconfig": "^4.2"
+        "php": "^8.1",
+        "silverstripe/vendor-plugin": "^2",
+        "silverstripe/framework": "^5",
+        "silverstripe/cms": "^5",
+        "silverstripe/reports": "^5",
+        "silverstripe/siteconfig": "^5"
     },
     "require-dev": {
-        "silverstripe/recipe-testing": "^2",
+        "silverstripe/recipe-testing": "^3",
         "squizlabs/php_codesniffer": "^3",
-        "symbiote/silverstripe-queuedjobs": "^4.9"
+        "symbiote/silverstripe-queuedjobs": "^5"
     },
     "suggest": {
         "symbiote/silverstripe-queuedjobs": "Automatically schedules content review emails to be sent, only requiring one crontask to be created"
