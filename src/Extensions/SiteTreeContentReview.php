@@ -142,7 +142,6 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
                 $groupMembers = DataObject::get(Member::class)
                     ->where("\"Group\".\"ID\" IN (" . implode(",", $groupIDs) . ")")
                     ->leftJoin("Group_Members", "\"Member\".\"ID\" = \"Group_Members\".\"MemberID\"")
-                    /** @skipUpgrade */
                     ->leftJoin('Group', "\"Group_Members\".\"GroupID\" = \"Group\".\"ID\"");
 
                 $contentReviewOwners->merge($groupMembers);
