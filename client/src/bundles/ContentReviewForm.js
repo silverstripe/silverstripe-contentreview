@@ -2,7 +2,7 @@
 import i18n from 'i18n';
 import jQuery from 'jquery';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { loadComponent } from 'lib/Injector';
 
 const FormBuilderModal = loadComponent('FormBuilderModal');
@@ -12,7 +12,7 @@ const FormBuilderModal = loadComponent('FormBuilderModal');
  * silverstripe/admin for reference.
  */
 jQuery.entwine('ss', ($) => {
-	/**
+  /**
    * Kick off a "content due for review" dialog from the CMS actions.
    */
   $('.cms-content-actions .content-review__button').entwine({
@@ -42,10 +42,12 @@ jQuery.entwine('ss', ($) => {
     },
   });
 
-	/**
+  /**
    * Uses reactstrap in order to replicate the bootstrap styling and JavaScript behaviour.
    */
   $('#content-review__dialog-wrapper').entwine({
+    ReactRoot: null,
+
     onunmatch() {
       // solves errors given by ReactDOM "no matched root found" error.
       this._clearModal();
@@ -70,7 +72,12 @@ jQuery.entwine('ss', ($) => {
       const modalSchemaUrl = `${sectionConfig.form.ReviewContentForm.schemaUrl}/${id}`;
       const title = i18n._t('ContentReview.CONTENT_DUE_FOR_REVIEW', 'Content due for review');
 
-      ReactDOM.render(
+      let root = this.getReactRoot();
+      if (!root) {
+        root = createRoot(this[0]);
+        this.setReactRoot(root);
+      }
+      root.render(
         <FormBuilderModal
           title={title}
           isOpen={isOpen}
@@ -82,13 +89,16 @@ jQuery.entwine('ss', ($) => {
           responseClassBad="modal__response modal__response--error"
           responseClassGood="modal__response modal__response--good"
           identifier="ContentReview.CONTENT_DUE_FOR_REVIEW"
-        />,
-        this[0]
+        />
       );
     },
 
     _clearModal() {
-      ReactDOM.unmountComponentAtNode(this[0]);
+      const root = this.getReactRoot();
+      if (root) {
+        root.unmount();
+        this.setReactRoot(null);
+      }
     },
 
     _handleSubmitModal(data, action, submitFn) {
