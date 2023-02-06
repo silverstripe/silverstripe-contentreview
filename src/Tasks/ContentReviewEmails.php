@@ -4,6 +4,7 @@ namespace SilverStripe\ContentReview\Tasks;
 
 use Page;
 use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
+use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\BuildTask;
@@ -15,18 +16,24 @@ use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
-use SilverStripe\ContentReview\Models\ContentReviewLog;
 
 /**
  * Daily task to send emails to the owners of content items when the review date rolls around.
  */
 class ContentReviewEmails extends BuildTask
 {
+    private static $disablePreProd = false;
     /**
      * @param HTTPRequest $request
      */
     public function run($request)
     {
+        // If the $disablePreProd static has been set to true, don't run the task
+        if (!Director::isLive() && $this->config()->get('disablePreProd')) {
+            echo 'The Content review task has been disabled for pre-prod environments';
+            exit;
+        }
+
         $compatibility = ContentReviewCompatability::start();
 
         // First grab all the pages with a custom setting

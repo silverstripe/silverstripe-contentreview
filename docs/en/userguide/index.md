@@ -27,3 +27,12 @@ CMS users without the permission to change the content review schedule can still
 and previous reviews in the same view, but cannot change anything.
 
 ![Read only view of page content review settings](_images/content-review-settings-ro.png)
+
+## Disable for pre-prod environments
+
+The sending of emails can be disabled for pre-production environments. This may be needed if a production database is restored to a UAT environment.
+
+```
+SilverStripe\ContentReview\Tasks\ContentReviewEmails:
+  disablePreProd: true
+```
