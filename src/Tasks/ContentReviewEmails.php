@@ -4,7 +4,6 @@ namespace SilverStripe\ContentReview\Tasks;
 
 use Page;
 use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
-use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Dev\BuildTask;
@@ -22,15 +21,16 @@ use SilverStripe\View\SSViewer;
  */
 class ContentReviewEmails extends BuildTask
 {
-    private static $disablePreProd = false;
+    private static $send_emails = true;
+
     /**
      * @param HTTPRequest $request
      */
     public function run($request)
     {
-        // If the $disablePreProd static has been set to true, don't run the task
-        if (!Director::isLive() && $this->config()->get('disablePreProd')) {
-            echo 'The Content review task has been disabled for pre-prod environments';
+        // If the $send_emails static has been set to false, don't run the task
+        if (!$this->config()->get('send_emails')) {
+            echo 'The Content review task has been disabled';
             exit;
         }
 

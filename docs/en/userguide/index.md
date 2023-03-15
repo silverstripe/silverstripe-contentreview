@@ -30,9 +30,9 @@ and previous reviews in the same view, but cannot change anything.
 
 ## Disable for pre-prod environments
 
-The sending of emails can be disabled for pre-production environments. This may be needed if a production database is restored to a UAT environment.
+The sending of emails can be disabled. This feature may be needed for example, if a production database is restored to a UAT environment.
 
 ```
 SilverStripe\ContentReview\Tasks\ContentReviewEmails:
-  disablePreProd: true
+  send_emails: false
 ```
