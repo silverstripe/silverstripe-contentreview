@@ -31,7 +31,7 @@ class ContentReviewEmails extends BuildTask
         // If the $send_emails static has been set to false, don't run the task
         if (!$this->config()->get('send_emails')) {
             echo 'The Content review task has been disabled';
-            exit;
+            return;
         }
 
         $compatibility = ContentReviewCompatability::start();
