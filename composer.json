@@ -22,10 +22,10 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "silverstripe/vendor-plugin": "^1",
-        "silverstripe/framework": "4.13.x-dev",
-        "silverstripe/cms": "4.13.x-dev",
-        "silverstripe/reports": "4.13.x-dev",
-        "silverstripe/siteconfig": "4.13.x-dev"
+        "silverstripe/framework": "^4.10",
+        "silverstripe/cms": "^4.2",
+        "silverstripe/reports": "^4.2",
+        "silverstripe/siteconfig": "^4.2"
     },
     "require-dev": {
         "silverstripe/recipe-testing": "^2",
