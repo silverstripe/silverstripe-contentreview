@@ -15,7 +15,6 @@ use SilverStripe\Security\Member;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
-use SilverStripe\ContentReview\Models\ContentReviewLog;
 
 /**
  * Daily task to send emails to the owners of content items when the review date rolls around.
@@ -93,6 +92,12 @@ class ContentReviewEmails extends BuildTask
         // Prepare variables
         $siteConfig = SiteConfig::current_site_config();
         $owner = Member::get()->byID($ownerID);
+
+        if (!$this->isValidEmail($owner->Email)
+            || !$this->isValidEmail($siteConfig->ReviewFrom)) {
+            return;
+        }
+
         $templateVariables = $this->getTemplateVariables($owner, $siteConfig, $pages);
 
         // Build email
@@ -158,5 +163,20 @@ class ContentReviewEmails extends BuildTask
             'ToSurname' => $recipient->Surname,
             'ToEmail' => $recipient->Email,
         ];
+    }
+
+    /**
+     * Check validity of email
+     */
+    protected function isValidEmail(?string $email): bool
+    {
+        if (!$email
+            || empty($email)
+            || !filter_var($email, FILTER_VALIDATE_EMAIL)
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }
