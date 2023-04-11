@@ -3,6 +3,7 @@
 namespace SilverStripe\ContentReview\Tasks;
 
 use Page;
+use RuntimeException;
 use SilverStripe\ContentReview\Compatibility\ContentReviewCompatability;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Control\HTTPRequest;
@@ -21,11 +22,23 @@ use SilverStripe\View\SSViewer;
  */
 class ContentReviewEmails extends BuildTask
 {
+    private array $invalid_emails = [];
+
     /**
      * @param HTTPRequest $request
+     * @throws RuntimeException
      */
     public function run($request)
     {
+        if (!$this->isValidEmail($senderEmail = SiteConfig::current_site_config()->ReviewFrom)) {
+            throw new RuntimeException(
+                sprintf(
+                    'Provided sender email address is invalid: "%s".',
+                    $senderEmail
+                )
+            );
+        }
+
         $compatibility = ContentReviewCompatability::start();
 
         // First grab all the pages with a custom setting
@@ -41,6 +54,16 @@ class ContentReviewEmails extends BuildTask
         }
 
         ContentReviewCompatability::done($compatibility);
+
+        if (is_array($this->invalid_emails) && count($this->invalid_emails) > 0) {
+            $plural = count($this->invalid_emails) > 1 ? 's are' : ' is';
+            throw new RuntimeException(
+                sprintf(
+                    'Provided email' . $plural . ' invalid: "%s".',
+                    implode(', ', $this->invalid_emails)
+                )
+            );
+        }
     }
 
     /**
@@ -93,8 +116,9 @@ class ContentReviewEmails extends BuildTask
         $siteConfig = SiteConfig::current_site_config();
         $owner = Member::get()->byID($ownerID);
 
-        if (!$this->isValidEmail($owner->Email)
-            || !$this->isValidEmail($siteConfig->ReviewFrom)) {
+        if (!$this->isValidEmail($owner->Email)) {
+            $this->invalid_emails[] = $owner->Name . ': ' . $owner->Email;
+
             return;
         }
 
@@ -170,13 +194,6 @@ class ContentReviewEmails extends BuildTask
      */
     protected function isValidEmail(?string $email): bool
     {
-        if (!$email
-            || empty($email)
-            || !filter_var($email, FILTER_VALIDATE_EMAIL)
-        ) {
-            return false;
-        }
-
-        return true;
+        return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 }

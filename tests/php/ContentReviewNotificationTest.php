@@ -150,6 +150,7 @@ class ContentReviewNotificationTest extends SapphireTest
 
         $this->assertFalse($method->invokeArgs($task, [null]));
         $this->assertFalse($method->invokeArgs($task, ['broken.email']));
+        $this->assertFalse($method->invokeArgs($task, ['broken@email']));
     }
 
     /**
