@@ -3,6 +3,7 @@
 namespace SilverStripe\ContentReview\Tests;
 
 use Page;
+use ReflectionClass;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\CMS\Controllers\CMSPageEditController;
 use SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension;
@@ -130,6 +131,26 @@ class ContentReviewNotificationTest extends SapphireTest
         $this->assertNull($email);
 
         DBDatetime::clear_mock_now();
+    }
+
+    /**
+     * Test that provided email is valid
+     */
+    public function testIsValidEmail()
+    {
+        $class = new ReflectionClass(ContentReviewEmails::class);
+        $method = $class->getMethod('isValidEmail');
+        $method->setAccessible(true);
+
+        $member = $this->objFromFixture(Member::class, 'author');
+        $task = new ContentReviewEmails();
+
+        $this->assertTrue($method->invokeArgs($task, [$member->Email]));
+        $this->assertTrue($method->invokeArgs($task, ['correct.email@example.com']));
+
+        $this->assertFalse($method->invokeArgs($task, [null]));
+        $this->assertFalse($method->invokeArgs($task, ['broken.email']));
+        $this->assertFalse($method->invokeArgs($task, ['broken@email']));
     }
 
     /**
