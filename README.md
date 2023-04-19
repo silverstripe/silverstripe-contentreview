@@ -13,11 +13,11 @@ There are two types of roles with this module.
  * Website owner; (typically assigned to the Administrator group) ensures that a website is accurate and up-to-date, by delegating responsibility to content reviewers.
  * Content reviewer; responsible for keeping a website or part of a website accurate and up-to-date.
 
-## Requirements
+## Installation
 
- * Silverstripe ^4.0
- 
- **Note:** For Silverstripe 3.x, please use the [3.x release line](https://github.com/silverstripe/silverstripe-contentreview/tree/3).
+```sh
+composer require silverstripe/contentreview
+```
 
 ## Features
 
@@ -36,7 +36,7 @@ There are two types of roles with this module.
 ## Composer installation
 
 ```sh
-$ composer require silverstripe/contentreview
+composer require silverstripe/contentreview
 ```
 
 You'll also need to run `dev/build`.
