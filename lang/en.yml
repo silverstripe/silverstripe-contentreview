@@ -1,6 +1,6 @@
 en:
   SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension:
-    ErrorItemPermissionDenied: 'It seems you don''t have the necessary permissions to review this content'
+    ErrorItemPermissionDenied: "It seems you don't have the necessary permissions to review this content"
   SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings:
     ADDGROUP: 'Add groups'
     ADDUSERS: 'Add users'
@@ -15,6 +15,14 @@ en:
     PAGEOWNERUSERS: Users
     REVIEWFREQUENCY: 'Review frequency'
     REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future, whenever the page is published.'
+    db_ReviewBody: 'Review body'
+    db_ReviewFrom: 'Review from'
+    db_ReviewPeriodDays: 'Review period days'
+    db_ReviewSubject: 'Review subject'
+    many_many_ContentReviewGroups: 'Content review groups'
+    many_many_ContentReviewUsers: 'Content review users'
+  SilverStripe\ContentReview\Extensions\ContentReviewOwner:
+    many_many_SiteTreeContentReview: 'Site tree content review'
   SilverStripe\ContentReview\Extensions\SiteTreeContentReview:
     ADDGROUP: 'Add groups'
     ADDUSERS: 'Add users'
@@ -34,8 +42,16 @@ en:
     REVIEWFREQUENCYDESCRIPTION: 'The review date will be set to this far in the future whenever the page is published'
     REVIEWHEADER: 'Content review'
     SETTINGSFROM: 'Options are'
+    belongs_many_many_ContentReviewGroups: 'Content review groups'
+    belongs_many_many_ContentReviewUsers: 'Content review users'
+    db_ContentReviewType: 'Content review type'
+    db_LastEditedByName: 'Last edited by name'
+    db_NextReviewDate: 'Next review date'
+    db_OwnerNames: 'Owner names'
+    db_ReviewPeriodDays: 'Review period days'
+    has_many_ReviewLogs: 'Review logs'
   SilverStripe\ContentReview\Forms\ReviewContentHandler:
-    ErrorReviewPermissionDenied: 'It seems you don''t have the necessary permissions to submit a content review'
+    ErrorReviewPermissionDenied: "It seems you don't have the necessary permissions to submit a content review"
     MarkAsReviewedAction: 'Mark as reviewed'
     NoComments: '(no comments)'
     Placeholder: 'Add comments (optional)'
@@ -46,6 +62,9 @@ en:
       one: 'A Content Review Log'
       other: '{count} Content Review Logs'
     SINGULARNAME: 'Content Review Log'
+    db_Note: Note
+    has_one_Reviewer: Reviewer
+    has_one_SiteTree: 'Site tree'
   SilverStripe\ContentReview\Reports\PagesDueForReviewReport:
     ONLYMYPAGES: 'Only Show pages assigned to me'
     REVIEWDATEAFTER: 'Review date after or on'
