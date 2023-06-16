@@ -93,7 +93,7 @@ class ContentReviewNotificationJob extends AbstractQueuedJob implements QueuedJo
     {
         $this->queueNextRun();
 
-        $task = new ContentReviewEmails();
+        $task = ContentReviewEmails::create();
         $task->run(new HTTPRequest("GET", "/dev/tasks/ContentReviewEmails"));
 
         $this->currentStep = 1;
