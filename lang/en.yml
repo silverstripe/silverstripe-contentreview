@@ -21,6 +21,8 @@ en:
     db_ReviewSubject: 'Review subject'
     many_many_ContentReviewGroups: 'Content review groups'
     many_many_ContentReviewUsers: 'Content review users'
+  SilverStripe\ContentReview\Extensions\ContentReviewOwner:
+    many_many_SiteTreeContentReview: 'Site tree content review'
   SilverStripe\ContentReview\Extensions\SiteTreeContentReview:
     ADDGROUP: 'Add groups'
     ADDUSERS: 'Add users'
@@ -74,5 +76,3 @@ en:
   SilverStripe\ContentReview\Tasks\ContentReviewEmails:
     REVIEWPAGELINK: 'Review the page in the CMS'
     VIEWPUBLISHEDLINK: 'View this page on the website'
-  SilverStripe\ContentReview\Extensions\ContentReviewOwner:
-    many_many_SiteTreeContentReview: 'Site tree content review'
