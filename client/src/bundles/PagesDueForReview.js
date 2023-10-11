@@ -1,8 +1,5 @@
 import jQuery from 'jquery';
 
-/**
- * @todo Re-validate this with Subsites
- */
 jQuery.entwine('ss', ($) => {
   // Hide all owner dropdowns except the one for the current subsite
   function showCorrectSubsiteIDDropdown(value) {
