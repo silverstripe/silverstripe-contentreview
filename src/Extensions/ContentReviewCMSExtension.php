@@ -129,8 +129,6 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
      * Check if the current request has a X-Formschema-Request header set.
      * Used by conditional logic that responds to validation results
      *
-     * @todo Remove duplication. See https://github.com/silverstripe/silverstripe-admin/issues/240
-     *
      * @return bool
      */
     protected function getSchemaRequested()
@@ -141,8 +139,6 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
 
     /**
      * Generate schema for the given form based on the X-Formschema-Request header value
-     *
-     * @todo Remove duplication. See https://github.com/silverstripe/silverstripe-admin/issues/240
      *
      * @param string $schemaID ID for this schema. Required.
      * @param Form $form Required for 'state' or 'schema' response

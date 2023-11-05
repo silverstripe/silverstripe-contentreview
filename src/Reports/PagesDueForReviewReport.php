@@ -179,7 +179,6 @@ class PagesDueForReviewReport extends Report
         } else {
             // Review date before
             if (!empty($params['ReviewDateBefore'])) {
-                // TODO Get value from DateField->dataValue() once we have access to form elements here
                 $nextReviewUnixSec = strtotime(
                     ' + 1 day',
                     strtotime($params['ReviewDateBefore'] ?? '')
@@ -194,7 +193,6 @@ class PagesDueForReviewReport extends Report
 
             // Review date after
             if (!empty($params['ReviewDateAfter'])) {
-                // TODO Get value from DateField->dataValue() once we have access to form elements here
                 $records = $records->where(
                     sprintf(
                         "\"NextReviewDate\" >= '%s'",
