@@ -6,6 +6,9 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
 
+/**
+ * @method SilverStripe\ORM\ManyManyList<SiteTree> SiteTreeContentReview()
+ */
 class ContentReviewOwner extends DataExtension
 {
     /**
