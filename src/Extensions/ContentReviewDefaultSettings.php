@@ -20,6 +20,8 @@ use SilverStripe\Security\Permission;
  * review setting.
  *
  * @property int $ReviewPeriodDays
+ * @method SilverStripe\ORM\ManyManyList<Group> ContentReviewGroups()
+ * @method SilverStripe\ORM\ManyManyList<Member> ContentReviewUsers()
  */
 class ContentReviewDefaultSettings extends DataExtension
 {

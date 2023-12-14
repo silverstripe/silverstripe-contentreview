@@ -50,9 +50,9 @@ use Symbiote\QueuedJobs\Services\QueuedJobService;
  * @property string $LastEditedByName
  * @property string $OwnerNames
  *
- * @method DataList ReviewLogs()
- * @method DataList ContentReviewGroups()
- * @method DataList ContentReviewUsers()
+ * @method SilverStripe\ORM\ManyManyList<Group> ContentReviewGroups()
+ * @method SilverStripe\ORM\ManyManyList<Member> ContentReviewUsers()
+ * @method SilverStripe\ORM\HasManyList<ContentReviewLog> ReviewLogs()
  */
 class SiteTreeContentReview extends DataExtension implements PermissionProvider
 {
