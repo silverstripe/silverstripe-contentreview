@@ -7,6 +7,10 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 
+/**
+ * @method Member Reviewer()
+ * @method SiteTree SiteTree()
+ */
 class ContentReviewLog extends DataObject
 {
     /**
