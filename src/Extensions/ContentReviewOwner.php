@@ -5,9 +5,13 @@ namespace SilverStripe\ContentReview\Extensions;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
 
 /**
  * @method SilverStripe\ORM\ManyManyList<SiteTree> SiteTreeContentReview()
+ *
+ * @extends DataExtension<Group|Member>
  */
 class ContentReviewOwner extends DataExtension
 {

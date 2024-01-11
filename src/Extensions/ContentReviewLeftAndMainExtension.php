@@ -2,8 +2,12 @@
 
 namespace SilverStripe\ContentReview\Extensions;
 
+use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Admin\LeftAndMainExtension;
 
+/**
+ * @extends LeftAndMainExtension<LeftAndMain>
+ */
 class ContentReviewLeftAndMainExtension extends LeftAndMainExtension
 {
     /**
