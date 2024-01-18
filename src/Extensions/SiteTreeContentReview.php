@@ -53,6 +53,8 @@ use Symbiote\QueuedJobs\Services\QueuedJobService;
  * @method SilverStripe\ORM\ManyManyList<Group> ContentReviewGroups()
  * @method SilverStripe\ORM\ManyManyList<Member> ContentReviewUsers()
  * @method SilverStripe\ORM\HasManyList<ContentReviewLog> ReviewLogs()
+ *
+ * @extends DataExtension<SiteTree>
  */
 class SiteTreeContentReview extends DataExtension implements PermissionProvider
 {
@@ -119,7 +121,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      * @param SS_List $groups
      * @param SS_List $members
      *
-     * @return ArrayList
+     * @return ArrayList<Group|Member>
      */
     public static function merge_owners(SS_List $groups, SS_List $members)
     {
@@ -293,7 +295,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
      * Get all Members that are Content Owners to this page. This includes checking group
      * hierarchy and adding any direct users.
      *
-     * @return ArrayList
+     * @return ArrayList<Group|Member>
      */
     public function ContentReviewOwners()
     {
@@ -304,7 +306,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     }
 
     /**
-     * @return ManyManyList
+     * @return ManyManyList<Group>
      */
     public function OwnerGroups()
     {
@@ -312,7 +314,7 @@ class SiteTreeContentReview extends DataExtension implements PermissionProvider
     }
 
     /**
-     * @return ManyManyList
+     * @return ManyManyList<Member>
      */
     public function OwnerUsers()
     {

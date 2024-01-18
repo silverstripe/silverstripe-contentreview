@@ -14,6 +14,7 @@ use SilverStripe\ORM\DataExtension;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\SiteConfig\SiteConfig;
 
 /**
  * This extensions add a default schema for new pages and pages without a content
@@ -22,6 +23,8 @@ use SilverStripe\Security\Permission;
  * @property int $ReviewPeriodDays
  * @method SilverStripe\ORM\ManyManyList<Group> ContentReviewGroups()
  * @method SilverStripe\ORM\ManyManyList<Member> ContentReviewUsers()
+ *
+ * @extends DataExtension<SiteConfig>
  */
 class ContentReviewDefaultSettings extends DataExtension
 {
@@ -88,7 +91,7 @@ class ContentReviewDefaultSettings extends DataExtension
     }
 
     /**
-     * @return ManyManyList
+     * @return ManyManyList<Group>
      */
     public function OwnerGroups()
     {
@@ -96,7 +99,7 @@ class ContentReviewDefaultSettings extends DataExtension
     }
 
     /**
-     * @return ManyManyList
+     * @return ManyManyList<Member>
      */
     public function OwnerUsers()
     {
@@ -180,7 +183,7 @@ class ContentReviewDefaultSettings extends DataExtension
      * Get all Members that are default Content Owners. This includes checking group hierarchy
      * and adding any direct users.
      *
-     * @return ArrayList
+     * @return ArrayList<Group|Member>
      */
     public function ContentReviewOwners()
     {

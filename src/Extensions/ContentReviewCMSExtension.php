@@ -4,6 +4,7 @@ namespace SilverStripe\ContentReview\Extensions;
 
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\Admin\LeftAndMainExtension;
+use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Forms\ReviewContentHandler;
 use SilverStripe\ContentReview\Traits\PermissionChecker;
@@ -17,6 +18,8 @@ use SilverStripe\Security\Security;
 /**
  * CMSPageEditController extension to receive the additional action button from
  * SiteTreeContentReview::updateCMSActions()
+ *
+ * @extends LeftAndMainExtension<CMSMain>
  */
 class ContentReviewCMSExtension extends LeftAndMainExtension
 {
