@@ -27,6 +27,8 @@ use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
+use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\SS_List;
@@ -50,9 +52,9 @@ use Symbiote\QueuedJobs\Services\QueuedJobService;
  * @property string $LastEditedByName
  * @property string $OwnerNames
  *
- * @method SilverStripe\ORM\ManyManyList<Group> ContentReviewGroups()
- * @method SilverStripe\ORM\ManyManyList<Member> ContentReviewUsers()
- * @method SilverStripe\ORM\HasManyList<ContentReviewLog> ReviewLogs()
+ * @method ManyManyList<Group> ContentReviewGroups()
+ * @method ManyManyList<Member> ContentReviewUsers()
+ * @method HasManyList<ContentReviewLog> ReviewLogs()
  *
  * @extends DataExtension<SiteTree>
  */

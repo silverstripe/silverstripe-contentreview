@@ -11,6 +11,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\ManyManyList;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -21,8 +22,8 @@ use SilverStripe\SiteConfig\SiteConfig;
  * review setting.
  *
  * @property int $ReviewPeriodDays
- * @method SilverStripe\ORM\ManyManyList<Group> ContentReviewGroups()
- * @method SilverStripe\ORM\ManyManyList<Member> ContentReviewUsers()
+ * @method ManyManyList<Group> ContentReviewGroups()
+ * @method ManyManyList<Member> ContentReviewUsers()
  *
  * @extends DataExtension<SiteConfig>
  */
