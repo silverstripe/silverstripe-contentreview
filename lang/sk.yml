@@ -1,0 +1,80 @@
+sk:
+  SilverStripe\ContentReview\Extensions\ContentReviewCMSExtension:
+    ErrorItemPermissionDenied: 'Zdá sa, že nemáte potrebné oprávnenia na kontrolu tohto obsahu'
+  SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings:
+    ADDGROUP: 'Pridať skupiny'
+    ADDUSERS: 'Pridať používateľov'
+    DEFAULTSETTINGSHELP: 'Tieto nastavenia sa použijú na všetky stránky, ktoré nemajú špecifický plán kontroly obsahu.'
+    EMAILFROM: 'Z e-mailovej adresy'
+    EMAILFROM_RIGHTTITLE: 'napr.: do-not-reply@site.com'
+    EMAILSUBJECT: Predmet
+    EMAILTEMPLATE: 'Šablóna e-mailu'
+    OWNERGROUPSDESCRIPTION: 'Vlastníci stránok, ktorí sú zodpovední za kontrolu'
+    OWNERUSERSDESCRIPTION: 'Vlastníci stránok, ktorí sú zodpovední za kontrolu'
+    PAGEOWNERGROUPS: Skupiny
+    PAGEOWNERUSERS: Používatelia
+    REVIEWFREQUENCY: 'Frekvencia kontroly'
+    REVIEWFREQUENCYDESCRIPTION: 'Dátum kontroly bude nastavený na tento dátum v budúcnosti, bez ohľadu na to, kedy bude stránka zverejnená.'
+    db_ReviewBody: 'Revízny orgán'
+    db_ReviewFrom: 'Kontrola od'
+    db_ReviewPeriodDays: 'Dni periódy kontroly'
+    db_ReviewSubject: 'Predmet kontroly'
+    many_many_ContentReviewGroups: 'Skupiny kontroly obsahu'
+    many_many_ContentReviewUsers: 'Používatelia kontroly obsahu'
+  SilverStripe\ContentReview\Extensions\ContentReviewOwner:
+    many_many_SiteTreeContentReview: 'Kontrola obsahu stromu stránok'
+  SilverStripe\ContentReview\Extensions\SiteTreeContentReview:
+    ADDGROUP: 'Pridať skupiny'
+    ADDUSERS: 'Pridať používateľov'
+    CONTENTOWNERS: 'Vlastníci obsahu'
+    CONTENTREVIEW: 'Obsah určený na kontrolu'
+    CUSTOM: 'Vlastné nastavenia'
+    DISABLE: 'Zakázať kontrolu obsahu'
+    INHERIT: 'Zdediť z nadradenej stránky'
+    NEXTREVIEWDATADESCRIPTION: 'Ak nechcete vyplniť kontrolu, ponechajte pole prázdne'
+    NEXTREVIEWDATE: 'Dátum ďalšej kontroly'
+    OPTIONS: Možnosti
+    OWNERGROUPSDESCRIPTION: 'Vlastníci stránok, ktorí sú zodpovední za kontrolu'
+    OWNERUSERSDESCRIPTION: 'Vlastníci stránok, ktorí sú zodpovední za kontrolu'
+    PAGEOWNERGROUPS: Skupiny
+    PAGEOWNERUSERS: Používatelia
+    REVIEWFREQUENCY: 'Frekvencia kontroly'
+    REVIEWFREQUENCYDESCRIPTION: 'Dátum kontroly bude nastavený na tento dátum v budúcnosti, bez ohľadu na to, kedy bude stránka zverejnená.'
+    REVIEWHEADER: 'Kontrola obsahu'
+    SETTINGSFROM: 'Možnosti sú'
+    belongs_many_many_ContentReviewGroups: 'Skupiny kontroly obsahu'
+    belongs_many_many_ContentReviewUsers: 'Používatelia kontroly obsahu'
+    db_ContentReviewType: 'Typ kontroly obsahu'
+    db_LastEditedByName: 'Naposledy upravené podľa mena'
+    db_NextReviewDate: 'Dátum ďalšej kontroly'
+    db_OwnerNames: 'Mená vlastníkov'
+    db_ReviewPeriodDays: 'Dni periódy kontroly'
+    has_many_ReviewLogs: 'Záznamy z kontroly'
+  SilverStripe\ContentReview\Forms\ReviewContentHandler:
+    ErrorReviewPermissionDenied: 'Zdá sa, že nemáte potrebné oprávnenia na odoslanie kontroly obsahu'
+    MarkAsReviewedAction: 'Označiť ako skontrolované'
+    NoComments: '(bez komentára)'
+    Placeholder: 'Pridať komentáre (voliteľné)'
+    Success: 'Kontrola bola úspešne pridaná'
+  SilverStripe\ContentReview\Models\ContentReviewLog:
+    PLURALNAME: 'Záznamy z kontroly obsahu'
+    PLURALS:
+      few: '{count} záznamy z kontroly obsahu'
+      many: '{count} záznamov z kontroly obsahu'
+      one: 'Záznam z kontroly obsahu'
+      other: '{count} záznamov z kontroly obsahu'
+    SINGULARNAME: 'Záznam z kontroly obsahu'
+    db_Note: Poznámka
+    has_one_Reviewer: Kontrolór
+    has_one_SiteTree: 'Strom stránok'
+  SilverStripe\ContentReview\Reports\PagesDueForReviewReport:
+    ONLYMYPAGES: 'Zobraziť iba mne priradené stránky'
+    REVIEWDATEAFTER: 'Dátum kontroly po'
+    REVIEWDATEBEFORE: 'Dátum kontroly pred'
+    SHOWVIRTUALPAGES: 'Zobraziť virtuálne stránky'
+    TITLE: 'Stránky určené na kontrolu'
+  SilverStripe\ContentReview\Reports\PagesWithoutReviewScheduleReport:
+    TITLE: 'Stránky bez naplánovanej kontroly.'
+  SilverStripe\ContentReview\Tasks\ContentReviewEmails:
+    REVIEWPAGELINK: 'Skontrolujte stránku v CMS'
+    VIEWPUBLISHEDLINK: 'Pozrite si túto stránku na webe'
