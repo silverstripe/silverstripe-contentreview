@@ -222,9 +222,14 @@ class ContentReviewDefaultSettings extends DataExtension
         if ($from) {
             return $from;
         }
-
         // Fall back to admin email
-        return Config::inst()->get(Email::class, 'admin_email');
+        $adminEmail = Config::inst()->get(Email::class, 'admin_email');
+        if (is_array($adminEmail)) {
+            // May be configured using an array ['admin-email@mysite.text' => 'Admin email label']
+            // https://docs.silverstripe.org/en/developer_guides/email/#administrator-emails
+            return array_values(array_keys($adminEmail))[0];
+        }
+        return $adminEmail;
     }
 
     /**
