@@ -12,6 +12,7 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Forms\Form;
+use SilverStripe\Forms\Schema\FormSchema;
 use SilverStripe\ORM\ValidationResult;
 use SilverStripe\Security\Security;
 
@@ -136,7 +137,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
      */
     protected function getSchemaRequested()
     {
-        $parts = $this->owner->getRequest()->getHeader(LeftAndMain::SCHEMA_HEADER);
+        $parts = $this->owner->getRequest()->getHeader(FormSchema::SCHEMA_HEADER);
         return !empty($parts);
     }
 
@@ -151,7 +152,7 @@ class ContentReviewCMSExtension extends LeftAndMainExtension
      */
     protected function getSchemaResponse($schemaID, $form = null, ValidationResult $errors = null, $extraData = [])
     {
-        $parts = $this->owner->getRequest()->getHeader(LeftAndMain::SCHEMA_HEADER);
+        $parts = $this->owner->getRequest()->getHeader(FormSchema::SCHEMA_HEADER);
         $data = $this->owner
             ->getFormSchema()
             ->getMultipartSchema($parts, $schemaID, $form, $errors);
