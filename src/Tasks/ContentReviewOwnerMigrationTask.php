@@ -9,7 +9,7 @@ use SilverStripe\ORM\DB;
 
 /**
  * Task which migrates the ContentReview Module's SiteTree->OwnerID column to a new column name.
- * @deprecated 5.4.0 Will be removed without equivalent functionality to replace it
+ * @deprecated 5.4.0 Will be removed without equivalent functionality to replace it in a future major release
  */
 class ContentReviewOwnerMigrationTask extends BuildTask
 {
@@ -19,7 +19,7 @@ class ContentReviewOwnerMigrationTask extends BuildTask
         Deprecation::withSuppressedNotice(function () {
             Deprecation::notice(
                 '5.4.0',
-                'Will be removed without equivalent functionality to replace it',
+                'Will be removed without equivalent functionality to replace it in a future major release',
                 Deprecation::SCOPE_CLASS
             );
         });
