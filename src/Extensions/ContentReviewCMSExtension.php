@@ -149,7 +149,7 @@ class ContentReviewCMSExtension extends Extension
      * @param array $extraData Any extra data to be merged with the schema response
      * @return HTTPResponse
      */
-    protected function getSchemaResponse($schemaID, $form = null, ValidationResult $errors = null, $extraData = [])
+    protected function getSchemaResponse($schemaID, $form = null, ?ValidationResult $errors = null, $extraData = [])
     {
         $parts = $this->owner->getRequest()->getHeader(FormSchema::SCHEMA_HEADER);
         $data = $this->owner

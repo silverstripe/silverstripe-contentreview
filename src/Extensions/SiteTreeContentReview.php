@@ -196,7 +196,7 @@ class SiteTreeContentReview extends Extension implements PermissionProvider
      *
      * @return null|DBDate
      */
-    public function getReviewDate(SiteTree $page = null)
+    public function getReviewDate(?SiteTree $page = null)
     {
         if ($page === null) {
             $page = $this->owner;
@@ -527,7 +527,7 @@ class SiteTreeContentReview extends Extension implements PermissionProvider
      *
      * @return bool
      */
-    public function canBeReviewedBy(Member $member = null)
+    public function canBeReviewedBy(?Member $member = null)
     {
         if (!$this->owner->obj('NextReviewDate')->exists()) {
             return false;
