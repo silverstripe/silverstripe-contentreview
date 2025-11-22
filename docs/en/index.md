@@ -1,5 +1,15 @@
 # Content Review module developer documentation
 
+## Installation
+
+```bash
+composer require silverstripe/contentreview
+```
+
+## GitHub repository
+
+<https://github.com/silverstripe/silverstripe-contentreview>
+
 ## Configuration
 
 ### Global settings
