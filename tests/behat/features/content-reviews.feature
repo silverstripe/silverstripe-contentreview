@@ -53,6 +53,6 @@ Feature: Set up reviews
     And I press "Mark as reviewed"
     And I wait for 1 second
     Then I should see "Review successfully added"
-    When I click on the ".close" element
+    When I click on the ".btn-close" element
     And I press the "Save" button
     Then I should see "My review"
