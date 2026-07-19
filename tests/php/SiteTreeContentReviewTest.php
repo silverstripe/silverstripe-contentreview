@@ -401,4 +401,49 @@ class SiteTreeContentReviewTest extends ContentReviewBaseTest
 
         DBDatetime::clear_mock_now();
     }
+
+    public function testAdvanceReviewDateDoesNotPublishUnrelatedDraftChanges()
+    {
+        /** @var \Page|SiteTreeContentReview $page */
+        $page = new \Page();
+        $page->Title = 'Review sync test';
+        $page->Content = 'Original content';
+        $page->ContentReviewType = 'Custom';
+        $page->ReviewPeriodDays = 30;
+        $page->write();
+        $page->publishRecursive();
+
+        // Make an unrelated, unpublished draft edit
+        $page->Content = 'Draft-only edit';
+        $page->write();
+
+        $page->advanceReviewDate();
+
+        /** @var \Page $live */
+        $live = Versioned::get_by_stage(\Page::class, Versioned::LIVE)->byID($page->ID);
+        /** @var \Page $draft */
+        $draft = Versioned::get_by_stage(\Page::class, Versioned::DRAFT)->byID($page->ID);
+
+        $this->assertNotNull($draft->NextReviewDate);
+        $this->assertEquals($draft->NextReviewDate, $live->NextReviewDate);
+        $this->assertEquals('Original content', $live->Content);
+        $this->assertEquals('Draft-only edit', $draft->Content);
+    }
+
+    public function testAdvanceReviewDateDoesNotAffectUnpublishedPages()
+    {
+        /** @var \Page|SiteTreeContentReview $page */
+        $page = new \Page();
+        $page->Title = 'Unpublished review test';
+        $page->ContentReviewType = 'Custom';
+        $page->ReviewPeriodDays = 30;
+        $page->write();
+
+        $this->assertFalse($page->isPublished());
+
+        $page->advanceReviewDate();
+
+        $draft = Versioned::get_by_stage(\Page::class, Versioned::DRAFT)->byID($page->ID);
+        $this->assertNotNull($draft->NextReviewDate);
+    }
 }
