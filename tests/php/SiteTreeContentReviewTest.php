@@ -10,11 +10,14 @@ use SilverStripe\ContentReview\Extensions\ContentReviewDefaultSettings;
 use SilverStripe\ContentReview\Extensions\ContentReviewOwner;
 use SilverStripe\ContentReview\Extensions\SiteTreeContentReview;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
 use SilverStripe\SiteConfig\SiteConfig;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\Model\List\ArrayList;
@@ -398,6 +401,40 @@ class SiteTreeContentReviewTest extends FunctionalTest
         // This is for CLI execution for ContentReviewEmails task
         $this->logOut();
         $this->assertTrue($extension->canBeReviewedBy());
+
+        DBDatetime::clear_mock_now();
+    }
+
+    public function testReadOnlyReviewNotesCreatedColumnIsCastAsDate()
+    {
+        DBDatetime::set_mock_now('2020-03-01 12:00:00');
+
+        /** @var Member $author */
+        $author = $this->objFromFixture(Member::class, 'author');
+        $this->logInAs($author);
+
+        // The read-only fields are only built for members without edit rights on the review fields
+        $this->assertFalse(Permission::check('EDIT_CONTENT_REVIEW_FIELDS'));
+
+        /** @var Page|SiteTreeContentReview $page */
+        $page = $this->objFromFixture(Page::class, 'staff');
+        $page->addReviewNote($author, 'Reviewed');
+
+        $logs = $page->getSettingsFields()->dataFieldByName('ROReviewNotes');
+        $this->assertInstanceOf(GridField::class, $logs);
+
+        $columns = $logs->getConfig()->getComponentByType(GridFieldDataColumns::class);
+        $this->assertSame(
+            [DBDatetime::class . '->FormatFromSettings'],
+            array_values($columns->getFieldCasting())
+        );
+
+        // Rendering the column is what throws when the casting is not a DBField
+        $log = $page->ReviewLogs()->first();
+        $this->assertStringContainsString(
+            '2020',
+            (string) $columns->getColumnContent($logs, $log, 'Created')
+        );
 
         DBDatetime::clear_mock_now();
     }
