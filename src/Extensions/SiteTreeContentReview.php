@@ -2,6 +2,7 @@
 
 namespace SilverStripe\ContentReview\Extensions;
 
+use Exception;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ContentReview\Jobs\ContentReviewNotificationJob;
 use SilverStripe\ContentReview\Models\ContentReviewLog;
