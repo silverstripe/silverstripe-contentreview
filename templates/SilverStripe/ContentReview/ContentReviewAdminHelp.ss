@@ -1,10 +1,16 @@
 <p>This is a list of dynamic variables that you can use in the email templates.</p>
 
-<ul>
-	<li>&#36;Subject - Email subject line</li>
-	<li>&#36;PagesCount - Number of pages pending review</li>
-	<li>&#36;FromEmail - Sender email address</li>
-	<li>&#36;ToFirstName - The email receivers first name</li>
-	<li>&#36;ToSurname - The email receivers surname</li>
-	<li>&#36;ToEmail - The email receivers email</li>
-</ul>
+<dl>
+    <dt>&#36;Subject</dt>
+    <dd>Email subject line</dd>
+    <dt>&#36;PagesCount</dt>
+    <dd>Number of pages pending review</dd>
+    <dt>&#36;FromEmail</dt>
+    <dd>Sender email address</dd>
+    <dt>&#36;ToFirstName</dt>
+    <dd>The email receivers first name</dd>
+    <dt>&#36;ToSurname</dt>
+    <dd>The email receivers surname</dd>
+    <dt>&#36;ToEmail</dt>
+    <dd>The email receivers email</dd>
+</dl>
