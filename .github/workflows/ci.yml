@@ -8,15 +8,4 @@ on:
 jobs:
   ci:
     name: CI
-    uses: silverstripe/gha-ci/.github/workflows/ci.yml@v1
-    with:
-      # PHP 8.4 is already covered by the dynamic matrix as the highest supported
-      # version. 8.5 is not, so add it explicitly to keep compatibility verified.
-      extra_jobs: |
-        - php: '8.5'
-          db: mysql84
-          phpunit: true
-          phpunit_suite: all
-        - php: '8.5'
-          db: mysql84
-          phplinting: true
+    uses: silverstripe/gha-ci/.github/workflows/ci.yml@v2
