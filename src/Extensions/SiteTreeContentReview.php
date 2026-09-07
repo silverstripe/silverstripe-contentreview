@@ -25,17 +25,19 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Model\List\ArrayList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\HasManyList;
-use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Model\List\SS_List;
+use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\Queries\SQLUpdate;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Security;
 use SilverStripe\SiteConfig\SiteConfig;
+use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
 use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
@@ -508,15 +510,59 @@ class SiteTreeContentReview extends Extension implements PermissionProvider
                 DBDatetime::now()->getTimestamp()
             );
             $this->owner->NextReviewDate = DBDate::create()->setValue($nextDateTimestamp)->Format(DBDate::ISO_DATE);
-            $this->owner->write();
+            $this->writeNextReviewDateToStages();
         }
 
         if ($options && $options->ReviewPeriodDays == 0) {
             $this->owner->NextReviewDate = null;
-            $this->owner->write();
+            $this->writeNextReviewDateToStages();
         }
 
         return (bool)$nextDateTimestamp;
+    }
+
+    /**
+     * Patch NextReviewDate directly on the draft table, and the live table if published,
+     * bypassing DataObject::write(). A normal write() bumps the Version column, which
+     * causes SiteTree::isModifiedOnDraft() to report the page as "Modified" purely
+     * because its review date advanced, even with no other changes.
+     * Genuine unpublished draft changes still show as "Modified", since they already move
+     * draft's Version ahead of live's independently of this method.
+     *
+     * @return void
+     */
+    private function writeNextReviewDateToStages()
+    {
+        // Fall back to a normal write for records that don't exist in the database yet -
+        // there's no draft row to patch, and this keeps creation behaviour unchanged.
+        if (!$this->owner->isInDB()) {
+            $this->owner->write();
+
+            return;
+        }
+
+        $schema = DataObject::getSchema();
+        $table  = $schema->tableForField(get_class($this->owner), 'NextReviewDate');
+
+        if (!$table) {
+            return;
+        }
+
+        $stages = [Versioned::DRAFT];
+
+        if ($this->owner->isPublished()) {
+            $stages[] = Versioned::LIVE;
+        }
+
+        foreach ($stages as $stage) {
+            $stageTable = $this->owner->stageTable($table, $stage);
+
+            SQLUpdate::create(
+                '"' . $stageTable . '"',
+                ['"NextReviewDate"' => $this->owner->NextReviewDate],
+                ['"ID"'             => $this->owner->ID]
+            )->execute();
+        }
     }
 
     /**
