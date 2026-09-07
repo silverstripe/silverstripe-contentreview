@@ -6,3 +6,5 @@
 /.scrutinizer.yml export-ignore
 /.phpcs.xml.dist export-ignore
 /.codecov.yml export-ignore
+/.yarnrc.yml export-ignore
+/yarn.lock export-ignore
