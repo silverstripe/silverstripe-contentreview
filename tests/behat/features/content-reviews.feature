@@ -24,6 +24,10 @@ Feature: Set up reviews
   Scenario: I can set content reviewers to users and groups who can edit pages
     When I select "Custom settings" from "Options" input group
     And I wait for 1 second
+    # Save before asserting rather than afterwards, so the form is never left dirty. A dirty
+    # form can raise the browser's "unsaved changes" dialog part way through the scenario,
+    # which kills the WebDriver session instead of failing an assertion.
+    And I press the "Save" button
 
     # Test adding individual member based on them having access to the Pages section fo the CMS
     Then the "#Form_EditForm_OwnerUsers" select element should have an option with an "Ed" label
@@ -32,9 +36,6 @@ Feature: Set up reviews
 
     # Test adding groups
     Then the "#Form_EditForm_OwnerGroups" select element should have an option with an "EDITOR" label
-
-    # Required to avoid "unsaved changed" browser dialog
-    Then I press the "Save" button
 
   Scenario: There is an alert icon when a content review is overdue
     When I select "Custom settings" from "Options" input group
